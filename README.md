@@ -42,19 +42,27 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 ---
 
+## Project Schedule
+
+Goal: finish one week early (target **Nov 29**).  
+Keep everything TypeScript (frontend + backend) and aligned directly with rubric wording.
+
+---
+
 ### Oct 29
 
 #### Estimates
 **Rubric Items**
-- [ ] GitHub repo + README proposal + 10 views list  
-- [ ] CI/CD pipeline (build + lint + fail-on-lint)  
-- [ ] Kubernetes scaffold (namespace + deployment + ingress)
+- [ ] Technology: CI/CD pipeline  
+- [ ] Technology: linting in pipeline  
+- [ ] Technology: Developer type helping (typescript)  
+- [ ] Technology: 10+ pages or views  
 
 **Features**
+- [ ] GitHub repo + README proposal + 10 views list  
 - [ ] Router with 10 view stubs (TypeScript frontend)  
-- [ ] Basic AppShell + one layout component  
 - [ ] Toast provider + error boundary wrappers  
-
+- [ ] Create client and server
 #### Delivered
 **Rubric Items:**  
 **Features:**
@@ -65,9 +73,10 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] Global client state (store or React Context)  
-- [ ] Auth foundation (Google OAuth skeleton)  
-- [ ] Route guards (public / protected)  
+- [ ] Technology: Client side state stores (e.g. tanstack query or context)  
+- [ ] Technology: authentication and user account support  
+- [ ] Technology: authorized pages and public pages  
+- [ ] Technology: Toasts / global notifications or alerts  
 
 **Features**
 - [ ] Home (Login) + Dashboard + Calendar (static grid)  
@@ -84,13 +93,15 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] Postgres connected (`events_cache`, `agent_actions`, `oauth_tokens`)  
-- [ ] Server error handling (API + render)
+- [ ] Technology: use local storage  
+- [ ] Technology: Error handling (both on api requests and render errors)  
+- [ ] Technology: Network Calls that read and write data  
 
 **Features**
+- [ ] Postgres connected (`events_cache`, `agent_actions`, `oauth_tokens`)  
 - [ ] Settings View (work / school hour defaults)  
 - [ ] Zod schemas (Event, FreeSlot, ActionLogEntry)  
-- [ ] Create Event Form (simple validation)
+- [ ] Create Event Form (simple validation)  
 
 #### Delivered
 **Rubric Items:**  
@@ -102,13 +113,14 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] Unit test scaffold + CI test job  
-- [ ] Google OAuth (Auth Code + PKCE) + encrypted token storage  
-- [ ] Network calls (read events + create event)
+- [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
+- [ ] Technology: authentication and user account support (OAuth integration)  
+- [ ] Technology: Network Calls that read and write data  
 
 **Features**
+- [ ] Google OAuth (Auth Code + PKCE) + encrypted token storage  
 - [ ] Calendar → Create Event flow (confirm → save → navigate)  
-- [ ] Reusable input #3 (TimeRangePicker or AttendeeSelect)
+- [ ] Reusable input #3 (TimeRangePicker or AttendeeSelect)  
 
 #### Delivered
 **Rubric Items:**  
@@ -120,15 +132,16 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] **Additional Task: Working with Pictures (OCR endpoint)**  
-- [ ] **Image Review page (verify/edit parsed times)**  
-- [ ] Autonomous action `suggestFreeTimeSlots` (highlights UI)  
-- [ ] Confirmation action `createEvent` integrated  
-- [ ] Zod output validation for slots and events
+- [ ] Project scope is 2–3 times larger than Inventory Management (per group member)  
+- [ ] Additional Task: Working with Pictures (OCR endpoint)  
+- [ ] Technology: 3+ generic form input components  
+- [ ] Technology: 4+ generic layout components  
 
 **Features**
+- [ ] Image Review page (verify/edit parsed times)  
 - [ ] Compare Schedule page (upload photo or add participant)  
-- [ ] Convert parsed events → availability windows  
+- [ ] Autonomous action `suggestFreeTimeSlots`  
+- [ ] Confirmation action `createEvent` integrated  
 
 #### Delivered
 **Rubric Items:**  
@@ -140,12 +153,15 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] Agent loop MVP (`AI Chat` view stream + confirm/deny)  
-- [ ] Persist decisions in `agent_actions` + show Action Log  
+- [ ] Technology: Client side state stores (e.g. tanstack query or context)  
+- [ ] Technology: Network Calls that read and write data  
+- [ ] Technology: Toasts / global notifications or alerts  
 
 **Features**
+- [ ] Agent loop MVP (`AI Chat` view stream + confirm/deny)  
+- [ ] Persist decisions in `agent_actions` + show Action Log  
 - [ ] `rescheduleEvent` wired with confirm  
-- [ ] Animations + spinners + disabled buttons  
+- [ ] Spinners and disabled states  
 
 #### Delivered
 **Rubric Items:**  
@@ -157,10 +173,13 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] `compareSchedulesAndPropose` (ranked meeting slots)  
-- [ ] Confirmation → `createEvent`  
+- [ ] Technology: 3+ generic form input components  
+- [ ] Technology: 4+ generic layout components  
+- [ ] Technology: Network Calls that read and write data  
 
 **Features**
+- [ ] `compareSchedulesAndPropose` (ranked meeting slots)  
+- [ ] Confirmation → `createEvent`  
 - [ ] Compare Schedule view shows top slots + reasons  
 - [ ] Event Detail page (conflict display)  
 
@@ -174,13 +193,14 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] Insights View Zod schema (weekly summary)  
-- [ ] Mobile responsive (≥ 3 layout reorders)  
-- [ ] 3 reusable inputs + 2 layout components confirmed  
+- [ ] Experience: all experiences mobile friendly  
+- [ ] Experience: 3 instances where elements re-order themselves on smaller screens  
+- [ ] Professional, organized and smooth experience  
 
 **Features**
-- [ ] Insights / Analytics View (simple charts or list summary)  
+- [ ] Responsive layout pass (≥ 3 reorders)  
 - [ ] Help View (usage + consent notes)  
+- [ ] Polish empty states and layout transitions  
 
 #### Delivered
 **Rubric Items:**  
@@ -192,12 +212,14 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] CI tests + lint must pass for deployment  
-- [ ] Production Kubernetes deployment live (public URL)
+- [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
+- [ ] Technology: linting in pipeline  
+- [ ] Technology: CI/CD pipeline  
+- [ ] Production deployment (Kubernetes public URL)
 
 **Features**
-- [ ] Polish empty states + minor UI cleanup  
-- [ ] Small UX improvements  
+- [ ] CI tests + lint must pass for deployment  
+- [ ] Polish UX details and bug fixes  
 
 #### Delivered
 **Rubric Items:**  
@@ -209,12 +231,12 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] CI/CD hardening (secrets + prod config)  
-- [ ] Code review & cleanup  
+- [ ] Technology: CI/CD pipeline  
+- [ ] Professional, organized and smooth experience  
 
 **Features**
-- [ ] Edge-case error toasts  
-- [ ] Documentation polish  
+- [ ] CI/CD hardening (secrets + prod config)  
+- [ ] Documentation and cleanup  
 
 #### Delivered
 **Rubric Items:**  
@@ -226,12 +248,12 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 #### Estimates
 **Rubric Items**
-- [ ] Final rubric checklist pass  
-- [ ] Demo script + screenshots/gif  
+- [ ] Professional, organized and smooth experience  
 
 **Features**
-- [ ] Performance tuning  
-- [ ] Any overflow bug fixes  
+- [ ] Final rubric checklist pass  
+- [ ] Demo script + screenshots/gif  
+- [ ] Performance tuning and overflow fixes  
 
 #### Delivered
 **Rubric Items:**  
