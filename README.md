@@ -37,16 +37,6 @@ To analyze calendar pictures for the schedule comparison.
 ###########################################################################################
 ## Project Schedule
 
-Goal: finish one week early (target **Nov 29**).  
-Keep everything TypeScript (frontend + backend) and focused on the required rubric items.
-
----
-
-## Project Schedule
-
- (target **Nov 29**).  
----
-
 ### Oct 29
 
 #### Estimates
