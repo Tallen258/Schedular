@@ -1,0 +1,11 @@
+{
+	"dependencies": {
+		"jose": "^6.1.0",
+		"react-hot-toast": "^2.6.0",
+		"react-router-dom": "^7.9.5",
+		"zod": "^4.1.12"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19"
+	}
+}
