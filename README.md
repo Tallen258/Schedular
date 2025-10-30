@@ -44,9 +44,7 @@ Keep everything TypeScript (frontend + backend) and focused on the required rubr
 
 ## Project Schedule
 
-Goal: finish one week early (target **Nov 29**).  
-Keep everything TypeScript (frontend + backend) and aligned directly with rubric wording.
-
+ (target **Nov 29**).  
 ---
 
 ### Oct 29
