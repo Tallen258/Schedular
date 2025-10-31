@@ -38,28 +38,30 @@ jobs:
         with: 
             version: 10
 
-      - name: Make datetime tag (UTC)
-        id: dt
-        run: echo "val=$(date -u +%Y%m%dT%H%M%SZ)" >> "$GITHUB_OUTPUT"
-
       - name: Build & Push CLIENT
         uses: docker/build-push-action@v6
         with:
-            context: ./client
-            file: ./client/Dockerfile
-            push: true
-            platforms: linux/amd64
-            tags: |
-                ${{ secrets.DOCKERHUB_USERNAME }}/schedular-client:${{ steps.dt.outputs.val }}
-                ${{ secrets.DOCKERHUB_USERNAME }}/schedular-client:latest
+          context: ./client
+          file: ./client/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.DH_USER }}/schedular-client:${{ steps.dt.outputs.val }}
+            ${{ env.DH_USER }}/schedular-client:latest
+          build-args: |
+            VITE_API_BASE=/api
+          cache-from: type=gha,scope=client
+          cache-to: type=gha,mode=max,scope=client
 
       - name: Build & Push SERVER
         uses: docker/build-push-action@v6
         with:
-            context: ./server
-            file: ./server/Dockerfile
-            push: true
-            platforms: linux/amd64
-            tags: |
-                ${{ secrets.DOCKERHUB_USERNAME }}/schedular-server:${{ steps.dt.outputs.val }}
-                ${{ secrets.DOCKERHUB_USERNAME }}/schedular-server:latest
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.DH_USER }}/schedular-server:${{ steps.dt.outputs.val }}
+            ${{ env.DH_USER }}/schedular-server:latest
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,mode=max,scope=server
