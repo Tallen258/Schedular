@@ -9,7 +9,7 @@ services:
       - NODE_ENV=development
       - VITE_API_URL=http://localhost:3000
     volumes:
-      - "C:/Users/myjee/fall25/Frontend/final/Schedular/client:/app"
+      - ./client:/app
       - /app/node_modules
     command: >
       sh -c "corepack enable &&
@@ -29,7 +29,7 @@ services:
       - NODE_ENV=development
       - PORT=3000
     volumes:
-      - "C:/Users/myjee/fall25/Backend/final/Schedular/server:/app"
+      - ./server:/app
       - /app/node_modules
     command: >
       sh -c "corepack enable &&
