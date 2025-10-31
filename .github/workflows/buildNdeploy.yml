@@ -21,9 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -33,35 +30,18 @@ jobs:
           username: ${{ env.DH_USER }}
           password: ${{ env.DH_TOKEN }}
         
-      - name: install pnpm
-        uses: pnpm/action-setup@v2
-        with: 
-            version: 10
+      - name: Build & Push CLIENT (bash)
+        run: |
+          docker build  \
+            -f ./client/Dockerfile \
+            -t ${{ env.DH_USER }}/schedular-client:${GITHUB_SHA::7} \
+            --build-arg VITE_API_BASE=/api
+          docker push ${{ env.DH_USER }}/schedular-client:${GITHUB_SHA::7}
 
-      - name: Build & Push CLIENT
-        uses: docker/build-push-action@v6
-        with:
-          context: ./client
-          file: ./client/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.DH_USER }}/schedular-client:${{ steps.dt.outputs.val }}
-            ${{ env.DH_USER }}/schedular-client:latest
-          build-args: |
-            VITE_API_BASE=/api
-          cache-from: type=gha,scope=client
-          cache-to: type=gha,mode=max,scope=client
-
-      - name: Build & Push SERVER
-        uses: docker/build-push-action@v6
-        with:
-          context: ./server
-          file: ./server/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.DH_USER }}/schedular-server:${{ steps.dt.outputs.val }}
-            ${{ env.DH_USER }}/schedular-server:latest
-          cache-from: type=gha,scope=server
-          cache-to: type=gha,mode=max,scope=server
+      - name: Build & Push SERVER (bash)
+        run: |
+          docker build  \
+            -f ./server/Dockerfile \
+            -t ${{ env.DH_USER }}/schedular-server:${GITHUB_SHA::7}
+          docker push ${{ env.DH_USER }}/schedular-server:${GITHUB_SHA::7}
+            
