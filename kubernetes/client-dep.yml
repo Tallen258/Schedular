@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-taft-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-taft-pod
+  template:
+    metadata:
+      labels:
+        app: client-taft-pod
+    spec:
+      containers:
+        - name: proj-schedular
+          image: taftallen/gitea:1.23.1
+          ports:
+            - containerPort: 3000
+          # (optional) relax probes for now, or point to a live path:
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20
