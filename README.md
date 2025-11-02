@@ -41,16 +41,16 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: CI/CD pipeline  
+- [X] Technology: CI/CD pipeline  
 - [ ] Technology: linting in pipeline  
-- [ ] Technology: Developer type helping (typescript)  
+- [X] Technology: Developer type helping (typescript)  
 - [ ] Technology: 10+ pages or views  
 
 **Features**
-- [ ] GitHub repo + README proposal + 10 views list  
-- [ ] Router with 10 view stubs (TypeScript frontend)  
+- [X] GitHub repo + README proposal + 10 views list  
+- [X] Router with 10 view stubs (TypeScript frontend)  
 - [ ] Toast provider + error boundary wrappers  
-- [ ] Create client and server
+- [X] Create client and server
 #### Delivered
 **Rubric Items:**  
 **Features:**
@@ -62,12 +62,12 @@ To analyze calendar pictures for the schedule comparison.
 #### Estimates
 **Rubric Items**
 - [ ] Technology: Client side state stores (e.g. tanstack query or context)  
-- [ ] Technology: authentication and user account support  
+- [X] Technology: authentication and user account support  
 - [ ] Technology: authorized pages and public pages  
 - [ ] Technology: Toasts / global notifications or alerts  
 
 **Features**
-- [ ] Home (Login) + Dashboard + Calendar (static grid)  
+- [X] Home (Login) + Dashboard + Calendar (static grid)  
 - [ ] Reusable inputs v1: DateTimePicker, Toggle, Select  
 - [ ] Toasts on simple navigation/actions  
 
