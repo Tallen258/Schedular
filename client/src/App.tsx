@@ -2,21 +2,29 @@ import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
+import Home from "./pages/home";
 
 // Simple error boundary (render-level)
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
   try {
     return <>{children}</>;
   } catch {
-    return <div role="alert" className="p-4 text-red-700 bg-red-100 rounded">
-      Something went wrong rendering this view.
-    </div>;
+    return (
+      <div role="alert" className="p-4 text-red-700 bg-red-100 rounded">
+        Something went wrong rendering this view.
+      </div>
+    );
   }
 }
 
+// Minimal splash for OIDC callback route
+function AuthCallback() {
+  // With react-oidc-context, the provider's onSigninCallback normally handles finishing the sign-in.
+  // This page just shows a friendly spinner while that happens.
+  return <div className="p-4">Finishing sign-in…</div>;
+}
 
 // ---- 10 view stubs ----
-function Home() { return <h1>Home</h1>; }
 function Dashboard() { return <h1>Dashboard (Upcoming + Free Slots)</h1>; }
 function CalendarView() { return <h1>Calendar</h1>; }
 function CreateEvent() { return <h1>Create Event</h1>; }
@@ -32,24 +40,33 @@ export default function App() {
   return (
     <>
       <Toaster position="top-center" />
-        <ErrorBoundary>
-          <Suspense fallback={<div className="p-4">Loading…</div>}>
-            <Routes>
-              <Route path="/" element={<Navigate to="/home" replace />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/calendar" element={<CalendarView />} />
-              <Route path="/events/new" element={<CreateEvent />} />
-              <Route path="/events/:id" element={<EventDetail />} />
-              <Route path="/compare" element={<CompareSchedules />} />
-              <Route path="/image-review" element={<ImageReview />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/chat" element={<AIChat />} />
-              <Route path="*" element={<div className="p-4">Not Found</div>} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
+      <ErrorBoundary>
+        <Suspense fallback={<div className="p-4">Loading…</div>}>
+          <Routes>
+            {/* Redirect root to /home */}
+            <Route index element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<Home />} />
+
+            {/* OIDC callback route (must match your redirect_uri path) */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+
+            {/* If your post_logout_redirect_uri is /account, funnel it to /home */}
+            <Route path="/account" element={<Navigate to="/home" replace />} />
+
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/calendar" element={<CalendarView />} />
+            <Route path="/events/new" element={<CreateEvent />} />
+            <Route path="/events/:id" element={<EventDetail />} />
+            <Route path="/compare" element={<CompareSchedules />} />
+            <Route path="/image-review" element={<ImageReview />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/chat" element={<AIChat />} />
+
+            <Route path="*" element={<div className="p-4">Not Found</div>} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 }

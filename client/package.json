@@ -15,9 +15,11 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "dompurify": "^3.2.7",
     "marked": "^16.3.0",
+    "oidc-client-ts": "^3.3.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-oidc-context": "^3.3.0",
     "react-router-dom": "^7.9.3",
     "tailwindcss": "^4.1.13",
     "zod": "^3.23.8"
