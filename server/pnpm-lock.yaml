@@ -14,6 +14,12 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.21.2
+      jose:
+        specifier: ^6.1.0
+        version: 6.1.0
+      ts-jose:
+        specifier: ^6.0.11
+        version: 6.0.11
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -544,6 +550,12 @@ packages:
     resolution: {integrity: sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==}
     hasBin: true
 
+  jose@6.0.11:
+    resolution: {integrity: sha512-QxG7EaliDARm1O1S8BGakqncGT9s25bKL1WSf6/oa17Tkqwi8D2ZNglqCF+DsYF88/rV66Q/Q2mFAy697E1DUg==}
+
+  jose@6.1.0:
+    resolution: {integrity: sha512-TTQJyoEoKcC1lscpVDCSsVgYzUDg/0Bt3WE//WiTPK6uOCQC2KZS4MpugbMWt/zyjkopgZoXhZuCi00gLudfUA==}
+
   js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
@@ -786,6 +798,10 @@ packages:
   touch@3.1.1:
     resolution: {integrity: sha512-r0eojU4bI8MnHr8c5bNo7lJDdI2qXlWWJk6a9EAFG7vbhTjElYhBVS3/miuE0uOuoLdb8Mc/rVfsmm6eo5o9GA==}
     hasBin: true
+
+  ts-jose@6.0.11:
+    resolution: {integrity: sha512-2QePQyWln44FdBmAT5cqk9ekydgd68GNGxfbFpcITUCNClgKgfUOeG/pP1XnFwKoOQQ0rs91IFXX8AZqw9H+jg==}
+    engines: {node: '>=20'}
 
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -1408,6 +1424,10 @@ snapshots:
   jiti@2.6.1:
     optional: true
 
+  jose@6.0.11: {}
+
+  jose@6.1.0: {}
+
   js-yaml@4.1.0:
     dependencies:
       argparse: 2.0.1
@@ -1639,6 +1659,10 @@ snapshots:
   toidentifier@1.0.1: {}
 
   touch@3.1.1: {}
+
+  ts-jose@6.0.11:
+    dependencies:
+      jose: 6.0.11
 
   ts-node@10.9.2(@types/node@20.19.24)(typescript@5.9.3):
     dependencies:

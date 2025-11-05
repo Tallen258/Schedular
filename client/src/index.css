@@ -1,68 +1,175 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
+  /* neutrals */
+  --color-warm-neutral: #fcfcfc;
+  --color-blue-white: #efece6; /* repurposed to a soft parchment */
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --color-custom-white: #fffdfa;
+  --color-custom-black: #0e0f16;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* === Itinerary Sand (brown/tan) scale === */
+  --color-itin-sand-10:  #fffdfa;
+  --color-itin-sand-50:  #faf3e7;
+  --color-itin-sand-100: #f2e4cc;
+  --color-itin-sand-200: #e6d3ae;
+  --color-itin-sand-300: #d9c196;
+  --color-itin-sand-400: #c8a97a; /* tan */
+  --color-itin-sand-500: #b18557; /* camel */
+  --color-itin-sand-600: #91653c; /* saddle */
+  --color-itin-sand-700: #744e30;
+  --color-itin-sand-800: #563a25;
+  --color-itin-sand-900: #3a2818;
+  --color-itin-sand-950: #22170f;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  /* keep your accent families as-is */
+  --color-brand-purple-50: #E3DCF4;
+  --color-brand-purple-400: #8774B3;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  --color-brand-teal-50: #eaefef;
+  --color-brand-teal-100: #b8cfce;
+  --color-brand-teal-200: #a0c1bf;
+  --color-brand-teal-300: #8cafac;
+  --color-brand-teal-400: #709994;
+  --color-brand-teal-500: #4e756e;
+  --color-brand-teal-600: #365650;
+  --color-brand-teal-700: #2c3f3c;
+  --color-brand-teal-800: #243330;
+  --color-brand-teal-900: #1c2322;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  --color-custom-red-50: #FFF7F7;
+  --color-custom-red-500: #B37171;
+  --color-custom-red-700: #8F4C4C;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer components {
+  .btn-primary {
+    @apply bg-itin-sand-600 text-itin-sand-10 font-semibold border-none;
+    @apply px-6 py-3 rounded-lg;
   }
-  a:hover {
-    color: #747bff;
+
+  .btn-primary:hover {
+    @apply bg-itin-sand-700 shadow-lg;
   }
-  button {
-    background-color: #f9f9f9;
+
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
   }
+
+  .btn-secondary {
+    @apply bg-itin-sand-100 text-itin-sand-700;
+    @apply text-sm font-semibold;
+    @apply px-4 py-2 rounded-2xl;
+    @apply transition-all duration-200 cursor-pointer;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-itin-sand-200 text-itin-sand-800;
+  }
+
+  .btn-tertiary {
+    @apply text-itin-sand-500 bg-transparent border-none p-2;
+    @apply font-normal cursor-pointer transition-all duration-200;
+  }
+
+  .btn-tertiary:hover {
+    @apply text-itin-sand-700 underline underline-offset-2;
+    text-decoration-color: theme("colors.itin-sand.200");
+  }
+
+  .segment-action-btn {
+    @apply ml-2 px-3 py-1 bg-itin-sand-50 text-itin-sand-600 rounded text-sm hover:bg-itin-sand-100;
+    @apply transition-all duration-200 cursor-pointer;
+    @apply opacity-80;
+  }
+
+  .card {
+    @apply bg-custom-white border-none;
+    @apply rounded-xl border shadow-sm;
+    @apply transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply shadow-md;
+  }
+
+  .form-input {
+    @apply bg-white border-2 border-itin-sand-50 text-itin-sand-800;
+    @apply px-4 py-3 w-full rounded-xl;
+    @apply transition-all duration-200;
+  }
+
+  .form-input:focus {
+    @apply outline-none border-itin-sand-200 shadow-md;
+  }
+
+  .form-input:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .form-label {
+    @apply text-itin-sand-800;
+    @apply font-semibold mb-2 block;
+  }
+
+  .accent-bar {
+    @apply w-16 h-1 rounded;
+    @apply bg-itin-sand-300;
+  }
+
+  .accent-bar-large {
+    @apply w-24 h-1 rounded;
+    @apply bg-itin-sand-300;
+  }
+
+  .text-itin-sand-800 { @apply text-itin-sand-800; }
+  .text-itin-sand-700 { @apply text-itin-sand-700; }
+  .text-itin-sand-600 { @apply text-itin-sand-600; }
+  .text-itin-sand-500 { @apply text-itin-sand-500; }
+  .text-itin-sand-400 { @apply text-itin-sand-400; }
+
+  .bg-itin-sand-50 { @apply bg-itin-sand-50; }
+
+  .border-itin-sand-100 { @apply border-itin-sand-100; }
+  .border-itin-sand-200 { @apply border-itin-sand-200; }
+
+  .no-underline { @apply no-underline; }
+  .text-gray-600 { @apply text-gray-600; }
+
+  h1 {
+    @apply text-4xl font-semibold mb-4;
+    @apply text-itin-sand-800;
+  }
+
+  .itin-header {
+    @apply text-5xl font-semibold mb-4;
+    @apply text-itin-sand-700;
+    font-family: "Archivo Black", sans-serif;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold mb-3;
+    @apply text-itin-sand-700;
+  }
+
+  h3 {
+    @apply text-xl font-extrabold mb-2 mt-4;
+    @apply text-itin-sand-700;
+  }
+
+  hr {
+    @apply border-itin-sand-100;
+    border-width: 1px;
+  }
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100vh;
+  background-color: #faf3e7; /* light tan canvas */
+  font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
