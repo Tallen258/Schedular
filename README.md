@@ -44,16 +44,17 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Technology: CI/CD pipeline  
 - [ ] Technology: linting in pipeline  
 - [X] Technology: Developer type helping (typescript)  
-- [ ] Technology: 10+ pages or views  
+- [X] Technology: 10+ pages or views  
 
 **Features**
 - [X] GitHub repo + README proposal + 10 views list  
 - [X] Router with 10 view stubs (TypeScript frontend)  
-- [ ] Toast provider + error boundary wrappers  
+- [X] Toast provider + error boundary wrappers  
 - [X] Create client and server
+
 #### Delivered
-**Rubric Items:**  
-**Features:**
+**Rubric Items:** ✅ CI/CD pipeline, ✅ TypeScript, ✅ 10+ views
+**Features:** ✅ All features completed
 
 ---
 
@@ -61,19 +62,19 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: Client side state stores (e.g. tanstack query or context)  
+- [X] Technology: Client side state stores (e.g. tanstack query or context)  
 - [X] Technology: authentication and user account support  
-- [ ] Technology: authorized pages and public pages  
-- [ ] Technology: Toasts / global notifications or alerts  
+- [X] Technology: authorized pages and public pages  
+- [X] Technology: Toasts / global notifications or alerts  
 
 **Features**
 - [X] Home (Login) + Dashboard + Calendar (static grid)  
 - [ ] Reusable inputs v1: DateTimePicker, Toggle, Select  
-- [ ] Toasts on simple navigation/actions  
+- [X] Toasts on simple navigation/actions  
 
 #### Delivered
-**Rubric Items:**  
-**Features:**
+**Rubric Items:** ✅ TanStack Query, ✅ Authentication (OIDC), ✅ Auth/Public pages, ✅ Toasts
+**Features:** ✅ Home/Dashboard/Calendar views, ✅ Toast notifications
 
 ---
 
@@ -82,18 +83,18 @@ To analyze calendar pictures for the schedule comparison.
 #### Estimates
 **Rubric Items**
 - [ ] Technology: use local storage  
-- [ ] Technology: Error handling (both on api requests and render errors)  
-- [ ] Technology: Network Calls that read and write data  
+- [X] Technology: Error handling (both on api requests and render errors)  
+- [X] Technology: Network Calls that read and write data  
 
 **Features**
-- [ ] Postgres connected (`events_cache`, `agent_actions`, `oauth_tokens`)  
+- [X] Postgres connected (`google_tokens` table created, `events_cache`, `agent_actions` pending)  
 - [ ] Settings View (work / school hour defaults)  
 - [ ] Zod schemas (Event, FreeSlot, ActionLogEntry)  
 - [ ] Create Event Form (simple validation)  
 
 #### Delivered
-**Rubric Items:**  
-**Features:**
+**Rubric Items:** ✅ Error handling, ✅ Network calls (API endpoints working)
+**Features:** ✅ PostgreSQL database setup with Docker, ✅ Google OAuth token storage, ✅ Frontend-backend integration complete
 
 ---
 

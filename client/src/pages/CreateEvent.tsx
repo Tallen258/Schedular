@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CreateEvent: React.FC = () => {
+const CreateEvent = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-2xl card p-6">

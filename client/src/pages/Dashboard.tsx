@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-4xl card p-6">

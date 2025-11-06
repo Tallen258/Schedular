@@ -1,6 +1,5 @@
-import React from 'react';
 
-const CompareSchedule: React.FC = () => {
+const CompareSchedule = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-3xl card p-6">

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./pages/home";
+import Calendar from "./pages/Calendar";
 import NavBar from "./components/NavBar";
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -24,7 +25,6 @@ function AuthCallback() {
 
 // ---- 10 view stubs ----
 function Dashboard() { return <h1>Dashboard (Upcoming + Free Slots)</h1>; }
-function CalendarView() { return <h1>Calendar</h1>; }
 function CreateEvent() { return <h1>Create Event</h1>; }
 function EventDetail() { return <h1>Event Detail</h1>; }
 function CompareSchedules() { return <h1>Compare Schedules (Upload)</h1>; }
@@ -54,7 +54,7 @@ export default function App() {
               <Route path="/account" element={<Navigate to="/home" replace />} />
 
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/calendar" element={<CalendarView />} />
+              <Route path="/calendar" element={<Calendar />} />
               <Route path="/events/new" element={<CreateEvent />} />
               <Route path="/events/:id" element={<EventDetail />} />
               <Route path="/compare" element={<CompareSchedules />} />
