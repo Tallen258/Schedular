@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CreateEvent = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
