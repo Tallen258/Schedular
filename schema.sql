@@ -23,12 +23,14 @@ create table if not exists events (
   start_time timestamptz not null,
   end_time timestamptz not null,
   all_day boolean default false,
+  google_event_id text,
   created_at timestamptz default now() not null,
   updated_at timestamptz default now() not null
 );
 
 create index if not exists idx_events_user_email on events(user_email);
 create index if not exists idx_events_start_time on events(start_time);
+create index if not exists idx_events_google_event_id on events(google_event_id);
 
 -- ============================================================================
 -- Helper Functions

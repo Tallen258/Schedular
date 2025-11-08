@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";
 import MyCalendar, { type RbcEvent } from "../components/myCalendar";
+import SyncGoogleCalendar from "../components/SyncGoogleCalendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const Calendar = () => {
@@ -46,6 +47,9 @@ const Calendar = () => {
             </button>
           </div>
         </header>
+
+        {/* Google Calendar Sync Section */}
+        <SyncGoogleCalendar />
 
         {isLoading && (
           <div className="card p-6">

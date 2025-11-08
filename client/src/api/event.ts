@@ -133,6 +133,76 @@ export const getTodaysEvents = async (): Promise<Event[]> => {
 };
 
 // ============================================================================
+// Google Calendar API Functions
+// ============================================================================
+
+export interface GoogleCalendarEvent {
+  id: string;
+  summary: string;
+  start: string | null;
+  end: string | null;
+  location: string | null;
+  attendees: { email: string; responseStatus?: string }[];
+  hangoutLink: string | null;
+}
+
+export interface GoogleCalendarResponse {
+  items: GoogleCalendarEvent[];
+}
+
+/**
+ * Start Google Calendar OAuth flow
+ */
+export const startGoogleCalendarAuth = async (): Promise<{ url: string }> => {
+  const response = await api.post<{ url: string }>('/api/auth/google/start', {});
+  return response.data;
+};
+
+/**
+ * Get upcoming Google Calendar events
+ */
+export const getGoogleCalendarEvents = async (): Promise<GoogleCalendarEvent[]> => {
+  const response = await api.get<GoogleCalendarResponse>('/api/google/calendar/upcoming');
+  return response.data.items ?? [];
+};
+
+/**
+ * Sync Google Calendar events to local database
+ */
+export const syncGoogleCalendarEvents = async (): Promise<{
+  success: boolean;
+  imported: number;
+  skipped: number;
+  total: number;
+  events: Event[];
+}> => {
+  const response = await api.post<{
+    success: boolean;
+    imported: number;
+    skipped: number;
+    total: number;
+    events: Event[];
+  }>('/api/google/calendar/sync', {});
+  return response.data;
+};
+
+/**
+ * Import a single Google Calendar event to local database
+ */
+export const importGoogleCalendarEvent = async (eventId: string): Promise<{
+  success: boolean;
+  event: Event;
+  action: 'created' | 'updated';
+}> => {
+  const response = await api.post<{
+    success: boolean;
+    event: Event;
+    action: 'created' | 'updated';
+  }>(`/api/google/calendar/import/${eventId}`, {});
+  return response.data;
+};
+
+// ============================================================================
 // Export all
 // ============================================================================
 
@@ -145,4 +215,9 @@ export const eventApi = {
   getEventsByDateRange,
   getUpcomingEvents,
   getTodaysEvents,
+  // Google Calendar functions
+  startGoogleCalendarAuth,
+  getGoogleCalendarEvents,
+  syncGoogleCalendarEvents,
+  importGoogleCalendarEvent,
 };
