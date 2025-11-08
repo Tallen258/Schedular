@@ -329,6 +329,181 @@ app.get("/api/calendar/events", (req: Request, res: Response) => {
 });
 
 /* ──────────────────────────────────────────────────────────────
+   Events CRUD API
+   ────────────────────────────────────────────────────────────── */
+
+/**
+ * GET /api/events - List all events for the authenticated user
+ */
+app.get("/api/events", async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.email) return res.status(401).send("Login required");
+    
+    if (!db) {
+      return res.status(503).json({ error: "Database not configured" });
+    }
+
+    const events = await db.any(`
+      select id, user_email, title, description, location, 
+             start_time, end_time, all_day, created_at, updated_at
+      from events
+      where user_email = $1
+      order by start_time asc
+    `, [req.user.email]);
+
+    res.json({ events });
+  } catch (e: any) {
+    console.error("Error fetching events:", e);
+    res.status(500).json({ error: e.message ?? "Failed to fetch events" });
+  }
+});
+
+/**
+ * GET /api/events/:id - Get a single event by ID
+ */
+app.get("/api/events/:id", async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.email) return res.status(401).send("Login required");
+    
+    if (!db) {
+      return res.status(503).json({ error: "Database not configured" });
+    }
+
+    const event = await db.oneOrNone(`
+      select id, user_email, title, description, location, 
+             start_time, end_time, all_day, created_at, updated_at
+      from events
+      where id = $1 and user_email = $2
+    `, [req.params.id, req.user.email]);
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json({ event });
+  } catch (e: any) {
+    console.error("Error fetching event:", e);
+    res.status(500).json({ error: e.message ?? "Failed to fetch event" });
+  }
+});
+
+/**
+ * POST /api/events - Create a new event
+ */
+app.post("/api/events", async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.email) return res.status(401).send("Login required");
+    
+    if (!db) {
+      return res.status(503).json({ error: "Database not configured" });
+    }
+
+    const { title, description, location, start_time, end_time, all_day } = req.body;
+
+    // Validation
+    if (!title || !start_time || !end_time) {
+      return res.status(400).json({ 
+        error: "Missing required fields: title, start_time, end_time" 
+      });
+    }
+
+    const event = await db.one(`
+      insert into events (user_email, title, description, location, start_time, end_time, all_day)
+      values ($1, $2, $3, $4, $5, $6, $7)
+      returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
+    `, [
+      req.user.email,
+      title,
+      description || null,
+      location || null,
+      start_time,
+      end_time,
+      all_day || false
+    ]);
+
+    res.status(201).json({ event });
+  } catch (e: any) {
+    console.error("Error creating event:", e);
+    res.status(500).json({ error: e.message ?? "Failed to create event" });
+  }
+});
+
+/**
+ * PUT /api/events/:id - Update an existing event
+ */
+app.put("/api/events/:id", async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.email) return res.status(401).send("Login required");
+    
+    if (!db) {
+      return res.status(503).json({ error: "Database not configured" });
+    }
+
+    const { title, description, location, start_time, end_time, all_day } = req.body;
+
+    // Validation
+    if (!title || !start_time || !end_time) {
+      return res.status(400).json({ 
+        error: "Missing required fields: title, start_time, end_time" 
+      });
+    }
+
+    const event = await db.oneOrNone(`
+      update events
+      set title = $3, description = $4, location = $5, 
+          start_time = $6, end_time = $7, all_day = $8
+      where id = $1 and user_email = $2
+      returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
+    `, [
+      req.params.id,
+      req.user.email,
+      title,
+      description || null,
+      location || null,
+      start_time,
+      end_time,
+      all_day || false
+    ]);
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json({ event });
+  } catch (e: any) {
+    console.error("Error updating event:", e);
+    res.status(500).json({ error: e.message ?? "Failed to update event" });
+  }
+});
+
+/**
+ * DELETE /api/events/:id - Delete an event
+ */
+app.delete("/api/events/:id", async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.email) return res.status(401).send("Login required");
+    
+    if (!db) {
+      return res.status(503).json({ error: "Database not configured" });
+    }
+
+    const result = await db.result(`
+      delete from events
+      where id = $1 and user_email = $2
+    `, [req.params.id, req.user.email]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json({ success: true, message: "Event deleted" });
+  } catch (e: any) {
+    console.error("Error deleting event:", e);
+    res.status(500).json({ error: e.message ?? "Failed to delete event" });
+  }
+});
+
+/* ──────────────────────────────────────────────────────────────
    Start
    ────────────────────────────────────────────────────────────── */
 const port = Number(process.env.PORT ?? 3000);

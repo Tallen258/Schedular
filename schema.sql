@@ -1,5 +1,8 @@
+-- ============================================================================
+-- Calendar AI Assistant Database Schema
+-- ============================================================================
+
 -- Google Calendar tokens storage
--- Run once to create the table
 create table if not exists google_tokens (
   user_email text primary key,
   access_token text not null,
@@ -9,3 +12,42 @@ create table if not exists google_tokens (
   inserted_at timestamptz default now() not null,
   updated_at timestamptz default now() not null
 );
+
+-- Events table (user-created events)
+create table if not exists events (
+  id serial primary key,
+  user_email text not null,
+  title text not null,
+  description text,
+  location text,
+  start_time timestamptz not null,
+  end_time timestamptz not null,
+  all_day boolean default false,
+  created_at timestamptz default now() not null,
+  updated_at timestamptz default now() not null
+);
+
+create index if not exists idx_events_user_email on events(user_email);
+create index if not exists idx_events_start_time on events(start_time);
+
+-- ============================================================================
+-- Helper Functions
+-- ============================================================================
+
+-- Function to automatically update updated_at timestamp
+create or replace function update_updated_at_column()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+-- Triggers for auto-updating updated_at
+drop trigger if exists update_google_tokens_updated_at on google_tokens;
+create trigger update_google_tokens_updated_at before update on google_tokens
+  for each row execute function update_updated_at_column();
+
+drop trigger if exists update_events_updated_at on events;
+create trigger update_events_updated_at before update on events
+  for each row execute function update_updated_at_column();
