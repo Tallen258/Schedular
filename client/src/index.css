@@ -42,6 +42,15 @@
   --color-custom-red-50: #FFF7F7;
   --color-custom-red-500: #B37171;
   --color-custom-red-700: #8F4C4C;
+
+  /* Dark green accent for events */
+--color-accent-green-50:  #eef7f1;
+--color-accent-green-200: #bfe3cf;
+--color-accent-green-400: #4fa37c;
+--color-accent-green-500: #3c8f68;
+--color-accent-green-600: #2d7654; /* primary event bg */
+--color-accent-green-700: #235e44; /* borders/hover */
+--color-accent-green-900: #163a28;
 }
 
 @layer components {
@@ -137,6 +146,7 @@
 
   .no-underline { @apply no-underline; }
   .text-gray-600 { @apply text-gray-600; }
+  
 
   h1 {
     @apply text-4xl font-semibold mb-4;

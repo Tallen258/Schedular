@@ -1,4 +1,4 @@
-import { Calendar, Views } from "react-big-calendar";
+import { Calendar, Views, type View } from "react-big-calendar";
 import { localizer } from "../utils/calendarLocalizer";
 export type RbcEvent = {
   id?: string;
@@ -11,11 +11,19 @@ export type RbcEvent = {
 
 export default function MyCalendar({
   events,
+  date,
+  view,
+  onNavigate,
+  onView,
   onRangeChange,
   onSelectEvent,
   onSelectSlot,
 }: {
   events: RbcEvent[];
+  date: Date;
+  view: View;
+  onNavigate: (newDate: Date) => void;
+  onView: (view: View) => void;
   onRangeChange?: (range: { start: Date; end: Date } | Date[]) => void;
   onSelectEvent?: (e: RbcEvent) => void;
   onSelectSlot?: (slot: { start: Date; end: Date }) => void;
@@ -26,6 +34,10 @@ export default function MyCalendar({
         <Calendar
           localizer={localizer}
           events={events}
+          date={date}
+          view={view}
+          onNavigate={onNavigate}
+          onView={onView}
           defaultView={Views.MONTH}
           views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
           popup

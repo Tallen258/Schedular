@@ -90,11 +90,11 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Postgres connected (`google_tokens` table created, `events_cache`, `agent_actions` pending)  
 - [ ] Settings View (work / school hour defaults)  
 - [ ] Zod schemas (Event, FreeSlot, ActionLogEntry)  
-- [ ] Create Event Form (simple validation)  
+- [X] Create Event Form (simple validation)  
 
 #### Delivered
-**Rubric Items:** ✅ Error handling, ✅ Network calls (API endpoints working)
-**Features:** ✅ PostgreSQL database setup with Docker, ✅ Google OAuth token storage, ✅ Frontend-backend integration complete
+**Rubric Items:** ✅ Error handling (error boundary + mutation error handling), ✅ Network calls (full CRUD API + Google Calendar integration)
+**Features:** ✅ PostgreSQL with Docker Compose + health checks, ✅ Google OAuth token storage table + events table with indexes, ✅ Frontend-backend integration, ✅ Create Event form with validation and React Hook Form patterns
 
 ---
 
@@ -103,17 +103,17 @@ To analyze calendar pictures for the schedule comparison.
 #### Estimates
 **Rubric Items**
 - [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
-- [ ] Technology: authentication and user account support (OAuth integration)  
-- [ ] Technology: Network Calls that read and write data  
+- [X] Technology: authentication and user account support (OAuth integration)  
+- [X] Technology: Network Calls that read and write data  
 
 **Features**
-- [ ] Google OAuth (Auth Code + PKCE) + encrypted token storage  
-- [ ] Calendar → Create Event flow (confirm → save → navigate)  
-- [ ] Reusable input #3 (TimeRangePicker or AttendeeSelect)  
+- [X] Google OAuth (Auth Code + PKCE) + encrypted token storage  
+- [X] Calendar → Create Event flow (confirm → save → navigate)  
+- [X] Reusable input #3 (TimeRangePicker or AttendeeSelect)  
 
 #### Delivered
-**Rubric Items:**  
-**Features:**
+**Rubric Items:** ✅ Google OAuth integration with token storage, ✅ Full CRUD API for events
+**Features:** ✅ Google Calendar OAuth flow with refresh token storage, ✅ Create/Update/Delete events with form validation, ✅ Event sync from Google Calendar to local database, ✅ datetime-local inputs for time selection
 
 ---
 

@@ -162,14 +162,15 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
   }
 
   return (
-    <div className="card p-6 mb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <div className="card p-6 mb-6 bg-gradient-to-r from-itin-sand-50 to-blue-white border-2 border-itin-sand-200">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-itin-sand-900">
+        <h2 className="text-xl font-bold text-itin-sand-800">
           🔗 Google Calendar Sync
         </h2>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-itin-sand-600 hover:text-itin-sand-900"
+          className="text-itin-sand-600 hover:text-itin-sand-800 transition-colors focus:outline-none"
+          style={{ color: 'var(--color-itin-sand-600)' }}
         >
           {isExpanded ? '▼' : '▶'}
         </button>
@@ -179,14 +180,14 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
         <>
           <div className="flex gap-2 mb-4 flex-wrap">
             <button
-              className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 rounded-xl bg-accent-green-700 text-itin-sand-50 hover:bg-accent-green-600 transition-colors font-semibold"
               onClick={connectGoogle}
             >
               🔐 Connect Google Calendar
             </button>
 
             <button
-              className="px-4 py-2 rounded-xl bg-itin-sand-700 text-white hover:opacity-90 transition-opacity"
+              className="px-4 py-2 rounded-xl bg-itin-sand-600 text-itin-sand-50 hover:bg-itin-sand-700 transition-colors font-semibold disabled:opacity-50"
               onClick={loadEvents}
               disabled={loading}
             >
@@ -195,7 +196,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
 
             {events.length > 0 && (
               <button
-                className="px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl bg-accent-green-600 text-itin-sand-50 hover:bg-accent-green-700 transition-colors font-semibold disabled:opacity-50"
                 onClick={syncAllEvents}
                 disabled={syncing || loading}
               >
@@ -205,34 +206,34 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
           </div>
 
           {syncResult && (
-            <div className="p-4 mb-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            <div className="p-4 mb-4 bg-accent-green-50 border-2 border-accent-green-400 text-accent-green-900 rounded-xl">
               ✅ Successfully imported {syncResult.imported} of {syncResult.total} events
               {syncResult.skipped > 0 && ` (${syncResult.skipped} skipped)`}
             </div>
           )}
 
           {loading && (
-            <div className="flex items-center gap-2 text-itin-sand-600">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-itin-sand-600"></div>
+            <div className="flex items-center gap-2 text-itin-sand-700">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-itin-sand-700"></div>
               <p>Loading events from Google Calendar...</p>
             </div>
           )}
 
           {error && (
-            <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div className="p-4 bg-custom-red-50 border-2 border-custom-red-500 text-custom-red-700 rounded-xl">
               <strong>Error:</strong> {error}
             </div>
           )}
 
           {!loading && !error && events.length === 0 && (
-            <p className="text-itin-sand-600">
+            <p className="text-itin-sand-700">
               No upcoming Google Calendar events found. Click "Connect Google Calendar" to link your account.
             </p>
           )}
 
           {!loading && !error && events.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-itin-sand-900 mb-3">
+              <h3 className="text-lg font-semibold text-itin-sand-800 mb-3">
                 Upcoming Google Calendar Events ({events.length})
               </h3>
               <ul className="space-y-3 max-h-96 overflow-y-auto">
@@ -241,11 +242,11 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
                   return (
                     <li 
                       key={ev.id} 
-                      className="p-4 bg-white border border-itin-sand-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                      className="p-4 bg-custom-white border-2 border-itin-sand-200 rounded-xl shadow-sm hover:shadow-md hover:border-itin-sand-300 transition-all"
                     >
                       <div className="flex justify-between items-start gap-3">
                         <div className="flex-1">
-                          <h4 className="text-lg font-semibold text-itin-sand-900">
+                          <h4 className="text-lg font-semibold text-itin-sand-800">
                             {ev.summary}
                           </h4>
                           <div className="flex gap-4 mt-2 text-sm text-itin-sand-700">
@@ -260,7 +261,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
                             <div className="text-sm mt-1">
                               <span className="text-itin-sand-600">📹 Meet: </span>
                               <a 
-                                className="underline text-blue-600 hover:text-blue-800" 
+                                className="underline text-accent-green-700 hover:text-accent-green-600 font-medium" 
                                 href={ev.hangoutLink} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
@@ -278,7 +279,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
                         <button
                           onClick={() => importSingleEvent(ev.id)}
                           disabled={isImporting}
-                          className="px-3 py-2 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+                          className="px-3 py-2 rounded-xl bg-accent-green-700 text-itin-sand-50 text-sm hover:bg-accent-green-600 transition-colors disabled:opacity-50 font-semibold whitespace-nowrap"
                         >
                           {isImporting ? '✓ Imported' : '📥 Import'}
                         </button>

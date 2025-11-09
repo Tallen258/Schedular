@@ -123,10 +123,10 @@ const EventDetail = () => {
             <div className="accent-bar mt-2" />
           </div>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/calendar')}
             className="btn-secondary"
           >
-            ← Back
+            ← Calendar
           </button>
         </header>
 

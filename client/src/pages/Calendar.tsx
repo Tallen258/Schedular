@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Views, type View } from "react-big-calendar";
 import { useEvents } from "../hooks/useEvents";
 import MyCalendar, { type RbcEvent } from "../components/myCalendar";
 import SyncGoogleCalendar from "../components/SyncGoogleCalendar";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const Calendar = () => {
   const navigate = useNavigate();
+  const [date, setDate] = useState<Date>(new Date());
+  const [view, setView] = useState<View>(Views.MONTH);
   const { data: events, isLoading, error } = useEvents();
 
   // Convert API events to react-big-calendar format
@@ -68,6 +71,10 @@ const Calendar = () => {
         {!isLoading && !error && (
           <MyCalendar
             events={calendarEvents}
+            date={date}
+            view={view}
+            onNavigate={setDate}
+            onView={setView}
             onSelectEvent={handleSelectEvent}
             onSelectSlot={handleSelectSlot}
           />

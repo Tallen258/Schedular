@@ -6,6 +6,8 @@ import { WebStorageStateStore } from "oidc-client-ts";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './index.css'
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import './styles/rbc-tailwind.css'
 import App from './App.tsx'
 
 // Create a client

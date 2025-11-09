@@ -1,0 +1,228 @@
+/* React Big Calendar Tailwind Overrides */
+/* This file customizes RBC to match the Schedular sand palette with dark green accents */
+
+/* Toolbar */
+.rbc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: var(--color-custom-white);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid var(--color-itin-sand-100);
+}
+
+.rbc-toolbar-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-itin-sand-700);
+}
+
+.rbc-btn-group > button {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-itin-sand-200);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-itin-sand-700);
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.rbc-btn-group > button:hover {
+  background-color: var(--color-itin-sand-50);
+}
+
+.rbc-btn-group > button.rbc-active {
+  background-color: var(--color-itin-sand-100);
+  font-weight: 600;
+}
+
+/* Month grid */
+.rbc-month-view {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--color-itin-sand-200);
+  background-color: var(--color-itin-sand-50);
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid var(--color-itin-sand-200);
+}
+
+.rbc-off-range-bg {
+  background-color: var(--color-warm-neutral);
+}
+
+.rbc-today {
+  background-color: var(--color-blue-white);
+}
+
+/* Headers */
+.rbc-header {
+  background-color: var(--color-itin-sand-100);
+  color: var(--color-itin-sand-700);
+  font-weight: 600;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--color-itin-sand-200);
+}
+
+.rbc-header + .rbc-header {
+  border-left: 1px solid var(--color-itin-sand-200);
+}
+
+/* Time/grid lines */
+.rbc-time-view,
+.rbc-agenda-view {
+  background-color: var(--color-custom-white);
+  border: 1px solid var(--color-itin-sand-200);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.rbc-time-header,
+.rbc-time-content,
+.rbc-agenda-view table {
+  border-color: var(--color-itin-sand-200);
+}
+
+.rbc-time-slot {
+  border-top: 1px solid var(--color-itin-sand-200);
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid var(--color-itin-sand-100);
+}
+
+/* Events: dark green background with light sand text */
+.rbc-event {
+  background-color: var(--color-accent-green-700);
+  color: var(--color-itin-sand-50);
+  border: 1px solid var(--color-accent-green-900);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.rbc-event:hover {
+  background-color: var(--color-accent-green-600);
+  color: var(--color-itin-sand-10);
+}
+
+.rbc-event.rbc-selected {
+  outline: 2px solid var(--color-accent-green-400);
+  outline-offset: 2px;
+}
+
+.rbc-event-label {
+  font-size: 10px;
+  opacity: 0.9;
+  color: var(--color-itin-sand-100);
+}
+
+.rbc-event-content {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-itin-sand-50);
+}
+
+/* Event variants (optional classes) */
+.rbc-event.event--accent {
+  background-color: var(--color-accent-green-700);
+  border-color: var(--color-accent-green-900);
+  color: var(--color-itin-sand-50);
+}
+
+.rbc-event.event--danger {
+  background-color: var(--color-custom-red-700);
+  border-color: var(--color-custom-red-700);
+  color: var(--color-itin-sand-50);
+}
+
+.rbc-event.event--teal {
+  background-color: var(--color-brand-teal-700);
+  border-color: var(--color-brand-teal-700);
+  color: var(--color-itin-sand-50);
+}
+
+/* Agenda rows */
+.rbc-agenda-view table.rbc-agenda-table {
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell,
+.rbc-agenda-event-cell {
+  border-bottom: 1px solid var(--color-itin-sand-200);
+  padding: 0.5rem;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell {
+  color: var(--color-itin-sand-700);
+}
+
+/* Week/Day view time gutter */
+.rbc-time-header-content {
+  border-left: 1px solid var(--color-itin-sand-200);
+}
+
+.rbc-time-content > * + * > * {
+  border-left: 1px solid var(--color-itin-sand-200);
+}
+
+.rbc-current-time-indicator {
+  background-color: var(--color-accent-green-600);
+  height: 2px;
+}
+
+/* DnD addon (if used) */
+.rbc-addons-dnd .rbc-addons-dnd-resizable {
+  cursor: ew-resize;
+}
+
+.rbc-addons-dnd .rbc-event {
+  cursor: move;
+}
+
+/* Dark mode (optional) */
+@media (prefers-color-scheme: dark) {
+  .dark .rbc-toolbar {
+    background-color: var(--color-custom-black);
+    color: var(--color-warm-neutral);
+    border-color: var(--color-itin-sand-800);
+  }
+  
+  .dark .rbc-month-view {
+    background-color: var(--color-itin-sand-900);
+    border-color: var(--color-itin-sand-800);
+  }
+  
+  .dark .rbc-day-bg + .rbc-day-bg {
+    border-color: var(--color-itin-sand-800);
+  }
+  
+  .dark .rbc-off-range-bg {
+    background-color: var(--color-itin-sand-900);
+  }
+  
+  .dark .rbc-today {
+    background-color: var(--color-accent-green-900);
+  }
+  
+  .dark .rbc-header {
+    background-color: var(--color-itin-sand-800);
+    color: var(--color-itin-sand-100);
+    border-color: var(--color-itin-sand-800);
+  }
+  
+  .dark .rbc-event {
+    background-color: var(--color-accent-green-700);
+    border-color: var(--color-accent-green-900);
+  }
+}
+
