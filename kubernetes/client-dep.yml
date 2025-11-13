@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: taft
   name: client-taft-dep
 spec:
   replicas: 1
@@ -14,7 +15,9 @@ spec:
     spec:
       containers:
         - name: proj-schedular
-          image: taftallen/gitea:1.23.1
+          # Use the image built by CI/CD. During CI deploy replace ${GITHUB_SHA::7} with the short SHA.
+          # Example tag produced by CI: taftallen/schedular-client:abcdef1
+          image: taftallen/schedular-client:Latest
           ports:
             - containerPort: 3000
           # (optional) relax probes for now, or point to a live path:

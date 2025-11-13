@@ -1,6 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  namespace: taft
   name: server-taft-ingress
   annotations:
     # If your app expects NO /api prefix internally, keep these to strip it:
