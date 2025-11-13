@@ -82,19 +82,19 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: use local storage  
+- [X] Technology: use local storage  
 - [X] Technology: Error handling (both on api requests and render errors)  
 - [X] Technology: Network Calls that read and write data  
 
 **Features**
 - [X] Postgres connected (`google_tokens` table created, `events_cache`, `agent_actions` pending)  
-- [ ] Settings View (work / school hour defaults)  
-- [ ] Zod schemas (Event, FreeSlot, ActionLogEntry)  
+- [X] Settings View (work / school hour defaults)  
+- [X] Zod schemas (Event, FreeSlot, ActionLogEntry)  
 - [X] Create Event Form (simple validation)  
 
 #### Delivered
-**Rubric Items:** ✅ Error handling (error boundary + mutation error handling), ✅ Network calls (full CRUD API + Google Calendar integration)
-**Features:** ✅ PostgreSQL with Docker Compose + health checks, ✅ Google OAuth token storage table + events table with indexes, ✅ Frontend-backend integration, ✅ Create Event form with validation and React Hook Form patterns
+**Rubric Items:** ✅ Local storage (user settings + sync timestamps), ✅ Error handling (error boundary + mutation error handling), ✅ Network calls (full CRUD API + Google Calendar integration)
+**Features:** ✅ PostgreSQL with Docker Compose + health checks, ✅ Google OAuth token storage table + events table with indexes, ✅ Frontend-backend integration, ✅ Create Event form with validation and React Hook Form patterns, ✅ Settings View with localStorage persistence, ✅ Zod schemas (Event, FreeSlot, ActionLogEntry)
 
 ---
 
@@ -121,7 +121,6 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Project scope is 2–3 times larger than Inventory Management (per group member)  
 - [ ] Additional Task: Working with Pictures (OCR endpoint)  
 - [ ] Technology: 3+ generic form input components  
 - [ ] Technology: 4+ generic layout components  
@@ -201,6 +200,7 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
+- [ ] Project scope is 2–3 times larger than Inventory Management (per group member)  
 - [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
 - [ ] Technology: linting in pipeline  
 - [ ] Technology: CI/CD pipeline  

@@ -1,3 +1,4 @@
+import ScheduleCompare from "./ScheduleCompare";
 
 const CompareSchedule = () => {
   return (
@@ -19,6 +20,7 @@ const CompareSchedule = () => {
             <button className="btn-primary">Upload & Analyze</button>
             <button className="btn-secondary ml-3">Clear</button>
           </div>
+          <ScheduleCompare />
         </div>
       </section>
     </main>

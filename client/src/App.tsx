@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import CreateEvent from "./pages/CreateEvent";
 import EventDetail from "./pages/EventDetail";
 import CompareSchedules from "./pages/CompareSchedule";
-import ImageReview from "./pages/ImageReview";
+import ImageReview from "./pages/ScheduleCompare";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import AIChat from "./pages/AIChat";
