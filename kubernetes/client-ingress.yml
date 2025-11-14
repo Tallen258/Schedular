@@ -9,10 +9,10 @@ spec:
     - host: "schedular-app.duckdns.org"
       http:
         paths:
-          - path: /taft
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: client-taft-svc
                 port:
-                  number: 5173
+                  number: 80
