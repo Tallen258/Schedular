@@ -34,16 +34,33 @@ jobs:
         run: |
           docker build  \
             -f ./client/Dockerfile \
-            -t ${{ env.DH_USER }}/schedular-client:2 \
+            -t ${{ env.DH_USER }}/schedular-client:${{ github.run_number }} \
             --build-arg VITE_API_BASE=/api \
             ./client
-          docker push ${{ env.DH_USER }}/schedular-client:2
+          docker push ${{ env.DH_USER }}/schedular-client:${{ github.run_number }}
 
       - name: Build & Push SERVER (bash)
         run: |
           docker build  \
             -f ./server/Dockerfile \
-            -t ${{ env.DH_USER }}/schedular-server:2 \
+            -t ${{ env.DH_USER }}/schedular-server:${{ github.run_number }} \
             ./server
-          docker push ${{ env.DH_USER }}/schedular-server:2
+          docker push ${{ env.DH_USER }}/schedular-server:${{ github.run_number }}
+
+  deploy:
+    runs-on: self-hosted
+    needs: build-and-push
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply Kubernetes Changes
+        run: |
+          export BUILD_NUMBER=${{ github.run_number }}
+
+          for FILE in "kube"/*
+          do
+              cat $FILE | envsubst | kubectl apply -f -
+          done
             

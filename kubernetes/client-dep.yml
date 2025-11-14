@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: proj-schedular
-          image: taftallen/schedular-client:2
+          image: taftallen/schedular-client:$BUILD_NUMBER
           ports:
             - containerPort: 5173
           readinessProbe:

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: server-taft-dep
-          image: taftallen/schedular-server:2
+          image: taftallen/schedular-server:$BUILD_NUMBER
           ports:
             - containerPort: 3000
           readinessProbe:
