@@ -2,28 +2,72 @@
 import api from '../services/api';
 
 export type ChatMessage = {
-  role: "user" | "assistant" | "system";
+  id: number;
+  conversationId: number;
+  role: "user" | "assistant";
   content: string;
+  createdAt: string;
+};
+
+export type Conversation = {
+  id: number;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 /**
- * Send a simple chat message to the AI assistant
+ * Fetch all conversations for the current user
  */
-export async function sendChatMessage(content: string): Promise<string> {
-  const response = await api.post<{ reply: string }>('/api/chat', {
-    content,
-  });
-
-  return response.data.reply;
+export async function fetchConversations(): Promise<Conversation[]> {
+  const response = await api.get<Conversation[]>('/api/conversations');
+  return response.data;
 }
 
 /**
- * Send a conversation with full message history to the AI assistant
+ * Create a new conversation
  */
-export async function sendChatConversation(messages: ChatMessage[]): Promise<string> {
-  const response = await api.post<{ reply: string }>('/api/chat', {
-    messages,
+export async function createConversation(): Promise<Conversation> {
+  const response = await api.post<Conversation>('/api/conversations', {
+    title: 'New chat',
   });
+  return response.data;
+}
 
-  return response.data.reply;
+/**
+ * Fetch all messages in a conversation
+ */
+export async function fetchMessages(conversationId: number): Promise<ChatMessage[]> {
+  const response = await api.get<ChatMessage[]>(`/api/conversations/${conversationId}/messages`);
+  return response.data;
+}
+
+/**
+ * Post a message to a conversation and get AI response
+ */
+export async function postMessage(
+  conversationId: number,
+  content: string,
+  model?: string
+): Promise<{ userMessage: ChatMessage; assistantMessage: ChatMessage }> {
+  const response = await api.post<{ userMessage: ChatMessage; assistantMessage: ChatMessage }>(
+    `/api/conversations/${conversationId}/messages`,
+    { content, model }
+  );
+  return response.data;
+}
+
+/**
+ * Delete a conversation
+ */
+export async function deleteConversation(conversationId: number): Promise<void> {
+  await api.delete(`/api/conversations/${conversationId}`);
+}
+
+/**
+ * Update conversation title
+ */
+export async function updateConversationTitle(conversationId: number, title: string): Promise<Conversation> {
+  const response = await api.patch<Conversation>(`/api/conversations/${conversationId}`, { title });
+  return response.data;
 }

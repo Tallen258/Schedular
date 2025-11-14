@@ -53,3 +53,20 @@ create trigger update_google_tokens_updated_at before update on google_tokens
 drop trigger if exists update_events_updated_at on events;
 create trigger update_events_updated_at before update on events
   for each row execute function update_updated_at_column();
+
+-- for ai stuff
+  create table if not exists conversation (
+  id serial primary key,
+  title text not null default 'New chat',
+  user_email text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists message (
+  id bigserial primary key,
+  conversation_id int not null references conversation(id) on delete cascade,
+  role text not null,          
+  content text not null,
+  created_at timestamptz not null default now()
+);

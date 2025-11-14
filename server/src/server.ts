@@ -10,6 +10,8 @@ import authRoutes from "./Endpoints/auth";
 import googleOAuthRoutes from "./Endpoints/googleOAuth";
 import googleCalendarRoutes from "./Endpoints/googleCalendar";
 import eventsRoutes from "./Endpoints/events";
+import chatRoutes from "./Endpoints/chat";
+import { conversationsRouter } from "./Endpoints/conversation";
 
 dotenv.config();
 
@@ -95,6 +97,10 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
+// Register conversation routes BEFORE auth (for dev testing)
+if (db) {
+  app.use("/api/conversations", conversationsRouter(db));
+}
 
 app.use(requireAuth);
 
@@ -104,6 +110,7 @@ app.use("/api/auth/google", googleOAuthRoutes);
 app.use("/api/google/calendar", googleCalendarRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api", eventsRoutes);  // For /api/calendar/events endpoint
+app.use("/api/chat", chatRoutes);
 
 
 const port = Number(process.env.PORT ?? 3000);

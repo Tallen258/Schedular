@@ -69,12 +69,12 @@ To analyze calendar pictures for the schedule comparison.
 
 **Features**
 - [X] Home (Login) + Dashboard + Calendar (static grid)  
-- [ ] Reusable inputs v1: DateTimePicker, Toggle, Select  
+- [X] Reusable inputs v1: DateTimePicker, Toggle, Select  
 - [X] Toasts on simple navigation/actions  
 
 #### Delivered
 **Rubric Items:** ✅ TanStack Query, ✅ Authentication (OIDC), ✅ Auth/Public pages, ✅ Toasts
-**Features:** ✅ Home/Dashboard/Calendar views, ✅ Toast notifications
+**Features:** ✅ Home/Dashboard/Calendar views, ✅ Toast notifications, ✅ datetime-local inputs (reusable date/time picker)
 
 ---
 
@@ -133,7 +133,12 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Delivered
 **Rubric Items:**  
-**Features:**
+**Features:** ✅ Server code refactored into modular route files (auth, googleOAuth, googleCalendar, events)
+✅ Added schedule comparison page with form
+✅ Event Detail page with edit/delete functionality
+✅ Help page with getting started guide
+✅ Google Calendar sync component with import functionality
+✅ Full CRUD operations for events (create, read, update, delete)
 
 ---
 

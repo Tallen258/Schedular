@@ -59,6 +59,7 @@ export default function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/help" element={<Help />} />
               <Route path="/chat" element={<AIChat />} />
+              <Route path="/chat/:conversationId" element={<AIChat />} />
 
               <Route path="*" element={<div className="p-4">Not Found</div>} />
             </Routes>
