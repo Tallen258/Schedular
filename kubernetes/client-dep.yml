@@ -15,12 +15,9 @@ spec:
     spec:
       containers:
         - name: proj-schedular
-          # Use the image built by CI/CD. During CI deploy replace ${GITHUB_SHA::7} with the short SHA.
-          # Example tag produced by CI: taftallen/schedular-client:abcdef1
-          image: taftallen/schedular-client:Latest
+          image: taftallen/schedular-client:2
           ports:
             - containerPort: 5173
-          # (optional) relax probes for now, or point to a live path:
           readinessProbe:
             httpGet:
               path: /

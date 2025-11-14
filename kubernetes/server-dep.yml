@@ -17,9 +17,7 @@ spec:
     spec:
       containers:
         - name: server-taft-dep
-          # Use the image built by CI/CD. During CI deploy replace ${GITHUB_SHA::7} with the short SHA.
-          # Example tag produced by CI: taftallen/schedular-server:abcdef1
-          image: taftallen/schedular-server:Latest
+          image: taftallen/schedular-server:2
           ports:
             - containerPort: 3000
           readinessProbe:

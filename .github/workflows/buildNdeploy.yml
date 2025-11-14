@@ -34,16 +34,16 @@ jobs:
         run: |
           docker build  \
             -f ./client/Dockerfile \
-            -t ${{ env.DH_USER }}/schedular-client:${GITHUB_SHA::7} \
+            -t ${{ env.DH_USER }}/schedular-client:2 \
             --build-arg VITE_API_BASE=/api \
             ./client
-          docker push ${{ env.DH_USER }}/schedular-client:${GITHUB_SHA::7}
+          docker push ${{ env.DH_USER }}/schedular-client:2
 
       - name: Build & Push SERVER (bash)
         run: |
           docker build  \
             -f ./server/Dockerfile \
-            -t ${{ env.DH_USER }}/schedular-server:${GITHUB_SHA::7} \
+            -t ${{ env.DH_USER }}/schedular-server:2 \
             ./server
-          docker push ${{ env.DH_USER }}/schedular-server:${GITHUB_SHA::7}
+          docker push ${{ env.DH_USER }}/schedular-server:2
             
