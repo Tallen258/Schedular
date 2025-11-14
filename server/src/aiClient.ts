@@ -1,5 +1,5 @@
 // src/aiClient.ts
-import fetch from "node-fetch"; // ⭐ add this line
+import fetch from "node-fetch"; 
 
 export type ChatMessage = {
   role: "user" | "assistant" | "system";

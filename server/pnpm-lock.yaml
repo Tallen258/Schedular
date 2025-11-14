@@ -26,6 +26,9 @@ importers:
       jose:
         specifier: ^6.1.0
         version: 6.1.0
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
       pg-promise:
         specifier: ^12.2.0
         version: 12.2.0(pg-query-stream@4.10.3(pg@8.16.3))
