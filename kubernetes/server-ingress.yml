@@ -3,10 +3,6 @@ kind: Ingress
 metadata:
   namespace: taft
   name: server-taft-ingress
-  annotations:
-    # If your app expects NO /api prefix internally, keep these to strip it:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
