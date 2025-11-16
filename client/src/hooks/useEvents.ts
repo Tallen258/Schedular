@@ -12,9 +12,6 @@ import {
   type UpdateEventInput,
 } from '../api/event';
 
-// ============================================================================
-// Query Keys
-// ============================================================================
 
 export const eventKeys = {
   all: ['events'] as const,
@@ -26,13 +23,7 @@ export const eventKeys = {
   today: () => [...eventKeys.all, 'today'] as const,
 };
 
-// ============================================================================
-// Query Hooks
-// ============================================================================
 
-/**
- * Get all events
- */
 export const useEvents = () => {
   return useQuery({
     queryKey: eventKeys.lists(),
@@ -40,20 +31,16 @@ export const useEvents = () => {
   });
 };
 
-/**
- * Get a single event by ID
- */
+
 export const useEvent = (id: number) => {
   return useQuery({
     queryKey: eventKeys.detail(id),
     queryFn: () => getEventById(id),
-    enabled: !!id, // Only run query if id exists
+    enabled: !!id, 
   });
 };
 
-/**
- * Get upcoming events
- */
+
 export const useUpcomingEvents = (limit?: number) => {
   return useQuery({
     queryKey: [...eventKeys.upcoming(), limit],
@@ -61,9 +48,6 @@ export const useUpcomingEvents = (limit?: number) => {
   });
 };
 
-/**
- * Get today's events
- */
 export const useTodaysEvents = () => {
   return useQuery({
     queryKey: eventKeys.today(),
@@ -71,20 +55,13 @@ export const useTodaysEvents = () => {
   });
 };
 
-// ============================================================================
-// Mutation Hooks
-// ============================================================================
 
-/**
- * Create a new event
- */
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (input: CreateEventInput) => createEvent(input),
     onSuccess: (newEvent) => {
-      // Invalidate and refetch events
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
       
       toast.success(`Event "${newEvent.title}" created successfully!`);
@@ -95,9 +72,7 @@ export const useCreateEvent = () => {
   });
 };
 
-/**
- * Update an existing event
- */
+
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
 
@@ -105,10 +80,8 @@ export const useUpdateEvent = () => {
     mutationFn: ({ id, input }: { id: number; input: UpdateEventInput }) =>
       updateEvent(id, input),
     onSuccess: (updatedEvent) => {
-      // Invalidate all event queries
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
       
-      // Update the specific event in cache
       queryClient.setQueryData(eventKeys.detail(updatedEvent.id), updatedEvent);
       
       toast.success(`Event "${updatedEvent.title}" updated successfully!`);
@@ -119,19 +92,14 @@ export const useUpdateEvent = () => {
   });
 };
 
-/**
- * Delete an event
- */
 export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: number) => deleteEvent(id),
     onSuccess: (_, deletedId) => {
-      // Invalidate all event queries
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
       
-      // Remove the specific event from cache
       queryClient.removeQueries({ queryKey: eventKeys.detail(deletedId) });
       
       toast.success('Event deleted successfully!');

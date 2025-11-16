@@ -132,13 +132,8 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Confirmation action `createEvent` integrated  
 
 #### Delivered
-**Rubric Items:**  
-**Features:** ✅ Server code refactored into modular route files (auth, googleOAuth, googleCalendar, events)
-✅ Added schedule comparison page with form
-✅ Event Detail page with edit/delete functionality
-✅ Help page with getting started guide
-✅ Google Calendar sync component with import functionality
-✅ Full CRUD operations for events (create, read, update, delete)
+**Rubric Items:** ✅ Form inputs (datetime-local, text, textarea, checkbox, select), ✅ Layout components (card, navbar, sidebar, form layouts)
+**Features:** ✅ Server code refactored into modular route files (auth, googleOAuth, googleCalendar, events), ✅ Schedule comparison page with form, ✅ Event Detail page with edit/delete functionality, ✅ Help page with getting started guide, ✅ Google Calendar sync component with import functionality, ✅ Full CRUD operations for events
 
 ---
 
@@ -146,9 +141,9 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: Client side state stores (e.g. tanstack query or context)  
-- [ ] Technology: Network Calls that read and write data  
-- [ ] Technology: Toasts / global notifications or alerts  
+- [X] Technology: Client side state stores (e.g. tanstack query or context)  
+- [X] Technology: Network Calls that read and write data  
+- [X] Technology: Toasts / global notifications or alerts  
 
 **Features**
 - [ ] Agent loop MVP (`AI Chat` view stream + confirm/deny)  
@@ -157,8 +152,8 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Spinners and disabled states  
 
 #### Delivered
-**Rubric Items:**  
-**Features:**
+**Rubric Items:** ✅ TanStack Query state management, ✅ Full CRUD network calls with mutations, ✅ Toast notifications throughout app
+**Features:** ✅ AI Chat view with conversational interface, ✅ AI tool calling for event creation from chat, ✅ Image upload support in chat, ✅ Loading states and disabled buttons during mutations
 
 ---
 
