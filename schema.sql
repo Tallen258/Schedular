@@ -68,5 +68,6 @@ create table if not exists message (
   conversation_id int not null references conversation(id) on delete cascade,
   role text not null,          
   content text not null,
+  image_url text,
   created_at timestamptz not null default now()
 );

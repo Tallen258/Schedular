@@ -48,8 +48,8 @@ export function usePostMessage() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ conversationId, content, model }: { conversationId: number; content: string; model?: string }) =>
-      chatApi.postMessage(conversationId, content, model),
+    mutationFn: ({ conversationId, content, model, imageFile }: { conversationId: number; content: string; model?: string; imageFile?: File }) =>
+      chatApi.postMessage(conversationId, content, model, imageFile),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: messagesKeys.list(variables.conversationId) });
       queryClient.invalidateQueries({ queryKey: conversationsKeys.lists() });

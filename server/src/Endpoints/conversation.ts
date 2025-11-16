@@ -1,5 +1,19 @@
 import { Router, type Request, type Response } from "express";
 import type { IDatabase } from "pg-promise";
+import multer from "multer";
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"));
+    }
+  },
+});
 
 /**
  * Generate a title from the first user message using AI
@@ -162,6 +176,7 @@ export function conversationsRouter(db: IDatabase<unknown>) {
          conversation_id as "conversationId",
          role,
          content,
+         image_url as "imageUrl",
          created_at     as "createdAt"
        from message
        where conversation_id = $1
@@ -173,7 +188,7 @@ export function conversationsRouter(db: IDatabase<unknown>) {
   });
 
 
-  r.post("/:id/messages", async (req: Request, res: Response) => {
+  r.post("/:id/messages", upload.single("image"), async (req: Request, res: Response) => {
     const conversationId = Number(req.params.id); // parse conversation id
     if (!Number.isFinite(conversationId)) return res.status(400).json({ error: "invalid id" });
 
@@ -181,15 +196,99 @@ export function conversationsRouter(db: IDatabase<unknown>) {
     const model = (req.body?.model ?? "gemma3-27b").toString(); // model name (optional override)
     if (!content) return res.status(400).json({ error: "content_required" });
 
+    // Get user email for event creation
+    const userEmail = req.user?.email || "dev@example.com";
+
+    // Handle uploaded image
+    let imageData: string | null = null;
+    let imageBase64: string | null = null;
+    
+    if (req.file) {
+      // Convert image buffer to base64
+      const base64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      imageData = `data:${mimeType};base64,${base64}`;
+      imageBase64 = base64;
+    }
+
     // Fetch all prior messages to construct the chat history sent upstream
-    const prior: Array<{ role: string; content: string }> = await db.manyOrNone(
-      `select role, content
+    const prior: Array<{ role: string; content: string; image_url?: string }> = await db.manyOrNone(
+      `select role, content, image_url as "imageUrl"
          from message
         where conversation_id = $1
         order by created_at asc`,
       [conversationId]
     );
-    const messages = [...prior, { role: "user", content }]; 
+    
+    // Build messages array in the format expected by the AI API
+    const messages = prior.map(msg => {
+      if (msg.image_url) {
+        // Message with image - use content array format
+        return {
+          role: msg.role,
+          content: [
+            { type: "text", text: msg.content },
+            { type: "image_url", image_url: { url: msg.image_url } }
+          ]
+        };
+      }
+      // Text-only message
+      return { role: msg.role, content: msg.content };
+    });
+
+    // Add current user message
+    if (imageData) {
+      messages.push({
+        role: "user",
+        content: [
+          { type: "text", text: content },
+          { type: "image_url", image_url: { url: imageData } }
+        ]
+      });
+    } else {
+      messages.push({ role: "user", content });
+    }
+
+    // Define tools for event creation
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "create_event",
+          description: "Create a new calendar event for the user. Use this when the user asks to schedule, create, or add an event to their calendar.",
+          parameters: {
+            type: "object",
+            properties: {
+              title: {
+                type: "string",
+                description: "The title/name of the event"
+              },
+              description: {
+                type: "string",
+                description: "Optional detailed description of the event"
+              },
+              location: {
+                type: "string",
+                description: "Optional location where the event will take place"
+              },
+              start_time: {
+                type: "string",
+                description: "Start date and time in ISO 8601 format (e.g., 2024-11-15T14:00:00Z or 2024-11-15T14:00:00-05:00)"
+              },
+              end_time: {
+                type: "string",
+                description: "End date and time in ISO 8601 format (e.g., 2024-11-15T15:00:00Z or 2024-11-15T15:00:00-05:00)"
+              },
+              all_day: {
+                type: "boolean",
+                description: "Whether this is an all-day event. Default is false."
+              }
+            },
+            required: ["title", "start_time", "end_time"]
+          }
+        }
+      }
+    ];
 
     // Prepare upstream AI request
     const base = process.env.AI_BASE_URL ?? "https://ai-snow.reindeer-pinecone.ts.net";
@@ -200,11 +299,11 @@ export function conversationsRouter(db: IDatabase<unknown>) {
       ...(apiKey && apiKey.trim() ? { Authorization: `Bearer ${apiKey}` } : {}),
     };
 
-    // Send chat history to AI
+    // Send chat history to AI with tools
     const upstream = await fetch(url, {
       method: "POST",
       headers,
-      body: JSON.stringify({ model, messages, temperature: 0.2 }),
+      body: JSON.stringify({ model, messages, tools, temperature: 0.2 }),
     });
 
     // Read body text regardless of status for better diagnostics
@@ -220,19 +319,81 @@ export function conversationsRouter(db: IDatabase<unknown>) {
 
     // Parse AI JSON and pull the assistant content
     const json = JSON.parse(bodyText);
-    const replyContent: string = json?.choices?.[0]?.message?.content ?? "";
+    const assistantMessage = json?.choices?.[0]?.message;
+    let replyContent: string = assistantMessage?.content ?? "";
+    
+    // Check if AI wants to call a tool
+    const toolCalls = assistantMessage?.tool_calls;
+    let eventCreated = null;
+    
+    if (toolCalls && toolCalls.length > 0) {
+      const toolCall = toolCalls[0];
+      
+      if (toolCall.function.name === "create_event") {
+        try {
+          const args = JSON.parse(toolCall.function.arguments);
+          
+          // Create the event in the database
+          const event = await db.one(`
+            insert into events (user_email, title, description, location, start_time, end_time, all_day)
+            values ($1, $2, $3, $4, $5, $6, $7)
+            returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
+          `, [
+            userEmail,
+            args.title,
+            args.description || null,
+            args.location || null,
+            args.start_time,
+            args.end_time,
+            args.all_day || false
+          ]);
+          
+          eventCreated = event;
+          
+          // Make a follow-up call to the AI with the tool result
+          const followUpMessages = [
+            ...messages,
+            assistantMessage,
+            {
+              role: "tool",
+              tool_call_id: toolCall.id,
+              name: "create_event",
+              content: JSON.stringify({ success: true, event })
+            }
+          ];
+          
+          const followUpResponse = await fetch(url, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ model, messages: followUpMessages, tools, temperature: 0.2 }),
+          });
+          
+          const followUpText = await followUpResponse.text();
+          if (followUpResponse.ok) {
+            const followUpJson = JSON.parse(followUpText);
+            replyContent = followUpJson?.choices?.[0]?.message?.content ?? "Event created successfully!";
+          } else {
+            replyContent = "Event created successfully!";
+          }
+        } catch (toolError: any) {
+          console.error("Tool execution error:", toolError);
+          replyContent = `I tried to create the event but encountered an error: ${toolError.message}`;
+        }
+      }
+    }
 
     try {
-      // Insert the user's message
+      // Insert the user's message with optional image
       const userMsg = await db.one(
-        `insert into message(conversation_id, role, content)
-         values ($1, 'user', $2)
+        `insert into message(conversation_id, role, content, image_url)
+         values ($1, 'user', $2, $3)
          returning id,
                    conversation_id as "conversationId",
                    role,
                    content,
+                   image_url as "imageUrl",
                    created_at      as "createdAt"`,
-        [conversationId, content]
+        [conversationId, content, imageData]
       );
 
       // Insert the assistant's message
@@ -243,6 +404,7 @@ export function conversationsRouter(db: IDatabase<unknown>) {
                    conversation_id as "conversationId",
                    role,
                    content,
+                   image_url as "imageUrl",
                    created_at      as "createdAt"`,
         [conversationId, replyContent]
       );
@@ -276,8 +438,12 @@ export function conversationsRouter(db: IDatabase<unknown>) {
         await db.none(`update conversation set updated_at = now() where id = $1`, [conversationId]);
       }
 
-      // Return both persisted messages
-      return res.json({ userMessage: userMsg, assistantMessage: aiMsg });
+      // Return both persisted messages and event info if created
+      return res.json({ 
+        userMessage: userMsg, 
+        assistantMessage: aiMsg,
+        ...(eventCreated && { eventCreated })
+      });
     } catch (e: any) {
       // Foreign key violation → conversation not found
       if (e && e.code === "23503") {

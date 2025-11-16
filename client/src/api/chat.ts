@@ -6,6 +6,7 @@ export type ChatMessage = {
   conversationId: number;
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string;
   createdAt: string;
 };
 
@@ -48,11 +49,22 @@ export async function fetchMessages(conversationId: number): Promise<ChatMessage
 export async function postMessage(
   conversationId: number,
   content: string,
-  model?: string
+  model?: string,
+  imageFile?: File
 ): Promise<{ userMessage: ChatMessage; assistantMessage: ChatMessage }> {
+  const formData = new FormData();
+  formData.append('content', content);
+  if (model) formData.append('model', model);
+  if (imageFile) formData.append('image', imageFile);
+
   const response = await api.post<{ userMessage: ChatMessage; assistantMessage: ChatMessage }>(
     `/api/conversations/${conversationId}/messages`,
-    { content, model }
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
   );
   return response.data;
 }

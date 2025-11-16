@@ -25,9 +25,9 @@ if (!connectionString) {
 } else {
   try {
     db = pgp(connectionString);
-    console.log("✅ Database connection configured");
+    console.log(" Database connection configured");
   } catch (e) {
-    console.error("❌ Failed to configure database:", e);
+    console.error(" Failed to configure database:", e);
     db = null;
   }
 }
@@ -97,7 +97,6 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
-// Register conversation routes BEFORE auth (for dev testing)
 if (db) {
   app.use("/api/conversations", conversationsRouter(db));
 }

@@ -21,8 +21,11 @@ const AIChat = () => {
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const createConversationMutation = useCreateConversation();
   const postMessageMutation = usePostMessage();
@@ -71,6 +74,26 @@ const AIChat = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function clearImage() {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }
+
   async function onSend(e: React.FormEvent) {
     e.preventDefault();
     if (!activeId) return;
@@ -85,14 +108,19 @@ const AIChat = () => {
       conversationId: activeId,
       role: "user",
       content,
+      imageUrl: imagePreview || undefined,
       createdAt: new Date().toISOString(),
     };
     setMessages((m) => [...m, optimistic]);
+
+    const imageToSend = selectedImage;
+    clearImage();
 
     try {
       const data = await postMessageMutation.mutateAsync({
         conversationId: activeId,
         content,
+        imageFile: imageToSend || undefined,
       });
       setMessages((m) => [
         ...m.filter((x) => x.id !== optimistic.id),
@@ -103,6 +131,14 @@ const AIChat = () => {
       setError(e?.message ?? "Send failed");
       setMessages((m) => m.filter((x) => x.id !== optimistic.id));
       setInput(content);
+      if (imageToSend) {
+        setSelectedImage(imageToSend);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(imageToSend);
+      }
     }
   }
 
@@ -147,6 +183,15 @@ const AIChat = () => {
                     : "bg-custom-white text-itin-sand-800 border border-itin-sand-200"
                 }`}
               >
+                {m.imageUrl && (
+                  <div className="mb-2">
+                    <img 
+                      src={m.imageUrl} 
+                      alt="Uploaded" 
+                      className="max-w-full h-auto rounded-lg max-h-64 object-contain"
+                    />
+                  </div>
+                )}
                 {m.role === "assistant" ? (
                   <Markdown content={m.content} />
                 ) : (
@@ -169,7 +214,41 @@ const AIChat = () => {
           onSubmit={onSend}
           className="p-4 border-t border-itin-sand-200 bg-custom-white"
         >
+          {imagePreview && (
+            <div className="mb-3 relative inline-block">
+              <img 
+                src={imagePreview} 
+                alt="Preview" 
+                className="max-h-32 rounded-lg border-2 border-itin-sand-300"
+              />
+              <button
+                type="button"
+                onClick={clearImage}
+                className="absolute -top-2 -right-2 bg-custom-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-custom-red-700 transition-colors"
+                title="Remove image"
+              >
+                ×
+              </button>
+            </div>
+          )}
           <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+              id="image-upload"
+            />
+            <label
+              htmlFor="image-upload"
+              className={`btn-secondary px-4 py-2 cursor-pointer flex items-center justify-center ${loading || !activeId ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title="Upload image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </label>
             <textarea
               className="form-input resize-none"
               placeholder="Ask about your schedule or request an event..."
