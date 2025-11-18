@@ -24,12 +24,26 @@ const EventDetail = () => {
   // Initialize form data when event loads
   useEffect(() => {
     if (event) {
+      // Convert UTC times to local datetime-local format
+      const startDate = new Date(event.start_time);
+      const endDate = new Date(event.end_time);
+      
+      // Format as YYYY-MM-DDTHH:mm for datetime-local input
+      const formatForInput = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      };
+      
       setFormData({
         title: event.title,
         description: event.description || '',
         location: event.location || '',
-        start_time: event.start_time.slice(0, 16), // Format for datetime-local input
-        end_time: event.end_time.slice(0, 16),
+        start_time: formatForInput(startDate),
+        end_time: formatForInput(endDate),
         all_day: event.all_day,
       });
     }
@@ -49,14 +63,18 @@ const EventDetail = () => {
     e.preventDefault();
 
     try {
+      // Convert local datetime to ISO string for API
+      const startISO = new Date(formData.start_time).toISOString();
+      const endISO = new Date(formData.end_time).toISOString();
+      
       await updateEventMutation.mutateAsync({
         id: eventId,
         input: {
           title: formData.title,
           description: formData.description || undefined,
           location: formData.location || undefined,
-          start_time: formData.start_time,
-          end_time: formData.end_time,
+          start_time: startISO,
+          end_time: endISO,
           all_day: formData.all_day,
         },
       });

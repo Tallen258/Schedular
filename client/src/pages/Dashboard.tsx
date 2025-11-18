@@ -85,9 +85,9 @@ const Dashboard = () => {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-4">Available Time Slots</h2>
+            <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="text-itin-sand-700">
-              AI-suggested time slots will appear here (coming soon).
+              View your calendar or compare schedules to find available time slots.
             </div>
           </div>
         </div>

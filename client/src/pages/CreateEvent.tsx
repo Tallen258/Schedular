@@ -25,12 +25,16 @@ const CreateEvent = () => {
     }
 
     try {
+      // Convert local datetime to ISO string for API
+      const startISO = new Date(formData.start_time).toISOString();
+      const endISO = new Date(formData.end_time).toISOString();
+      
       await createEventMutation.mutateAsync({
         title: formData.title,
         description: formData.description || undefined,
         location: formData.location || undefined,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
+        start_time: startISO,
+        end_time: endISO,
         all_day: formData.all_day,
       });
 
