@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Schema for a parsed event from an image
- */
 export const ParsedEventSchema = z.object({
   id: z.string().default(() => crypto.randomUUID()),
   title: z.string().min(1, 'Title is required'),
@@ -16,9 +13,7 @@ export const ParsedEventSchema = z.object({
 
 export type ParsedEvent = z.infer<typeof ParsedEventSchema>;
 
-/**
- * Schema for the complete parsed schedule from an image
- */
+
 export const ParsedScheduleSchema = z.object({
   imageUrl: z.string().url().optional(),
   imageFile: z.instanceof(File).optional(),
@@ -26,14 +21,12 @@ export const ParsedScheduleSchema = z.object({
   events: z.array(ParsedEventSchema).default([]),
   parsedAt: z.string().datetime().default(() => new Date().toISOString()),
   ownerName: z.string().optional(), // Name of schedule owner
-  notes: z.string().optional(), // Additional notes about the schedule
+  notes: z.string().optional(), 
 });
 
 export type ParsedSchedule = z.infer<typeof ParsedScheduleSchema>;
 
-/**
- * Schema for schedule comparison request
- */
+
 export const CompareScheduleRequestSchema = z.object({
   myEvents: z.array(ParsedEventSchema),
   theirEvents: z.array(ParsedEventSchema),
@@ -44,9 +37,7 @@ export const CompareScheduleRequestSchema = z.object({
 
 export type CompareScheduleRequest = z.infer<typeof CompareScheduleRequestSchema>;
 
-/**
- * Schema for a suggested meeting slot from comparison
- */
+
 export const MeetingSlotSchema = z.object({
   start: z.string().datetime(),
   end: z.string().datetime(),
@@ -58,9 +49,7 @@ export const MeetingSlotSchema = z.object({
 
 export type MeetingSlot = z.infer<typeof MeetingSlotSchema>;
 
-/**
- * Schema for schedule comparison response
- */
+
 export const CompareScheduleResponseSchema = z.object({
   suggestedSlots: z.array(MeetingSlotSchema),
   totalConflicts: z.number().int().nonnegative(),
