@@ -11,6 +11,7 @@ import googleOAuthRoutes from "./Endpoints/googleOAuth";
 import googleCalendarRoutes from "./Endpoints/googleCalendar";
 import eventsRoutes from "./Endpoints/events";
 import chatRoutes from "./Endpoints/chat";
+import scheduleCompareRoutes from "./Endpoints/scheduleCompare";
 import { conversationsRouter } from "./Endpoints/conversation";
 
 dotenv.config();
@@ -110,6 +111,7 @@ app.use("/api/google/calendar", googleCalendarRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api", eventsRoutes);  // For /api/calendar/events endpoint
 app.use("/api/chat", chatRoutes);
+app.use("/api/schedule", scheduleCompareRoutes);
 
 
 const port = Number(process.env.PORT ?? 3000);

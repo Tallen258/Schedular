@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
 import { apiService } from './api';
 
-// Hook for checking API health
 export const useHealthCheck = (): UseQueryResult<{ ok: boolean; time: string }, Error> => {
   return useQuery({
     queryKey: ['health'],
@@ -13,7 +12,6 @@ export const useHealthCheck = (): UseQueryResult<{ ok: boolean; time: string }, 
   });
 };
 
-// Hook for getting user info
 export const useWhoAmI = (): UseQueryResult<{
   sub: string | null;
   email: string | null;
@@ -28,14 +26,3 @@ export const useWhoAmI = (): UseQueryResult<{
     },
   });
 };
-
-// Add more custom hooks here as needed for your application
-// Example:
-// export const useCreateEvent = (): UseMutationResult<Event, Error, EventData> => {
-//   return useMutation({
-//     mutationFn: async (data) => {
-//       const response = await apiService.createEvent(data);
-//       return response.data;
-//     },
-//   });
-// };

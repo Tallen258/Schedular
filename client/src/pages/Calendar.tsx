@@ -11,23 +11,20 @@ const Calendar = () => {
   const [view, setView] = useState<View>(Views.MONTH);
   const { data: events, isLoading, error } = useEvents();
 
-  // Convert API events to react-big-calendar format
   const calendarEvents: RbcEvent[] = (events || []).map(event => ({
     id: event.id.toString(),
     title: event.title,
     start: new Date(event.start_time),
     end: new Date(event.end_time),
     allDay: event.all_day,
-    resource: event, // Store full event data for later use
+    resource: event, 
   }));
 
   const handleSelectEvent = (event: RbcEvent) => {
-    // Navigate to event detail page when clicking on an event
     navigate(`/event/${event.id}`);
   };
 
   const handleSelectSlot = (slot: { start: Date; end: Date }) => {
-    // Navigate to create event page with pre-filled times
     const startTime = slot.start.toISOString().slice(0, 16);
     const endTime = slot.end.toISOString().slice(0, 16);
     navigate(`/create-event?start=${startTime}&end=${endTime}`);

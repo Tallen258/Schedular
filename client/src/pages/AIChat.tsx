@@ -43,7 +43,6 @@ const AIChat = () => {
     }
   }
 
-  // If no :conversationId, pick first or create one
   useEffect(() => {
     if (conversationsQuery.isLoading) return;
     if (activeId && Number.isFinite(activeId)) return;

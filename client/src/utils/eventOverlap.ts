@@ -72,18 +72,13 @@ export function checkEventOverlap(
   };
 }
 
-/**
- * Get events for a specific date
- * Compares events in local time to match user's selected date
- */
+
 export function getEventsForDate(events: Event[], targetDate: string): Event[] {
-  // Parse the target date as YYYY-MM-DD in local time
   const [year, month, day] = targetDate.split('-').map(Number);
   
   return events.filter(event => {
     const eventStart = new Date(event.start_time);
     
-    // Compare in local time
     const eventYear = eventStart.getFullYear();
     const eventMonth = eventStart.getMonth() + 1; // getMonth() is 0-indexed
     const eventDay = eventStart.getDate();

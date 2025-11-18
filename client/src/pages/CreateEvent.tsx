@@ -19,13 +19,11 @@ const CreateEvent = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
     if (!formData.title || !formData.start_time || !formData.end_time) {
       return;
     }
 
     try {
-      // Convert local datetime to ISO string for API
       const startISO = new Date(formData.start_time).toISOString();
       const endISO = new Date(formData.end_time).toISOString();
       
@@ -38,10 +36,8 @@ const CreateEvent = () => {
         all_day: formData.all_day,
       });
 
-      // Navigate to calendar on success
       navigate('/calendar');
     } catch (error) {
-      // Error is handled by the mutation hook with toast
       console.error('Failed to create event:', error);
     }
   };

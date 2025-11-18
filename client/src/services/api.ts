@@ -19,20 +19,12 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// API endpoints
 export const apiService = {
-  // Health check
   checkHealth: () => api.get('/api/health'),
 
-  // User info
   getWhoAmI: () => api.get('/api/whoami'),
 
-  // Add more API endpoints here as needed for your application
-  // Example:
-  // createEvent: (data) => api.post('/api/events', data),
-  // getEvents: () => api.get('/api/events'),
-  // updateEvent: (id, data) => api.put(`/api/events/${id}`, data),
-  // deleteEvent: (id) => api.delete(`/api/events/${id}`),
+
 };
 
 export default api;
