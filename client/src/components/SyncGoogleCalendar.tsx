@@ -1,28 +1,20 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "react-oidc-context";
-import { syncGoogleCalendarEvents, importGoogleCalendarEvent } from "../api/event";
+import { 
+  startGoogleCalendarAuth,
+  getGoogleCalendarEvents,
+  syncGoogleCalendarEvents, 
+  importGoogleCalendarEvent,
+  type GoogleCalendarEvent
+} from "../api/event";
 import { useQueryClient } from "@tanstack/react-query";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
-
-type GoogleEventItem = {
-  id: string;
-  summary: string;
-  start: string | null;
-  end: string | null;
-  location: string | null;
-  attendees: { email: string; responseStatus?: string }[];
-  hangoutLink: string | null;
-};
-
 interface SyncGoogleCalendarProps {
-  onEventsLoaded?: (events: GoogleEventItem[]) => void;
+  onEventsLoaded?: (events: GoogleCalendarEvent[]) => void;
 }
 
 const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded }) => {
-  const auth = useAuth();
   const queryClient = useQueryClient();
-  const [events, setEvents] = useState<GoogleEventItem[]>([]);
+  const [events, setEvents] = useState<GoogleCalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -39,25 +31,8 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
     setError(null);
     console.log('Loading events from Google Calendar');
     try {
-      const token = auth?.user?.access_token;
-      const r = await fetch(`${API_BASE}/api/google/calendar/upcoming`, {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        credentials: "include",
-      });
-      if (!r.ok) {
-        const text = await r.text();
-        let errorMsg = text || r.statusText;
-        try {
-          const json = JSON.parse(text);
-          errorMsg = json.error || errorMsg;
-        } catch {}
-        throw new Error(errorMsg);
-      }
-      const data = await r.json();
-      console.log('Received events:', data.items);
-      const googleEvents = data.items ?? [];
+      const googleEvents = await getGoogleCalendarEvents();
+      console.log('Received events:', googleEvents);
       setEvents(googleEvents);
       if (onEventsLoaded) {
         onEventsLoaded(googleEvents);
@@ -80,24 +55,13 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
   }, []);
 
   async function connectGoogle() {
-    const token = auth?.user?.access_token;
-    const r = await fetch(`${API_BASE}/api/auth/google/start`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      credentials: "include",
-    });
-
-    if (!r.ok) {
-      const text = await r.text();
-      alert("Failed to start Google link: " + text);
-      return;
+    try {
+      const { url } = await startGoogleCalendarAuth();
+      window.location.href = url;
+    } catch (e: any) {
+      setError(e.message ?? "Failed to start Google link");
+      console.error('Error connecting to Google:', e);
     }
-
-    const { url } = await r.json();
-    window.location.href = url;
   }
 
   function formatDate(dateString: string | null) {

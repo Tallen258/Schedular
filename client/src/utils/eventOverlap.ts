@@ -1,4 +1,4 @@
-import type { Event } from '../schemas/event';
+import type { Event } from '../api/event';
 
 export interface TimeSlot {
   start: Date;
