@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateEvent } from '../hooks/useEvents';
+import TextInput from '../components/forms/TextInput';
+import TextArea from '../components/forms/TextArea';
+import DateTimeInput from '../components/forms/DateTimeInput';
+import PageContainer from '../components/layout/PageContainer';
+import Card from '../components/layout/Card';
+import PageHeader from '../components/layout/PageHeader';
+import Grid from '../components/layout/Grid';
 
 const CreateEvent = () => {
   console.log('CreateEvent component rendering');
@@ -53,80 +60,56 @@ const CreateEvent = () => {
   };
 
   return (
-    <main className="min-h-screen p-6 bg-itin-sand-50">
-      <section className="mx-auto max-w-2xl card p-6">
-        <header>
-          <div className="itin-header">Create Event</div>
-          <div className="accent-bar mt-2" />
-        </header>
+    <PageContainer maxWidth="sm">
+      <Card>
+        <PageHeader title="Create Event" />
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="form-label">
-              Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="title"
-              className="form-input"
-              placeholder="Team Meeting"
-              value={formData.title}
+          <TextInput
+            label="Title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Team Meeting"
+            required
+          />
+
+          <Grid cols={2} gap="md">
+            <DateTimeInput
+              label="Start Date & Time"
+              name="start_time"
+              value={formData.start_time}
               onChange={handleChange}
+              type="datetime-local"
               required
             />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="form-label">
-                Start Date & Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                name="start_time"
-                type="datetime-local"
-                className="form-input"
-                value={formData.start_time}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="form-label">
-                End Date & Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                name="end_time"
-                type="datetime-local"
-                className="form-input"
-                value={formData.end_time}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="form-label">Location</label>
-            <input
-              name="location"
-              className="form-input"
-              placeholder="Conference Room A"
-              value={formData.location}
+            <DateTimeInput
+              label="End Date & Time"
+              name="end_time"
+              value={formData.end_time}
               onChange={handleChange}
+              type="datetime-local"
+              required
             />
-          </div>
+          </Grid>
 
-          <div>
-            <label className="form-label">Description</label>
-            <textarea
-              name="description"
-              className="form-input"
-              rows={4}
-              placeholder="Optional notes about the event"
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </div>
+          <TextInput
+            label="Location"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            placeholder="Conference Room A"
+          />
+
+          <TextArea
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Optional notes about the event"
+          />
 
           <div className="flex items-center gap-2">
             <input
@@ -160,8 +143,8 @@ const CreateEvent = () => {
             </button>
           </div>
         </form>
-      </section>
-    </main>
+      </Card>
+    </PageContainer>
   );
 };
 

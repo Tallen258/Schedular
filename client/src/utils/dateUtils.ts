@@ -1,10 +1,4 @@
-/**
- * Utility functions for date and time formatting
- */
 
-/**
- * Format ISO string for datetime-local input (converts to local time)
- */
 export const formatForDatetimeLocal = (isoString: string): string => {
   const date = new Date(isoString);
   const year = date.getFullYear();
@@ -15,9 +9,7 @@ export const formatForDatetimeLocal = (isoString: string): string => {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-/**
- * Format time in user-friendly format (e.g., "2:30 PM")
- */
+
 export const formatTime = (date: Date): string => {
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -26,9 +18,7 @@ export const formatTime = (date: Date): string => {
   });
 };
 
-/**
- * Format duration between two dates (e.g., "2h 30m")
- */
+
 export const formatDuration = (start: Date, end: Date): string => {
   const durationMs = end.getTime() - start.getTime();
   const hours = Math.floor(durationMs / (1000 * 60 * 60));

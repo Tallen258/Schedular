@@ -10,9 +10,9 @@ interface ExtractedEventsEditorProps {
 
 const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedEventsEditorProps) => {
   return (
-    <div className="border border-itin-sand-200 rounded p-3 bg-blue-50">
+    <div className="border border-itin-sand-200 rounded p-3 bg-brand-teal-50">
       <div className="flex justify-between items-center mb-2">
-        <h4 className="font-semibold text-blue-900">
+        <h4 className="font-semibold text-brand-teal-800">
           Their Events from Image ({events.length})
         </h4>
         <button
@@ -23,17 +23,17 @@ const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedE
         </button>
       </div>
       {events.length === 0 ? (
-        <p className="text-sm text-blue-700">No events extracted from the image.</p>
+        <p className="text-sm text-brand-teal-700">No events extracted from the image.</p>
       ) : (
         <div className="space-y-3">
           {events.map((event, index) => (
-            <div key={index} className="border border-blue-300 rounded p-3 bg-white">
+            <div key={index} className="border border-brand-teal-200 rounded p-3 bg-white">
               <div className="space-y-2">
                 <div className="flex justify-between items-start">
-                  <label className="text-xs font-medium text-blue-900">Title</label>
+                  <label className="text-xs font-medium text-brand-teal-800">Title</label>
                   <button
                     onClick={() => onRemove(index)}
-                    className="text-red-600 hover:text-red-800 text-xs"
+                    className="text-custom-red-700 hover:text-custom-red-700 text-xs font-semibold"
                   >
                     ✕ Remove
                   </button>
@@ -47,7 +47,7 @@ const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedE
                 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs font-medium text-blue-900">Start Time</label>
+                    <label className="text-xs font-medium text-brand-teal-800">Start Time</label>
                     <input
                       type="datetime-local"
                       value={formatForDatetimeLocal(event.start_time)}
@@ -59,7 +59,7 @@ const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedE
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-blue-900">End Time</label>
+                    <label className="text-xs font-medium text-brand-teal-800">End Time</label>
                     <input
                       type="datetime-local"
                       value={formatForDatetimeLocal(event.end_time)}

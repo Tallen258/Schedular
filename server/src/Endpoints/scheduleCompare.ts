@@ -45,6 +45,8 @@ interface ExtractedEvent {
 
 interface CompareScheduleRequest {
   date: string;
+  workStartHour?: number;
+  workEndHour?: number;
   myEvents: Array<{
     title: string;
     start_time: string;
@@ -67,7 +69,7 @@ router.post('/compare', upload.single('image'), async (req: Request, res: Respon
     console.log('✅ Image file received:', req.file.filename);
     console.log('📦 Request body data:', req.body.data);
 
-    const { date, myEvents } = JSON.parse(req.body.data || '{}') as CompareScheduleRequest;
+    const { date, myEvents, workStartHour = 9, workEndHour = 17 } = JSON.parse(req.body.data || '{}') as CompareScheduleRequest;
 
     if (!date || !myEvents) {
       console.error('❌ Missing required fields');
@@ -75,6 +77,7 @@ router.post('/compare', upload.single('image'), async (req: Request, res: Respon
     }
 
     console.log('📅 Date:', date);
+    console.log('⏰ Work hours:', workStartHour, '-', workEndHour);
     console.log('📋 My events count:', myEvents.length);
 
     // Read the uploaded image file
@@ -204,10 +207,10 @@ IMPORTANT: Return ONLY the JSON array, no markdown formatting, no explanations.`
       }))
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    // Calculate free time slots (9 AM - 5 PM working hours)
+    // Calculate free time slots using provided work hours
     const [year, month, day] = date.split('-').map(Number);
-    const dayStart = new Date(year, month - 1, day, 9, 0, 0);
-    const dayEnd = new Date(year, month - 1, day, 17, 0, 0);
+    const dayStart = new Date(year, month - 1, day, workStartHour, 0, 0);
+    const dayEnd = new Date(year, month - 1, day, workEndHour, 0, 0);
 
     const freeSlots: Array<{ start: string; end: string }> = [];
     let currentTime = dayStart;

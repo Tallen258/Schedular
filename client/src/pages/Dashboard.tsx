@@ -41,7 +41,7 @@ const Dashboard = () => {
             )}
 
             {error && (
-              <div className="text-red-600">
+              <div className="text-custom-red-700">
                 Failed to load events: {error.message}
               </div>
             )}
@@ -57,7 +57,7 @@ const Dashboard = () => {
                 {upcomingEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="border border-itin-sand-200 rounded-lg p-4 hover:border-itin-orange-500 transition-colors cursor-pointer"
+                    className="border border-itin-sand-200 rounded-lg p-4 hover:border-itin-sand-400 transition-colors cursor-pointer"
                     onClick={() => navigate(`/event/${event.id}`)}
                   >
                     <div className="flex justify-between items-start">

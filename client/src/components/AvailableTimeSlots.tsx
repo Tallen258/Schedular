@@ -28,7 +28,7 @@ const AvailableTimeSlots = ({
 
   if (error) {
     return (
-      <div className="text-red-600">
+      <div className="text-custom-red-700">
         Failed to load time slots: {error.message}
       </div>
     );
@@ -79,7 +79,7 @@ const AvailableTimeSlots = ({
           type="date"
           value={selectedDate}
           onChange={handleDateChange}
-          className="px-3 py-2 border border-itin-sand-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-itin-orange-500"
+          className="px-3 py-2 border border-itin-sand-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-itin-sand-500"
         />
       </div>
 
@@ -89,8 +89,8 @@ const AvailableTimeSlots = ({
         </div>
       ) : (
         <>
-          <div className="mb-4 p-3 bg-itin-orange-50 border border-itin-orange-200 rounded-lg">
-            <span className="font-semibold text-itin-orange-800">
+          <div className="mb-4 p-3 bg-itin-sand-100 border border-itin-sand-300 rounded-lg">
+            <span className="font-semibold text-itin-sand-700">
               Total Available: {totalHours.toFixed(1)} hours
             </span>
             <span className="text-sm text-itin-sand-600 ml-2">
@@ -102,7 +102,7 @@ const AvailableTimeSlots = ({
             {availableSlots.map((slot, index) => (
               <div
                 key={index}
-                className="border border-itin-sand-200 rounded-lg p-4 hover:border-itin-orange-400 transition-colors"
+                className="border border-itin-sand-200 rounded-lg p-4 hover:border-itin-sand-400 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">

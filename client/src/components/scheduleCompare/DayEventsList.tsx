@@ -14,7 +14,7 @@ const DayEventsList = ({ selectedDate, events }: DayEventsListProps) => {
       ) : (
         <div className="space-y-2">
           {events.map((event) => (
-            <div key={event.id} className="text-sm border-l-2 border-itin-sage-500 pl-3 py-1">
+            <div key={event.id} className="text-sm border-l-2 border-accent-green-600 pl-3 py-1">
               <div className="font-medium">{event.title}</div>
               <div className="text-itin-sand-600">
                 {new Date(event.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} -

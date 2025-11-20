@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getEventsForDate, getAvailableTimeSlots, getTotalAvailableHours } from '../utils/eventOverlap';
 import { compareScheduleWithImage, type ExtractedEvent, type FreeSlot } from '../api/scheduleCompare';
 import { useEvents } from '../hooks/useEvents';
+import { getUserSettings } from '../utils/localStorage';
 import toast from 'react-hot-toast';
 import DateSelector from '../components/scheduleCompare/DateSelector';
 import DayEventsList from '../components/scheduleCompare/DayEventsList';
@@ -14,6 +15,7 @@ import AvailableSlotsPanel from '../components/scheduleCompare/AvailableSlotsPan
 
 const ScheduleCompare = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [excludeAllDayEvents, setExcludeAllDayEvents] = useState(true); // Default to excluding all-day events
   
   // Image upload states
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -27,8 +29,15 @@ const ScheduleCompare = () => {
   const { data: events = [] } = useEvents();
   const dayEvents = getEventsForDate(events, selectedDate);
 
-  const availableSlots = getAvailableTimeSlots(events, selectedDate, 9, 17);
-  const totalAvailableHours = getTotalAvailableHours(events, selectedDate, 9, 17);
+  // Get user's configured work hours from settings
+  const settings = getUserSettings();
+  const workStart = settings.workStartTime ? parseInt(settings.workStartTime.split(':')[0]) : 9;
+  const workEnd = settings.workEndTime ? parseInt(settings.workEndTime.split(':')[0]) : 17;
+
+  console.log('⏰ Using work hours:', workStart, '-', workEnd, '(from user settings)');
+
+  const availableSlots = getAvailableTimeSlots(events, selectedDate, workStart, workEnd);
+  const totalAvailableHours = getTotalAvailableHours(events, selectedDate, workStart, workEnd);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,7 +87,7 @@ const ScheduleCompare = () => {
         eventsCount: myEvents.length
       });
 
-      const result = await compareScheduleWithImage(uploadedImage, selectedDate, myEvents);
+      const result = await compareScheduleWithImage(uploadedImage, selectedDate, myEvents, workStart, workEnd);
       
       console.log('✅ Received result:', result);
 
@@ -91,7 +100,7 @@ const ScheduleCompare = () => {
         duration: 4000,
       });
     } catch (error) {
-      console.error('❌ Failed to analyze schedule:', error);
+      console.error(' Failed to analyze schedule:', error);
       toast.error('Failed to analyze the schedule image. Please try again.');
     } finally {
       setIsAnalyzing(false);
@@ -115,18 +124,30 @@ const ScheduleCompare = () => {
       return;
     }
 
-    // Recalculate free slots with potentially edited events
-    const myEvents = dayEvents.map(e => ({
-      start_time: e.start_time,
-      end_time: e.end_time,
-    }));
+    // Filter events to only include the selected date
+    const myEventsForDate = dayEvents
+      .filter(e => !excludeAllDayEvents || !e.all_day) // Optionally exclude all-day events
+      .map(e => ({
+        start_time: e.start_time,
+        end_time: e.end_time,
+      }));
 
-    const theirEvents = editableExtractedEvents.map(e => ({
-      start_time: e.start_time,
-      end_time: e.end_time,
-    }));
+    const theirEventsForDate = editableExtractedEvents
+      .filter(e => {
+        // Only include events on the selected date
+        const eventDate = new Date(e.start_time).toISOString().split('T')[0];
+        return eventDate === selectedDate;
+      })
+      .map(e => ({
+        start_time: e.start_time,
+        end_time: e.end_time,
+      }));
 
-    const allEvents = [...myEvents, ...theirEvents];
+    console.log('📅 Comparing for date:', selectedDate);
+    console.log('📋 My events:', myEventsForDate.length);
+    console.log('📋 Their events (filtered to date):', theirEventsForDate.length);
+
+    const allEvents = [...myEventsForDate, ...theirEventsForDate];
     
     // Sort all events by start time
     const sortedEvents = allEvents
@@ -136,33 +157,43 @@ const ScheduleCompare = () => {
       }))
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    // Calculate free time slots (9 AM - 5 PM working hours)
+    // Calculate free time slots using user's configured work hours
     const [year, month, day] = selectedDate.split('-').map(Number);
-    const dayStart = new Date(year, month - 1, day, 9, 0, 0);
-    const dayEnd = new Date(year, month - 1, day, 17, 0, 0);
+    const dayStart = new Date(year, month - 1, day, workStart, 0, 0);
+    const dayEnd = new Date(year, month - 1, day, workEnd, 0, 0);
 
     const freeSlots: FreeSlot[] = [];
     let currentTime = dayStart;
 
+    console.log('🕒 Day boundaries:', dayStart.toISOString(), 'to', dayEnd.toISOString());
+    console.log('📅 Processing', sortedEvents.length, 'events');
+
     for (const event of sortedEvents) {
+      console.log('  Event:', event.start.toISOString(), 'to', event.end.toISOString());
+      
       if (currentTime < event.start && event.start <= dayEnd) {
-        freeSlots.push({
+        const slot = {
           start: currentTime.toISOString(),
           end: event.start.toISOString(),
-        });
+        };
+        console.log('  ✅ Free slot:', slot.start, 'to', slot.end);
+        freeSlots.push(slot);
       }
       if (event.end > currentTime) {
         currentTime = event.end;
       }
     }
 
-    // Add remaining time after last event
     if (currentTime < dayEnd) {
-      freeSlots.push({
+      const slot = {
         start: currentTime.toISOString(),
         end: dayEnd.toISOString(),
-      });
+      };
+      console.log('  ✅ Final free slot:', slot.start, 'to', slot.end);
+      freeSlots.push(slot);
     }
+
+    console.log('✨ Total free slots found:', freeSlots.length);
 
     setCommonFreeSlots(freeSlots);
     setIsConfirmed(true);
@@ -226,13 +257,22 @@ const ScheduleCompare = () => {
 
               {extractedEvents.length > 0 && (
                 <div className="space-y-4">
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800 mb-2">
+                  <div className="p-3 bg-brand-teal-50 border border-brand-teal-200 rounded-lg">
+                    <p className="text-sm text-brand-teal-800 mb-2">
                       ℹ️ Review the extracted events below and confirm to find common free time.
                     </p>
+                    <label className="flex items-center gap-2 text-sm text-brand-teal-800 mt-2">
+                      <input
+                        type="checkbox"
+                        checked={excludeAllDayEvents}
+                        onChange={(e) => setExcludeAllDayEvents(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                      Exclude all-day events from comparison
+                    </label>
                   </div>
 
-                  <YourEventsSummary events={dayEvents} />
+                  <YourEventsSummary events={dayEvents.filter(e => !excludeAllDayEvents || !e.all_day)} />
 
                   <ExtractedEventsEditor
                     events={editableExtractedEvents}

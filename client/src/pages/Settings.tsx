@@ -7,7 +7,6 @@ const Settings = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    // Load settings on mount
     const loaded = getUserSettings();
     setSettings(loaded);
   }, []);
@@ -120,8 +119,8 @@ const Settings = () => {
                   onClick={() => handleToggleDay(index)}
                   className={`px-4 py-2 rounded border transition-colors ${
                     settings.preferredDays.includes(index)
-                      ? 'bg-itin-sage-600 text-white border-itin-sage-600'
-                      : 'bg-white text-itin-sand-700 border-itin-sand-200 hover:border-itin-sage-400'
+                      ? 'bg-accent-green-600 text-white border-accent-green-600'
+                      : 'bg-white text-itin-sand-700 border-itin-sand-200 hover:border-accent-green-400'
                   }`}
                 >
                   {name}

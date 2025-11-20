@@ -107,7 +107,7 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
                 {newEvents.length > 1 && (
                   <button
                     onClick={() => removeEvent(event.id)}
-                    className="text-red-600 hover:text-red-800 text-sm"
+                    className="text-custom-red-700 hover:text-custom-red-700 text-sm font-semibold"
                   >
                     ✕ Remove
                   </button>
@@ -147,15 +147,15 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
                 </div>
 
                 {overlapResult && event.endTime > event.startTime && (
-                  <div className={`p-3 rounded ${overlapResult.hasOverlap ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
+                  <div className={`p-3 rounded ${overlapResult.hasOverlap ? 'bg-custom-red-50 border border-custom-red-500' : 'bg-accent-green-50 border border-accent-green-400'}`}>
                     {overlapResult.hasOverlap ? (
                       <>
-                        <p className="font-semibold text-red-800 mb-2 text-sm">⚠️ Conflicts ({overlapResult.conflicts.length}):</p>
-                        <ul className="text-xs text-red-700 space-y-1">
+                        <p className="font-semibold text-custom-red-700 mb-2 text-sm">⚠️ Conflicts ({overlapResult.conflicts.length}):</p>
+                        <ul className="text-xs text-custom-red-700 space-y-1">
                           {overlapResult.conflicts.map((evt) => (
                             <li key={evt.id} className="flex justify-between">
                               <span>• {evt.title}</span>
-                              <span className="text-red-600 ml-2">
+                              <span className="text-custom-red-700 ml-2">
                                 {new Date(evt.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - 
                                 {new Date(evt.end_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </span>
@@ -164,14 +164,14 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
                         </ul>
                       </>
                     ) : (
-                      <p className="text-green-800 font-medium text-sm">✓ No conflicts!</p>
+                      <p className="text-accent-green-700 font-medium text-sm">✓ No conflicts!</p>
                     )}
                   </div>
                 )}
                 
                 {hasInvalidTime && (
-                  <div className="p-2 rounded bg-yellow-50 border border-yellow-200">
-                    <p className="text-yellow-800 text-xs">⚠️ End time must be after start time</p>
+                  <div className="p-2 rounded bg-itin-sand-100 border border-itin-sand-300">
+                    <p className="text-itin-sand-700 text-xs">⚠️ End time must be after start time</p>
                   </div>
                 )}
               </div>

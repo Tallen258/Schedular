@@ -8,7 +8,7 @@ export default defineConfig({
     host: true,        // expose LAN URLs
     port: 5173,
     strictPort: true,
-    open: true,
+    open: false,       // disable auto-open in Docker
     proxy: {
       '/api': {
         target: 'http://localhost:3000', // <-- change if your server uses another port

@@ -123,7 +123,7 @@ const EventDetail = () => {
     return (
       <main className="min-h-screen p-6 bg-itin-sand-50">
         <section className="mx-auto max-w-2xl card p-6">
-          <div className="text-red-600">Failed to load event: {error?.message || 'Event not found'}</div>
+          <div className="text-custom-red-700">Failed to load event: {error?.message || 'Event not found'}</div>
           <button onClick={() => navigate('/dashboard')} className="btn-primary mt-4">
             Back to Dashboard
           </button>
@@ -193,7 +193,7 @@ const EventDetail = () => {
               </button>
               <button
                 onClick={handleDelete}
-                className="btn-secondary bg-red-100 text-red-700 hover:bg-red-200"
+                className="btn-secondary bg-custom-red-50 text-custom-red-700 hover:bg-custom-red-500 hover:text-white"
                 disabled={deleteEventMutation.isPending}
               >
                 {deleteEventMutation.isPending ? 'Deleting...' : 'Delete Event'}

@@ -8,7 +8,7 @@ export default function Markdown({ content }: MarkdownProps) {
     let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
-    formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded">$1</code>');
+    formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-itin-sand-100 px-1 rounded">$1</code>');
     
     formatted = formatted.replace(/\n/g, '<br />');
     

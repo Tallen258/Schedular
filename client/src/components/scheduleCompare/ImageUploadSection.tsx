@@ -33,7 +33,7 @@ const ImageUploadSection = ({
             <span className="text-sm font-medium">Preview</span>
             <button
               onClick={onClearImage}
-              className="text-red-600 hover:text-red-800 text-sm"
+              className="text-custom-red-700 hover:text-custom-red-700 text-sm font-semibold"
             >
               ✕ Clear
             </button>

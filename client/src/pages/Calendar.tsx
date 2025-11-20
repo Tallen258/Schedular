@@ -59,7 +59,7 @@ const Calendar = () => {
 
         {error && (
           <div className="card p-6">
-            <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div className="p-4 bg-custom-red-50 border border-custom-red-500 text-custom-red-700 rounded-lg">
               Error: {error.message}
             </div>
           </div>

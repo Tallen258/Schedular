@@ -18,7 +18,7 @@ function ErrorBoundary({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   } catch {
     return (
-      <div role="alert" className="p-4 text-red-700 bg-red-100 rounded">
+      <div role="alert" className="p-4 text-custom-red-700 bg-custom-red-50 rounded">
         Something went wrong rendering this view.
       </div>
     );
@@ -26,8 +26,6 @@ function ErrorBoundary({ children }: { children: React.ReactNode }) {
 }
 
 function AuthCallback() {
-  // With react-oidc-context, the provider's onSigninCallback normally handles finishing the sign-in.
-  // This page just shows a friendly spinner while that happens.
   return <div className="p-4">Finishing sign-in…</div>;
 }
 

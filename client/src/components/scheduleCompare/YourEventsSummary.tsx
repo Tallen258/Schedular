@@ -15,7 +15,7 @@ const YourEventsSummary = ({ events }: YourEventsSummaryProps) => {
       ) : (
         <div className="space-y-2">
           {events.map((event) => (
-            <div key={event.id} className="text-sm border-l-2 border-itin-sage-500 pl-3 py-1">
+            <div key={event.id} className="text-sm border-l-2 border-accent-green-600 pl-3 py-1">
               <div className="font-medium text-itin-sand-900">{event.title}</div>
               <div className="text-itin-sand-600">
                 {new Date(event.start_time).toLocaleString('en-US', { 

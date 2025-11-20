@@ -10,7 +10,6 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import './styles/rbc-tailwind.css'
 import App from './App.tsx'
 
-// Create a client
 const queryClient = new QueryClient()
 
 const oidcConfig: AuthProviderProps = {
