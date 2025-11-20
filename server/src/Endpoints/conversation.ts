@@ -6,7 +6,7 @@ import multer from "multer";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
@@ -201,14 +201,12 @@ export function conversationsRouter(db: IDatabase<unknown>) {
 
     // Handle uploaded image
     let imageData: string | null = null;
-    let imageBase64: string | null = null;
     
     if (req.file) {
       // Convert image buffer to base64
       const base64 = req.file.buffer.toString("base64");
       const mimeType = req.file.mimetype;
       imageData = `data:${mimeType};base64,${base64}`;
-      imageBase64 = base64;
     }
 
     // Fetch all prior messages to construct the chat history sent upstream
