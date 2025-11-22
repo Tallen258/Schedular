@@ -166,7 +166,7 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Technology: Network Calls that read and write data  
 
 **Features**
-- [ ] `compareSchedulesAndPropose` (ranked meeting slots)  
+- [ ] `compareSchedulesAndPropose` 
 - [ ] Confirmation → `createEvent`  
 - [ ] Compare Schedule view shows top slots + reasons  
 - [ ] Event Detail page (conflict display)  

@@ -34,7 +34,7 @@ const ScheduleCompare = () => {
   const workStart = settings.workStartTime ? parseInt(settings.workStartTime.split(':')[0]) : 9;
   const workEnd = settings.workEndTime ? parseInt(settings.workEndTime.split(':')[0]) : 17;
 
-  console.log('⏰ Using work hours:', workStart, '-', workEnd, '(from user settings)');
+  console.log('Using work hours:', workStart, '-', workEnd, '(from user settings)');
 
   const availableSlots = getAvailableTimeSlots(events, selectedDate, workStart, workEnd);
   const totalAvailableHours = getTotalAvailableHours(events, selectedDate, workStart, workEnd);
@@ -65,9 +65,9 @@ const ScheduleCompare = () => {
       return;
     }
 
-    console.log('🔍 Starting schedule analysis...');
-    console.log('📅 Selected date:', selectedDate);
-    console.log('📋 Day events count:', dayEvents.length);
+    console.log('Starting schedule analysis...');
+    console.log('Selected date:', selectedDate);
+    console.log('Day events count:', dayEvents.length);
 
     setIsAnalyzing(true);
     setIsConfirmed(false);
@@ -80,7 +80,7 @@ const ScheduleCompare = () => {
         end_time: e.end_time,
       }));
 
-      console.log('📤 Sending request with:', {
+      console.log('Sending request with:', {
         imageSize: uploadedImage.size,
         imageType: uploadedImage.type,
         date: selectedDate,
@@ -89,7 +89,7 @@ const ScheduleCompare = () => {
 
       const result = await compareScheduleWithImage(uploadedImage, selectedDate, myEvents, workStart, workEnd);
       
-      console.log('✅ Received result:', result);
+      console.log('Received result:', result);
 
       setExtractedEvents(result.extractedEvents);
       setEditableExtractedEvents(result.extractedEvents);
@@ -143,9 +143,9 @@ const ScheduleCompare = () => {
         end_time: e.end_time,
       }));
 
-    console.log('📅 Comparing for date:', selectedDate);
-    console.log('📋 My events:', myEventsForDate.length);
-    console.log('📋 Their events (filtered to date):', theirEventsForDate.length);
+    console.log('Comparing for date:', selectedDate);
+    console.log('My events:', myEventsForDate.length);
+    console.log('Their events (filtered to date):', theirEventsForDate.length);
 
     const allEvents = [...myEventsForDate, ...theirEventsForDate];
     
@@ -165,8 +165,8 @@ const ScheduleCompare = () => {
     const freeSlots: FreeSlot[] = [];
     let currentTime = dayStart;
 
-    console.log('🕒 Day boundaries:', dayStart.toISOString(), 'to', dayEnd.toISOString());
-    console.log('📅 Processing', sortedEvents.length, 'events');
+    console.log('Day boundaries:', dayStart.toISOString(), 'to', dayEnd.toISOString());
+    console.log('Processing', sortedEvents.length, 'events');
 
     for (const event of sortedEvents) {
       console.log('  Event:', event.start.toISOString(), 'to', event.end.toISOString());
@@ -176,7 +176,7 @@ const ScheduleCompare = () => {
           start: currentTime.toISOString(),
           end: event.start.toISOString(),
         };
-        console.log('  ✅ Free slot:', slot.start, 'to', slot.end);
+        console.log('Free slot:', slot.start, 'to', slot.end);
         freeSlots.push(slot);
       }
       if (event.end > currentTime) {
@@ -189,7 +189,7 @@ const ScheduleCompare = () => {
         start: currentTime.toISOString(),
         end: dayEnd.toISOString(),
       };
-      console.log('  ✅ Final free slot:', slot.start, 'to', slot.end);
+      console.log('Final free slot:', slot.start, 'to', slot.end);
       freeSlots.push(slot);
     }
 
@@ -240,7 +240,7 @@ const ScheduleCompare = () => {
           <NewEventsOverlapChecker selectedDate={selectedDate} dayEvents={dayEvents} />
 
           <div className="border border-itin-sand-200 rounded p-4 bg-white">
-            <h3 className="font-semibold mb-3">Compare with Another Schedule</h3>
+            <h3 className="font-semibold mb-3">Compare Schedules</h3>
             <p className="text-sm text-itin-sand-600 mb-4">
               Upload a photo of someone else's calendar to find common free time slots.
             </p>
@@ -259,7 +259,7 @@ const ScheduleCompare = () => {
                 <div className="space-y-4">
                   <div className="p-3 bg-brand-teal-50 border border-brand-teal-200 rounded-lg">
                     <p className="text-sm text-brand-teal-800 mb-2">
-                      ℹ️ Review the extracted events below and confirm to find common free time.
+                       Review the image events below and confirm they are correct to find common free time.
                     </p>
                     <label className="flex items-center gap-2 text-sm text-brand-teal-800 mt-2">
                       <input

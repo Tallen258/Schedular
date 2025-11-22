@@ -3,9 +3,6 @@ import { Router, type Request, type Response } from "express";
 
 const router = Router();
 
-/**
- * Get current user info
- */
 router.get("/whoami", (req: Request, res: Response) => {
   res.json({
     sub: req.user?.sub ?? null,
@@ -15,11 +12,8 @@ router.get("/whoami", (req: Request, res: Response) => {
   });
 });
 
-/**
- * Example protected endpoint
- */
 router.get("/secure-example", (_req: Request, res: Response) => {
-  res.json({ secret: "you are authenticated 🎉" });
+  res.json({ secret: "you are authenticated" });
 });
 
 export default router;

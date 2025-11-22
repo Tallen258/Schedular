@@ -62,37 +62,37 @@ router.post('/compare', upload.single('image'), async (req: Request, res: Respon
   console.log('📸 Schedule compare request received');
   try {
     if (!req.file) {
-      console.error('❌ No image file in request');
+      console.error(' No image file in request');
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    console.log('✅ Image file received:', req.file.filename);
-    console.log('📦 Request body data:', req.body.data);
+    console.log(' Image file received:', req.file.filename);
+    console.log(' Request body data:', req.body.data);
 
     const { date, myEvents, workStartHour = 9, workEndHour = 17 } = JSON.parse(req.body.data || '{}') as CompareScheduleRequest;
 
     if (!date || !myEvents) {
-      console.error('❌ Missing required fields');
+      console.error(' Missing required fields');
       return res.status(400).json({ error: 'Missing required fields: date and myEvents' });
     }
 
-    console.log('📅 Date:', date);
-    console.log('⏰ Work hours:', workStartHour, '-', workEndHour);
-    console.log('📋 My events count:', myEvents.length);
+    console.log('Date:', date);
+    console.log('Work hours:', workStartHour, '-', workEndHour);
+    console.log('My events count:', myEvents.length);
 
     // Read the uploaded image file
     const imagePath = req.file.path;
-    console.log('📂 Image path:', imagePath);
+    console.log('Image path:', imagePath);
 
     // Read and convert image to base64
     const imageBuffer = fs.readFileSync(imagePath);
     const base64Image = imageBuffer.toString('base64');
     const mimeType = req.file.mimetype;
     const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
-    console.log('🖼️  Image converted to base64, size:', base64Image.length);
+    console.log('Image converted to base64, size:', base64Image.length);
 
     // Use AI to extract events from the image
-    console.log('🤖 Starting AI vision analysis...');
+    console.log('Starting AI vision analysis...');
 
     const extractionPrompt = `Analyze this calendar/schedule image and extract ALL visible events or appointments.
 
@@ -135,9 +135,8 @@ IMPORTANT: Return ONLY the JSON array, no markdown formatting, no explanations.`
         headers.Authorization = `Bearer ${apiKey}`;
       }
 
-      // Use vision model with image
       const payload = {
-        model: "gemma3-27b", // Use the same model as chat
+        model: "gemma3-27b", 
         messages: [
           {
             role: "user",
@@ -165,24 +164,21 @@ IMPORTANT: Return ONLY the JSON array, no markdown formatting, no explanations.`
 
       const responseJson = JSON.parse(responseText);
       aiResponse = responseJson?.choices?.[0]?.message?.content ?? "[]";
-      console.log('✅ AI Response received');
+      console.log(' AI Response received');
     } catch (aiError) {
-      console.error('❌ AI call failed:', aiError);
-      // Fallback: return empty events array
+      console.error(' AI call failed:', aiError);
       aiResponse = '[]';
     }
 
-    console.log('🤖 AI Response:', aiResponse.substring(0, 200));
+    console.log(' AI Response:', aiResponse.substring(0, 200));
 
-    // Parse the extracted events
     let extractedEvents: ExtractedEvent[] = [];
     try {
-      // Try to parse the response as JSON
       const cleanedResponse = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
       extractedEvents = JSON.parse(cleanedResponse);
-      console.log('✅ Parsed', extractedEvents.length, 'events from AI response');
+      console.log(' Parsed', extractedEvents.length, 'events from AI response');
     } catch (parseError) {
-      console.error('❌ Failed to parse AI response:', aiResponse);
+      console.error(' Failed to parse AI response:', aiResponse);
       console.error('Parse error:', parseError);
       // Use empty array as fallback
       extractedEvents = [];
@@ -237,14 +233,14 @@ IMPORTANT: Return ONLY the JSON array, no markdown formatting, no explanations.`
 
     // Clean up uploaded file
     fs.unlinkSync(imagePath);
-    console.log('🗑️  Cleaned up uploaded file');
+    console.log('  Cleaned up uploaded file');
 
     const totalFreeHours = freeSlots.reduce((total, slot) => {
       const duration = new Date(slot.end).getTime() - new Date(slot.start).getTime();
       return total + duration / (1000 * 60 * 60);
     }, 0);
 
-    console.log('✅ Sending response:', { extractedCount: theirEvents.length, freeSlotsCount: freeSlots.length, totalFreeHours });
+    console.log(' Sending response:', { extractedCount: theirEvents.length, freeSlotsCount: freeSlots.length, totalFreeHours });
 
     res.json({
       success: true,

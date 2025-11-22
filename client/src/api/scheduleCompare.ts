@@ -18,9 +18,6 @@ export interface CompareScheduleResponse {
   totalFreeHours: number;
 }
 
-/**
- * Upload a calendar image and compare it with the user's calendar
- */
 export const compareScheduleWithImage = async (
   imageFile: File,
   date: string,
@@ -28,17 +25,17 @@ export const compareScheduleWithImage = async (
   workStartHour?: number,
   workEndHour?: number
 ): Promise<CompareScheduleResponse> => {
-  console.log('📡 API: compareScheduleWithImage called');
-  console.log('📡 API: Image file:', imageFile.name, imageFile.size, 'bytes');
-  console.log('📡 API: Date:', date);
-  console.log('📡 API: Work hours:', workStartHour, '-', workEndHour);
-  console.log('📡 API: Events count:', myEvents.length);
+  console.log(' API: compareScheduleWithImage called');
+  console.log('API: Image file:', imageFile.name, imageFile.size, 'bytes');
+  console.log('API: Date:', date);
+  console.log('API: Work hours:', workStartHour, '-', workEndHour);
+  console.log('API: Events count:', myEvents.length);
 
   const formData = new FormData();
   formData.append('image', imageFile);
   formData.append('data', JSON.stringify({ date, myEvents, workStartHour, workEndHour }));
 
-  console.log('📡 API: Sending POST request to /api/schedule/compare');
+  console.log('API: Sending POST request to /api/schedule/compare');
 
   try {
     const response = await api.post<CompareScheduleResponse>(
@@ -51,10 +48,10 @@ export const compareScheduleWithImage = async (
       }
     );
 
-    console.log('📡 API: Response received:', response.data);
+    console.log('API: Response received:', response.data);
     return response.data;
   } catch (error) {
-    console.error('📡 API: Request failed:', error);
+    console.error('API: Request failed:', error);
     throw error;
   }
 };

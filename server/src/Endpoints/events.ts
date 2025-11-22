@@ -4,14 +4,10 @@ import { db } from "../server";
 
 const router = Router();
 
-/**
- * GET /api/calendar/events - Get calendar events (mock data fallback)
- * TODO: Remove this once Google Calendar integration is fully working
- */
+
 router.get("/calendar/events", (req: Request, res: Response) => {
   if (!req.user?.email) return res.status(401).send("Login required");
 
-  // Mock calendar events for demonstration
   const mockEvents = [
     {
       id: "1",
@@ -41,9 +37,6 @@ router.get("/calendar/events", (req: Request, res: Response) => {
   res.json({ events: mockEvents });
 });
 
-/**
- * GET / - List all events for the authenticated user
- */
 router.get("/", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
@@ -67,9 +60,6 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * GET /:id - Get a single event by ID
- */
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
@@ -96,9 +86,6 @@ router.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST / - Create a new event
- */
 router.post("/", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
@@ -137,9 +124,6 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * PUT /:id - Update an existing event
- */
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
@@ -185,9 +169,6 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * DELETE /:id - Delete an event
- */
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
