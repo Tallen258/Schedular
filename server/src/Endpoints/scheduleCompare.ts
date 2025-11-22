@@ -1,47 +1,10 @@
 // src/Endpoints/scheduleCompare.ts
 import { Router, Request, Response } from 'express';
-import multer from 'multer';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { uploadScheduleImage } from '../middleware/uploadScheduleImage';
+import { extractEventsFromScheduleImage } from '../services/scheduleExtraction';
 
 const router = Router();
-
-// Configure multer for image uploads
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => {
-      const uploadDir = path.join(__dirname, '../../uploads');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      cb(null, uploadDir);
-    },
-    filename: (_req, file, cb) => {
-      const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}${path.extname(file.originalname)}`;
-      cb(null, uniqueName);
-    },
-  }),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  },
-});
-
-interface ExtractedEvent {
-  title: string;
-  startTime: string;
-  endTime: string;
-  date?: string;
-}
 
 interface CompareScheduleRequest {
   date: string;
@@ -58,7 +21,7 @@ interface CompareScheduleRequest {
  * POST /api/schedule/compare
  * Upload an image of a calendar/schedule and extract events, then compare with user's calendar
  */
-router.post('/compare', upload.single('image'), async (req: Request, res: Response) => {
+router.post('/compare', uploadScheduleImage.single('image'), async (req: Request, res: Response) => {
   console.log('📸 Schedule compare request received');
   try {
     if (!req.file) {
@@ -93,96 +56,8 @@ router.post('/compare', upload.single('image'), async (req: Request, res: Respon
 
     // Use AI to extract events from the image
     console.log('Starting AI vision analysis...');
-
-    const extractionPrompt = `Analyze this calendar/schedule image and extract ALL visible events or appointments.
-
-For each event you find, provide:
-- title: The event name/description
-- startTime: Start time in HH:MM format (24-hour, e.g., "14:00")
-- endTime: End time in HH:MM format (24-hour, e.g., "15:30")
-- date: The date in YYYY-MM-DD format (e.g., "2025-11-18")
-
-Return ONLY a valid JSON array. Example:
-[
-  {
-    "title": "Team Meeting",
-    "startTime": "09:00",
-    "endTime": "10:00",
-    "date": "2025-11-18"
-  },
-  {
-    "title": "Lunch Break",
-    "startTime": "12:00",
-    "endTime": "13:00",
-    "date": "2025-11-18"
-  }
-]
-
-If you cannot see any events or the image is unclear, return an empty array: []
-
-IMPORTANT: Return ONLY the JSON array, no markdown formatting, no explanations.`;
-
-    let aiResponse: string;
-    try {
-      const base = process.env.AI_BASE_URL ?? "https://ai-snow.reindeer-pinecone.ts.net";
-      const url = `${base}/api/chat/completions`;
-      const apiKey = process.env.OPENWEBUI_API_KEY;
-      
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (apiKey && apiKey.trim()) {
-        headers.Authorization = `Bearer ${apiKey}`;
-      }
-
-      const payload = {
-        model: "gemma3-27b", 
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: extractionPrompt },
-              { type: "image_url", image_url: { url: imageDataUrl } }
-            ]
-          }
-        ],
-        temperature: 0.1,
-      };
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(payload),
-      });
-
-      const responseText = await response.text();
-      
-      if (!response.ok) {
-        console.error('❌ AI API error:', response.status, responseText);
-        throw new Error(`AI API error: ${response.status}`);
-      }
-
-      const responseJson = JSON.parse(responseText);
-      aiResponse = responseJson?.choices?.[0]?.message?.content ?? "[]";
-      console.log(' AI Response received');
-    } catch (aiError) {
-      console.error(' AI call failed:', aiError);
-      aiResponse = '[]';
-    }
-
-    console.log(' AI Response:', aiResponse.substring(0, 200));
-
-    let extractedEvents: ExtractedEvent[] = [];
-    try {
-      const cleanedResponse = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
-      extractedEvents = JSON.parse(cleanedResponse);
-      console.log(' Parsed', extractedEvents.length, 'events from AI response');
-    } catch (parseError) {
-      console.error(' Failed to parse AI response:', aiResponse);
-      console.error('Parse error:', parseError);
-      // Use empty array as fallback
-      extractedEvents = [];
-    }
+    const extractedEvents = await extractEventsFromScheduleImage(imageDataUrl);
+    console.log(' Parsed', extractedEvents.length, 'events from AI response');
 
     // Convert extracted events to the same format as myEvents for comparison
     const theirEvents = extractedEvents.map(event => ({
