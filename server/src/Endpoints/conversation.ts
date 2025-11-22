@@ -1,63 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import type { IDatabase } from "pg-promise";
-import multer from "multer";
-
-// Configure multer for memory storage
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"));
-    }
-  },
-});
-
-/**
- * Generate a title from the first user message using AI
- */
-async function generateTitleFromFirstMessage(firstMessage: string): Promise<string> {
-  const prompt = `
-Given ONLY the user’s first message,
-output a short, descriptive sidebar title.
-
-Requirements:
-- Max 30 characters (soft cap), 3–5 words
-- Use title case (capitalize main words)
-- Return ONLY the title text
-
-First message:
-${firstMessage}
-  `.trim();
-
-  const base = process.env.AI_BASE_URL ?? "https://ai-snow.reindeer-pinecone.ts.net";
-  const url = `${base}/api/chat/completions`; 
-  const apiKey = process.env.OPENWEBUI_API_KEY; 
-
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (apiKey && apiKey.trim()) headers.Authorization = `Bearer ${apiKey}`;
-
-  const payload = {
-    model: "gemma3-27b",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.2,
-  };
-
-  const resp = await fetch(url, { method: "POST", headers, body: JSON.stringify(payload) });
-  const text = await resp.text();
-
-
-  const json = JSON.parse(text);
-  let title: string = json?.choices?.[0]?.message?.content ?? "New chat";
-
-  // Sanitize & soft length cap for sidebar
-  title = title.replace(/\r?\n/g, " ").trim();
-  if (title.length > 28) title = title.slice(0, 27) + "…";
-  if (!title) title = "New chat";
-  return title;
-}
+import { uploadImage } from "../middleware/uploadImage";
+import { chatWithToolsAndMaybeCreateEvent } from "../services/chatWithTools";
+import { generateTitleFromFirstMessage } from "../services/titleGenerator";
 
 export function conversationsRouter(db: IDatabase<unknown>) {
   const r = Router();
@@ -188,28 +133,25 @@ export function conversationsRouter(db: IDatabase<unknown>) {
   });
 
 
-  r.post("/:id/messages", upload.single("image"), async (req: Request, res: Response) => {
-    const conversationId = Number(req.params.id); // parse conversation id
+  r.post("/:id/messages", uploadImage.single("image"), async (req: Request, res: Response) => {
+    const conversationId = Number(req.params.id);
     if (!Number.isFinite(conversationId)) return res.status(400).json({ error: "invalid id" });
 
-    const content = (req.body?.content ?? "").toString().trim(); // user message content
-    const model = (req.body?.model ?? "gemma3-27b").toString(); // model name (optional override)
+    const content = (req.body?.content ?? "").toString().trim();
+    const model = (req.body?.model ?? "gemma3-27b").toString();
     if (!content) return res.status(400).json({ error: "content_required" });
 
-    // Get user email for event creation
     const userEmail = req.user?.email || "dev@example.com";
 
     // Handle uploaded image
     let imageData: string | null = null;
-    
     if (req.file) {
-      // Convert image buffer to base64
       const base64 = req.file.buffer.toString("base64");
       const mimeType = req.file.mimetype;
       imageData = `data:${mimeType};base64,${base64}`;
     }
 
-    // Fetch all prior messages to construct the chat history sent upstream
+    // Fetch all prior messages to construct the chat history
     const prior: Array<{ role: string; content: string; image_url?: string }> = await db.manyOrNone(
       `select role, content, image_url as "imageUrl"
          from message
@@ -221,7 +163,6 @@ export function conversationsRouter(db: IDatabase<unknown>) {
     // Build messages array in the format expected by the AI API
     const messages = prior.map(msg => {
       if (msg.image_url) {
-        // Message with image - use content array format
         return {
           role: msg.role,
           content: [
@@ -230,7 +171,6 @@ export function conversationsRouter(db: IDatabase<unknown>) {
           ]
         };
       }
-      // Text-only message
       return { role: msg.role, content: msg.content };
     });
 
@@ -247,137 +187,27 @@ export function conversationsRouter(db: IDatabase<unknown>) {
       messages.push({ role: "user", content });
     }
 
-    // Define tools for event creation
-    const tools = [
-      {
-        type: "function",
-        function: {
-          name: "create_event",
-          description: "Create a new calendar event for the user. Use this when the user asks to schedule, create, or add an event to their calendar.",
-          parameters: {
-            type: "object",
-            properties: {
-              title: {
-                type: "string",
-                description: "The title/name of the event"
-              },
-              description: {
-                type: "string",
-                description: "Optional detailed description of the event"
-              },
-              location: {
-                type: "string",
-                description: "Optional location where the event will take place"
-              },
-              start_time: {
-                type: "string",
-                description: "Start date and time in ISO 8601 format (e.g., 2024-11-15T14:00:00Z or 2024-11-15T14:00:00-05:00)"
-              },
-              end_time: {
-                type: "string",
-                description: "End date and time in ISO 8601 format (e.g., 2024-11-15T15:00:00Z or 2024-11-15T15:00:00-05:00)"
-              },
-              all_day: {
-                type: "boolean",
-                description: "Whether this is an all-day event. Default is false."
-              }
-            },
-            required: ["title", "start_time", "end_time"]
-          }
-        }
-      }
-    ];
-
-    // Prepare upstream AI request
-    const base = process.env.AI_BASE_URL ?? "https://ai-snow.reindeer-pinecone.ts.net";
-    const url = `${base}/api/chat/completions`;
-    const apiKey = process.env.OPENWEBUI_API_KEY;
-    const headers = {
-      "Content-Type": "application/json",
-      ...(apiKey && apiKey.trim() ? { Authorization: `Bearer ${apiKey}` } : {}),
-    };
-
-    // Send chat history to AI with tools
-    const upstream = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ model, messages, tools, temperature: 0.2 }),
-    });
-
-    // Read body text regardless of status for better diagnostics
-    const bodyText = await upstream.text();
-    if (!upstream.ok) {
-      // Bubble up upstream error with its body for debugging
-      return res.status(upstream.status).type("application/json").send(JSON.stringify({
-        title: "Chat provider error",
-        detail: bodyText,
-        statusCode: upstream.status,
-      }));
-    }
-
-    // Parse AI JSON and pull the assistant content
-    const json = JSON.parse(bodyText);
-    const assistantMessage = json?.choices?.[0]?.message;
-    let replyContent: string = assistantMessage?.content ?? "";
+    // Call AI service with tools
+    let replyContent: string;
+    let eventCreated: any | null;
     
-    // Check if AI wants to call a tool
-    const toolCalls = assistantMessage?.tool_calls;
-    let eventCreated = null;
-    
-    if (toolCalls && toolCalls.length > 0) {
-      const toolCall = toolCalls[0];
-      
-      if (toolCall.function.name === "create_event") {
-        try {
-          const args = JSON.parse(toolCall.function.arguments);
-          
-          // Create the event in the database
-          const event = await db.one(`
-            insert into events (user_email, title, description, location, start_time, end_time, all_day)
-            values ($1, $2, $3, $4, $5, $6, $7)
-            returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
-          `, [
-            userEmail,
-            args.title,
-            args.description || null,
-            args.location || null,
-            args.start_time,
-            args.end_time,
-            args.all_day || false
-          ]);
-          
-          eventCreated = event;
-          
-          // Make a follow-up call to the AI with the tool result
-          const followUpMessages = [
-            ...messages,
-            assistantMessage,
-            {
-              role: "tool",
-              tool_call_id: toolCall.id,
-              name: "create_event",
-              content: JSON.stringify({ success: true, event })
-            }
-          ];
-          
-          const followUpResponse = await fetch(url, {
-            method: "POST",
-            headers,
-            body: JSON.stringify({ model, messages: followUpMessages, tools, temperature: 0.2 }),
-          });
-          
-          const followUpText = await followUpResponse.text();
-          if (followUpResponse.ok) {
-            const followUpJson = JSON.parse(followUpText);
-            replyContent = followUpJson?.choices?.[0]?.message?.content ?? "Event created successfully!";
-          } else {
-            replyContent = "Event created successfully!";
-          }
-        } catch (toolError: any) {
-          console.error("Tool execution error:", toolError);
-          replyContent = `I tried to create the event but encountered an error: ${toolError.message}`;
-        }
+    try {
+      const result = await chatWithToolsAndMaybeCreateEvent({ db, model, messages, userEmail });
+      replyContent = result.replyContent;
+      eventCreated = result.eventCreated;
+    } catch (err: any) {
+      if (err?.type === "upstream_error") {
+        return res
+          .status(err.status)
+          .type("application/json")
+          .send(JSON.stringify({
+            title: "Chat provider error",
+            detail: err.body,
+            statusCode: err.status,
+          }));
       }
+      console.error("chat service error:", err);
+      return res.status(500).json({ error: "chat_failed" });
     }
 
     try {
@@ -407,7 +237,7 @@ export function conversationsRouter(db: IDatabase<unknown>) {
         [conversationId, replyContent]
       );
 
-      // Fetch the conversation to know the current title (to avoid unnecessary title-gen)
+      // Fetch the conversation to know the current title
       const convo = await db.oneOrNone(
         `select id, title from conversation where id = $1`,
         [conversationId]
@@ -420,7 +250,6 @@ export function conversationsRouter(db: IDatabase<unknown>) {
       if (isFirstUserMessage && isDefaultTitle) {
         try {
           const newTitle = await generateTitleFromFirstMessage(content);
-
           await db.none(
             `update conversation
                set title = $2, updated_at = now()
@@ -432,7 +261,6 @@ export function conversationsRouter(db: IDatabase<unknown>) {
           await db.none(`update conversation set updated_at = now() where id = $1`, [conversationId]);
         }
       } else {
-        // Not first message or already renamed → just bump updated_at
         await db.none(`update conversation set updated_at = now() where id = $1`, [conversationId]);
       }
 
@@ -443,7 +271,6 @@ export function conversationsRouter(db: IDatabase<unknown>) {
         ...(eventCreated && { eventCreated })
       });
     } catch (e: any) {
-      // Foreign key violation → conversation not found
       if (e && e.code === "23503") {
         return res.status(404).json({ error: "conversation_not_found" });
       }
@@ -452,5 +279,5 @@ export function conversationsRouter(db: IDatabase<unknown>) {
     }
   });
 
-  return r; // export the configured router
+  return r; 
 }
