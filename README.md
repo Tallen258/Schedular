@@ -192,7 +192,7 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Delivered
 **Rubric Items:**  
-**Features:**
+**Features:**  Agentic UI - actions automatically adjust UI 
 
 ---
 

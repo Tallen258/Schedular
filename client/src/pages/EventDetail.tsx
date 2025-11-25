@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEvent, useUpdateEvent, useDeleteEvent } from '../hooks/useEvents';
+import { useAgenticAction } from '../contexts/AgenticActionContext';
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const eventId = id ? Number(id) : 0;
+  const { recordAction } = useAgenticAction();
 
   const { data: event, isLoading, error } = useEvent(eventId);
   const updateEventMutation = useUpdateEvent();
@@ -79,8 +81,22 @@ const EventDetail = () => {
         },
       });
       setIsEditing(false);
+      
+      // Trigger automatic UI update
+      recordAction('event_updated', {
+        actionName: 'Event Updated',
+        message: `"${formData.title}" has been successfully updated`,
+        type: 'success',
+        eventTitle: formData.title
+      });
     } catch (error) {
       console.error('Failed to update event:', error);
+      recordAction('error', {
+        actionName: 'Update Failed',
+        message: 'Unable to update event. Please try again.',
+        type: 'error',
+        retryCount: 1
+      });
     }
   };
 
@@ -90,10 +106,24 @@ const EventDetail = () => {
     }
 
     try {
+      const eventTitle = event?.title || 'Event';
       await deleteEventMutation.mutateAsync(eventId);
-      navigate('/dashboard');
+      
+      // Trigger automatic UI update with navigation to calendar
+      recordAction('event_deleted', {
+        actionName: 'Event Deleted',
+        message: `"${eventTitle}" has been removed from your calendar`,
+        type: 'success',
+        eventTitle
+      });
     } catch (error) {
       console.error('Failed to delete event:', error);
+      recordAction('error', {
+        actionName: 'Delete Failed',
+        message: 'Unable to delete event. Please try again.',
+        type: 'error',
+        retryCount: 1
+      });
     }
   };
 

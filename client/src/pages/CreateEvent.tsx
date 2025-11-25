@@ -8,11 +8,13 @@ import PageContainer from '../components/layout/PageContainer';
 import Card from '../components/layout/Card';
 import PageHeader from '../components/layout/PageHeader';
 import Grid from '../components/layout/Grid';
+import { useAgenticAction } from '../contexts/AgenticActionContext';
 
 const CreateEvent = () => {
   console.log('CreateEvent component rendering');
   const navigate = useNavigate();
   const createEventMutation = useCreateEvent();
+  const { recordAction } = useAgenticAction();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -43,9 +45,21 @@ const CreateEvent = () => {
         all_day: formData.all_day,
       });
 
-      navigate('/calendar');
+      // Trigger automatic UI updates: notification panel slides out + navigation
+      recordAction('event_created', {
+        actionName: 'Event Created',
+        message: `"${formData.title}" has been added to your calendar`,
+        type: 'success',
+        eventTitle: formData.title
+      });
     } catch (error) {
       console.error('Failed to create event:', error);
+      recordAction('error', {
+        actionName: 'Creation Failed',
+        message: 'Unable to create event. Please try again.',
+        type: 'error',
+        retryCount: 1
+      });
     }
   };
 

@@ -7,10 +7,32 @@ export interface UserSettings {
   preferredDays: number[]; 
 }
 
+export interface ScheduleCompareState {
+  selectedDate: string;
+  imagePreview: string | null;
+  extractedEvents: Array<{
+    title: string;
+    start_time: string;
+    end_time: string;
+  }>;
+  editableExtractedEvents: Array<{
+    title: string;
+    start_time: string;
+    end_time: string;
+  }>;
+  commonFreeSlots: Array<{
+    start: string;
+    end: string;
+  }>;
+  isConfirmed: boolean;
+  excludeAllDayEvents: boolean;
+}
+
 const STORAGE_KEYS = {
   USER_SETTINGS: 'schedular_user_settings',
   THEME_PREFERENCE: 'schedular_theme',
   LAST_SYNC: 'schedular_last_sync',
+  SCHEDULE_COMPARE: 'schedular_schedule_compare',
 } as const;
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -105,5 +127,34 @@ export function clearAllAppData(): void {
     });
   } catch (error) {
     console.error('Error clearing app data:', error);
+  }
+}
+
+// Schedule Compare State Management
+export function getScheduleCompareState(): ScheduleCompareState | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.SCHEDULE_COMPARE);
+    if (!stored) return null;
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error('Error reading schedule compare state:', error);
+    return null;
+  }
+}
+
+export function saveScheduleCompareState(state: ScheduleCompareState): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.SCHEDULE_COMPARE, JSON.stringify(state));
+  } catch (error) {
+    console.error('Error saving schedule compare state:', error);
+    throw error;
+  }
+}
+
+export function clearScheduleCompareState(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.SCHEDULE_COMPARE);
+  } catch (error) {
+    console.error('Error clearing schedule compare state:', error);
   }
 }

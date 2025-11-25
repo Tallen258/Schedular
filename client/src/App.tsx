@@ -11,7 +11,9 @@ import ImageReview from "./pages/ScheduleCompare";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import AIChat from "./pages/AIChat";
+import Notifications from "./pages/Notifications";
 import NavBar from "./components/NavBar";
+import { AgenticActionProvider } from "./contexts/AgenticActionContext";
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
   try {
@@ -34,13 +36,14 @@ export default function App() {
     <>
       <Toaster position="top-center" />
       <ErrorBoundary>
-        <Suspense fallback={<div className="p-4">Loading…</div>}>
-          <NavBar />
-          <div className="main-content">
-            <Routes>
-              {/* Redirect root to /home */}
-              <Route index element={<Navigate to="/home" replace />} />
-              <Route path="/home" element={<Home />} />
+        <AgenticActionProvider>
+          <Suspense fallback={<div className="p-4">Loading…</div>}>
+            <NavBar />
+            <div className="main-content">
+              <Routes>
+                {/* Redirect root to /home */}
+                <Route index element={<Navigate to="/home" replace />} />
+                <Route path="/home" element={<Home />} />
 
               {/* OIDC callback route (must match your redirect_uri path) */}
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -58,11 +61,13 @@ export default function App() {
               <Route path="/help" element={<Help />} />
               <Route path="/chat" element={<AIChat />} />
               <Route path="/chat/:conversationId" element={<AIChat />} />
+              <Route path="/notifications" element={<Notifications />} />
 
               <Route path="*" element={<div className="p-4">Not Found</div>} />
             </Routes>
           </div>
         </Suspense>
+        </AgenticActionProvider>
       </ErrorBoundary>
     </>
   );

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getEventsForDate, getAvailableTimeSlots, getTotalAvailableHours } from '../utils/eventOverlap';
 import { compareScheduleWithImage, type ExtractedEvent, type FreeSlot } from '../api/scheduleCompare';
 import { useEvents } from '../hooks/useEvents';
-import { getUserSettings } from '../utils/localStorage';
+import { getUserSettings, getScheduleCompareState, saveScheduleCompareState, clearScheduleCompareState } from '../utils/localStorage';
 import toast from 'react-hot-toast';
 import DateSelector from '../components/scheduleCompare/DateSelector';
 import DayEventsList from '../components/scheduleCompare/DayEventsList';
@@ -12,19 +12,25 @@ import YourEventsSummary from '../components/scheduleCompare/YourEventsSummary';
 import ExtractedEventsEditor from '../components/scheduleCompare/ExtractedEventsEditor';
 import CommonFreeSlotsPanel from '../components/scheduleCompare/CommonFreeSlotsPanel';
 import AvailableSlotsPanel from '../components/scheduleCompare/AvailableSlotsPanel';
+import { useAgenticAction } from '../contexts/AgenticActionContext';
 
 const ScheduleCompare = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [excludeAllDayEvents, setExcludeAllDayEvents] = useState(true); // Default to excluding all-day events
+  const { recordAction } = useAgenticAction();
+  
+  // Load persisted state from localStorage
+  const persistedState = getScheduleCompareState();
+  
+  const [selectedDate, setSelectedDate] = useState(persistedState?.selectedDate || new Date().toISOString().split('T')[0]);
+  const [excludeAllDayEvents, setExcludeAllDayEvents] = useState(persistedState?.excludeAllDayEvents ?? true);
   
   // Image upload states
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(persistedState?.imagePreview || null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [extractedEvents, setExtractedEvents] = useState<ExtractedEvent[]>([]);
-  const [editableExtractedEvents, setEditableExtractedEvents] = useState<ExtractedEvent[]>([]);
-  const [commonFreeSlots, setCommonFreeSlots] = useState<FreeSlot[]>([]);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [extractedEvents, setExtractedEvents] = useState<ExtractedEvent[]>(persistedState?.extractedEvents || []);
+  const [editableExtractedEvents, setEditableExtractedEvents] = useState<ExtractedEvent[]>(persistedState?.editableExtractedEvents || []);
+  const [commonFreeSlots, setCommonFreeSlots] = useState<FreeSlot[]>(persistedState?.commonFreeSlots || []);
+  const [isConfirmed, setIsConfirmed] = useState(persistedState?.isConfirmed ?? false);
 
   const { data: events = [] } = useEvents();
   const dayEvents = getEventsForDate(events, selectedDate);
@@ -38,6 +44,20 @@ const ScheduleCompare = () => {
 
   const availableSlots = getAvailableTimeSlots(events, selectedDate, workStart, workEnd);
   const totalAvailableHours = getTotalAvailableHours(events, selectedDate, workStart, workEnd);
+
+  // Persist state to localStorage whenever key state changes
+  useEffect(() => {
+    const stateToSave = {
+      selectedDate,
+      imagePreview,
+      extractedEvents,
+      editableExtractedEvents,
+      commonFreeSlots,
+      isConfirmed,
+      excludeAllDayEvents,
+    };
+    saveScheduleCompareState(stateToSave);
+  }, [selectedDate, imagePreview, extractedEvents, editableExtractedEvents, commonFreeSlots, isConfirmed, excludeAllDayEvents]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,8 +75,11 @@ const ScheduleCompare = () => {
     setUploadedImage(null);
     setImagePreview(null);
     setExtractedEvents([]);
+    setEditableExtractedEvents([]);
     setCommonFreeSlots([]);
     setIsConfirmed(false);
+    // Clear localStorage
+    clearScheduleCompareState();
   };
 
   const handleAnalyzeSchedule = async () => {
@@ -96,12 +119,21 @@ const ScheduleCompare = () => {
       // Store free slots but don't show them yet - they'll be recalculated on confirm
       setCommonFreeSlots(result.freeSlots);
       
-      toast.success(`Extracted ${result.extractedEvents.length} events from image. Please review and confirm.`, {
-        duration: 4000,
+      // Trigger UI update
+      recordAction('schedule_analyzed', {
+        actionName: 'Schedule Analyzed',
+        message: `Extracted ${result.extractedEvents.length} events from image`,
+        type: 'success',
+        eventsCount: result.extractedEvents.length
       });
     } catch (error) {
       console.error(' Failed to analyze schedule:', error);
-      toast.error('Failed to analyze the schedule image. Please try again.');
+      recordAction('error', {
+        actionName: 'Analysis Failed',
+        message: 'Unable to analyze the schedule image',
+        type: 'error',
+        retryCount: 1
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -198,8 +230,12 @@ const ScheduleCompare = () => {
     setCommonFreeSlots(freeSlots);
     setIsConfirmed(true);
     
-    toast.success(`Found ${freeSlots.length} common free time slots!`, {
-      duration: 3000,
+    // Trigger UI update with action panel
+    recordAction('schedules_compared', {
+      actionName: 'Schedules Compared',
+      message: `Found ${freeSlots.length} common free time slots`,
+      type: 'success',
+      slotsCount: freeSlots.length
     });
   };
 
@@ -212,7 +248,11 @@ const ScheduleCompare = () => {
   const removeExtractedEvent = (index: number) => {
     const updated = editableExtractedEvents.filter((_, i) => i !== index);
     setEditableExtractedEvents(updated);
-    toast.success('Event removed');
+    recordAction('event_removed', {
+      actionName: 'Event Removed',
+      message: 'Event removed from comparison',
+      type: 'info'
+    });
   };
 
   const addExtractedEvent = () => {
@@ -227,10 +267,32 @@ const ScheduleCompare = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-2xl card p-6">
-        <header>
-          <div className="itin-header">Event Overlap Checker</div>
-          <div className="accent-bar mt-2" />
+        <header className="flex justify-between items-start">
+          <div>
+            <div className="itin-header">Event Overlap Checker</div>
+            <div className="accent-bar mt-2" />
+          </div>
+          {persistedState && (
+            <button
+              onClick={() => {
+                handleClearImage();
+                toast.success('Cached comparison data cleared');
+              }}
+              className="btn-secondary text-xs"
+              title="Clear cached comparison data"
+            >
+              Clear Cache
+            </button>
+          )}
         </header>
+
+        {persistedState && (
+          <div className="mt-4 p-3 bg-brand-teal-50 border border-brand-teal-200 rounded-lg">
+            <p className="text-sm text-brand-teal-800">
+              📋 Restored your previous comparison session
+            </p>
+          </div>
+        )}
 
         <div className="mt-6 space-y-6">
           <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />

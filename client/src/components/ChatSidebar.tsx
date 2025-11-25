@@ -1,4 +1,5 @@
 // src/components/ChatSidebar.tsx
+import { useState } from 'react';
 import type { Conversation } from '../api/chat';
 
 interface ChatSidebarProps {
@@ -9,22 +10,64 @@ interface ChatSidebarProps {
 }
 
 export default function ChatSidebar({ conversations, activeId, onNew, onSelect }: ChatSidebarProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <aside className="w-64 bg-custom-white border-r border-itin-sand-200 flex flex-col">
-      <div className="p-4 border-b border-itin-sand-200">
+    <aside className={`bg-custom-white border-r border-itin-sand-200 flex flex-col transition-all duration-300 ease-in-out ${
+      isCollapsed ? 'w-16' : 'w-64'
+    }`}>
+      {/* Toggle button */}
+      <div className={`p-4 border-b border-itin-sand-200 flex items-center ${
+        isCollapsed ? 'justify-center' : 'justify-between'
+      }`}>
+        {!isCollapsed && (
+          <button
+            onClick={onNew}
+            className="btn-primary flex-1 mr-2"
+          >
+            + New Chat
+          </button>
+        )}
         <button
-          onClick={onNew}
-          className="btn-primary w-full"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-2 hover:bg-itin-sand-100 rounded transition-colors"
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          + New Chat
+          <svg 
+            className={`w-5 h-5 text-itin-sand-600 transition-transform duration-300 ${
+              isCollapsed ? 'rotate-180' : ''
+            }`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
         </button>
       </div>
 
+      {/* New chat button when collapsed */}
+      {isCollapsed && (
+        <div className="p-2 border-b border-itin-sand-200">
+          <button
+            onClick={onNew}
+            className="w-full p-2 hover:bg-itin-sand-100 rounded transition-colors flex items-center justify-center"
+            title="New chat"
+          >
+            <svg className="w-6 h-6 text-itin-sand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto">
         {conversations.length === 0 ? (
-          <div className="p-4 text-sm text-itin-sand-500 text-center">
-            No conversations yet
-          </div>
+          !isCollapsed && (
+            <div className="p-4 text-sm text-itin-sand-500 text-center">
+              No conversations yet
+            </div>
+          )
         ) : (
           <ul className="p-2">
             {conversations.map((convo) => (
@@ -36,11 +79,22 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect }
                       ? 'bg-itin-sand-200 text-itin-sand-900'
                       : 'hover:bg-itin-sand-50 text-itin-sand-700'
                   }`}
+                  title={isCollapsed ? convo.title : undefined}
                 >
-                  <div className="font-medium text-sm truncate">{convo.title}</div>
-                  <div className="text-xs text-itin-sand-500 mt-1">
-                    {new Date(convo.updatedAt).toLocaleDateString()}
-                  </div>
+                  {isCollapsed ? (
+                    <div className="flex justify-center">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="font-medium text-sm truncate">{convo.title}</div>
+                      <div className="text-xs text-itin-sand-500 mt-1">
+                        {new Date(convo.updatedAt).toLocaleDateString()}
+                      </div>
+                    </>
+                  )}
                 </button>
               </li>
             ))}
