@@ -19,7 +19,6 @@ const NavBar: React.FC = () => {
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/calendar">Calendar</Link>
           <Link to="/create-event">Create Event</Link>
-          <Link to="/event/1">Event Details</Link>
           <Link to="/compare">Compare</Link>
           <Link to="/settings">Settings</Link>
           <Link to="/help">Help</Link>

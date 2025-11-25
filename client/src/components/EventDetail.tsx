@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEvent, useUpdateEvent, useDeleteEvent } from '../hooks/useEvents';
 import { useAgenticAction } from '../contexts/AgenticActionContext';
+import EventForm from './EventForm';
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,10 +18,8 @@ const EventDetail = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    location: '',
     start_time: '',
     end_time: '',
-    all_day: false,
   });
 
   // Initialize form data when event loads
@@ -43,10 +42,8 @@ const EventDetail = () => {
       setFormData({
         title: event.title,
         description: event.description || '',
-        location: event.location || '',
         start_time: formatForInput(startDate),
         end_time: formatForInput(endDate),
-        all_day: event.all_day,
       });
     }
   }, [event]);
@@ -74,10 +71,8 @@ const EventDetail = () => {
         input: {
           title: formData.title,
           description: formData.description || undefined,
-          location: formData.location || undefined,
           start_time: startISO,
           end_time: endISO,
-          all_day: formData.all_day,
         },
       });
       setIsEditing(false);
@@ -165,7 +160,7 @@ const EventDetail = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-2xl card p-6">
-        <header className="flex justify-between items-start">
+        <header className="flex justify-between items-start mb-6">
           <div>
             <div className="itin-header">Event Details</div>
             <div className="accent-bar mt-2" />
@@ -179,7 +174,7 @@ const EventDetail = () => {
         </header>
 
         {!isEditing ? (
-          <div className="mt-6 space-y-4">
+          <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-bold">{event.title}</h2>
             </div>
@@ -231,103 +226,14 @@ const EventDetail = () => {
             </div>
           </div>
         ) : (
-          <form onSubmit={handleUpdate} className="mt-6 space-y-4">
-            <div>
-              <label className="form-label">
-                Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                name="title"
-                className="form-input"
-                value={formData.title}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="form-label">
-                  Start Date & Time <span className="text-red-500">*</span>
-                </label>
-                <input
-                  name="start_time"
-                  type="datetime-local"
-                  className="form-input"
-                  value={formData.start_time}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="form-label">
-                  End Date & Time <span className="text-red-500">*</span>
-                </label>
-                <input
-                  name="end_time"
-                  type="datetime-local"
-                  className="form-input"
-                  value={formData.end_time}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="form-label">Location</label>
-              <input
-                name="location"
-                className="form-input"
-                value={formData.location}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label className="form-label">Description</label>
-              <textarea
-                name="description"
-                className="form-input"
-                rows={4}
-                value={formData.description}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                name="all_day"
-                type="checkbox"
-                id="all_day"
-                checked={formData.all_day}
-                onChange={handleChange}
-                className="h-4 w-4"
-              />
-              <label htmlFor="all_day" className="form-label !mb-0">
-                All Day Event
-              </label>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={updateEventMutation.isPending}
-              >
-                {updateEventMutation.isPending ? 'Saving...' : 'Save Changes'}
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setIsEditing(false)}
-                disabled={updateEventMutation.isPending}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+          <EventForm
+            formData={formData}
+            onChange={handleChange}
+            onSubmit={handleUpdate}
+            onCancel={() => setIsEditing(false)}
+            submitLabel="Save Changes"
+            isSubmitting={updateEventMutation.isPending}
+          />
         )}
       </section>
     </main>

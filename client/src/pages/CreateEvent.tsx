@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateEvent } from '../hooks/useEvents';
-import TextInput from '../components/forms/TextInput';
-import TextArea from '../components/forms/TextArea';
-import DateTimeInput from '../components/forms/DateTimeInput';
 import PageContainer from '../components/layout/PageContainer';
 import Card from '../components/layout/Card';
 import PageHeader from '../components/layout/PageHeader';
-import Grid from '../components/layout/Grid';
+import EventForm from '../components/EventForm';
 import { useAgenticAction } from '../contexts/AgenticActionContext';
 
 const CreateEvent = () => {
@@ -19,10 +16,8 @@ const CreateEvent = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    location: '',
     start_time: '',
     end_time: '',
-    all_day: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,10 +34,8 @@ const CreateEvent = () => {
       await createEventMutation.mutateAsync({
         title: formData.title,
         description: formData.description || undefined,
-        location: formData.location || undefined,
         start_time: startISO,
         end_time: endISO,
-        all_day: formData.all_day,
       });
 
       // Trigger automatic UI updates: notification panel slides out + navigation
@@ -77,86 +70,14 @@ const CreateEvent = () => {
     <PageContainer maxWidth="sm">
       <Card>
         <PageHeader title="Create Event" />
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <TextInput
-            label="Title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Team Meeting"
-            required
-          />
-
-          <Grid cols={2} gap="md">
-            <DateTimeInput
-              label="Start Date & Time"
-              name="start_time"
-              value={formData.start_time}
-              onChange={handleChange}
-              type="datetime-local"
-              required
-            />
-
-            <DateTimeInput
-              label="End Date & Time"
-              name="end_time"
-              value={formData.end_time}
-              onChange={handleChange}
-              type="datetime-local"
-              required
-            />
-          </Grid>
-
-          <TextInput
-            label="Location"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            placeholder="Conference Room A"
-          />
-
-          <TextArea
-            label="Description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            placeholder="Optional notes about the event"
-          />
-
-          <div className="flex items-center gap-2">
-            <input
-              name="all_day"
-              type="checkbox"
-              id="all_day"
-              checked={formData.all_day}
-              onChange={handleChange}
-              className="h-4 w-4"
-            />
-            <label htmlFor="all_day" className="form-label !mb-0">
-              All Day Event
-            </label>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={createEventMutation.isPending}
-            >
-              {createEventMutation.isPending ? 'Creating...' : 'Create Event'}
-            </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => navigate('/calendar')}
-              disabled={createEventMutation.isPending}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        <EventForm
+          formData={formData}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/calendar')}
+          submitLabel="Create Event"
+          isSubmitting={createEventMutation.isPending}
+        />
       </Card>
     </PageContainer>
   );

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { getEventsForDate, getAvailableTimeSlots, getTotalAvailableHours } from '../utils/eventOverlap';
 import { compareScheduleWithImage, type ExtractedEvent, type FreeSlot } from '../api/scheduleCompare';
 import { useEvents } from '../hooks/useEvents';
-import { getUserSettings, getScheduleCompareState, saveScheduleCompareState, clearScheduleCompareState } from '../utils/localStorage';
+import { getUserSettings } from '../utils/localStorage';
 import toast from 'react-hot-toast';
 import DateSelector from '../components/scheduleCompare/DateSelector';
 import DayEventsList from '../components/scheduleCompare/DayEventsList';
@@ -17,20 +17,20 @@ import { useAgenticAction } from '../contexts/AgenticActionContext';
 const ScheduleCompare = () => {
   const { recordAction } = useAgenticAction();
   
-  // Load persisted state from localStorage
-  const persistedState = getScheduleCompareState();
+  // Toggle between manual and AI comparison modes
+  const [comparisonMode, setComparisonMode] = useState<'manual' | 'ai'>('manual');
   
-  const [selectedDate, setSelectedDate] = useState(persistedState?.selectedDate || new Date().toISOString().split('T')[0]);
-  const [excludeAllDayEvents, setExcludeAllDayEvents] = useState(persistedState?.excludeAllDayEvents ?? true);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [excludeAllDayEvents, setExcludeAllDayEvents] = useState(true);
   
   // Image upload states
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(persistedState?.imagePreview || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [extractedEvents, setExtractedEvents] = useState<ExtractedEvent[]>(persistedState?.extractedEvents || []);
-  const [editableExtractedEvents, setEditableExtractedEvents] = useState<ExtractedEvent[]>(persistedState?.editableExtractedEvents || []);
-  const [commonFreeSlots, setCommonFreeSlots] = useState<FreeSlot[]>(persistedState?.commonFreeSlots || []);
-  const [isConfirmed, setIsConfirmed] = useState(persistedState?.isConfirmed ?? false);
+  const [extractedEvents, setExtractedEvents] = useState<ExtractedEvent[]>([]);
+  const [editableExtractedEvents, setEditableExtractedEvents] = useState<ExtractedEvent[]>([]);
+  const [commonFreeSlots, setCommonFreeSlots] = useState<FreeSlot[]>([]);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const { data: events = [] } = useEvents();
   const dayEvents = getEventsForDate(events, selectedDate);
@@ -44,20 +44,6 @@ const ScheduleCompare = () => {
 
   const availableSlots = getAvailableTimeSlots(events, selectedDate, workStart, workEnd);
   const totalAvailableHours = getTotalAvailableHours(events, selectedDate, workStart, workEnd);
-
-  // Persist state to localStorage whenever key state changes
-  useEffect(() => {
-    const stateToSave = {
-      selectedDate,
-      imagePreview,
-      extractedEvents,
-      editableExtractedEvents,
-      commonFreeSlots,
-      isConfirmed,
-      excludeAllDayEvents,
-    };
-    saveScheduleCompareState(stateToSave);
-  }, [selectedDate, imagePreview, extractedEvents, editableExtractedEvents, commonFreeSlots, isConfirmed, excludeAllDayEvents]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,8 +64,6 @@ const ScheduleCompare = () => {
     setEditableExtractedEvents([]);
     setCommonFreeSlots([]);
     setIsConfirmed(false);
-    // Clear localStorage
-    clearScheduleCompareState();
   };
 
   const handleAnalyzeSchedule = async () => {
@@ -267,46 +251,45 @@ const ScheduleCompare = () => {
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-2xl card p-6">
-        <header className="flex justify-between items-start">
+        <header className="flex items-center justify-between mb-6">
           <div>
             <div className="itin-header">Event Overlap Checker</div>
             <div className="accent-bar mt-2" />
           </div>
-          {persistedState && (
-            <button
-              onClick={() => {
-                handleClearImage();
-                toast.success('Cached comparison data cleared');
-              }}
-              className="btn-secondary text-xs"
-              title="Clear cached comparison data"
-            >
-              Clear Cache
-            </button>
-          )}
         </header>
 
-        {persistedState && (
-          <div className="mt-4 p-3 bg-brand-teal-50 border border-brand-teal-200 rounded-lg">
-            <p className="text-sm text-brand-teal-800">
-              📋 Restored your previous comparison session
-            </p>
-          </div>
-        )}
+        {/* Mode Toggle */}
+        <div className="mt-6 flex gap-2 p-1 bg-itin-sand-100 rounded-lg w-fit">
+          <button
+            onClick={() => setComparisonMode('manual')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              comparisonMode === 'manual'
+                ? 'bg-white text-itin-sand-800 shadow-sm'
+                : 'text-itin-sand-600 hover:text-itin-sand-800'
+            }`}
+          >
+            📝 Manual Entry
+          </button>
+          <button
+            onClick={() => setComparisonMode('ai')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              comparisonMode === 'ai'
+                ? 'bg-white text-itin-sand-800 shadow-sm'
+                : 'text-itin-sand-600 hover:text-itin-sand-800'
+            }`}
+          >
+            🤖 AI Image Analysis
+          </button>
+        </div>
 
         <div className="mt-6 space-y-6">
           <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
           <DayEventsList selectedDate={selectedDate} events={dayEvents} />
 
-          <NewEventsOverlapChecker selectedDate={selectedDate} dayEvents={dayEvents} />
-
-          <div className="border border-itin-sand-200 rounded p-4 bg-white">
-            <h3 className="font-semibold mb-3">Compare Schedules</h3>
-            <p className="text-sm text-itin-sand-600 mb-4">
-              Upload a photo of someone else's calendar to find common free time slots.
-            </p>
-            
+          {comparisonMode === 'manual' ? (
+            <NewEventsOverlapChecker selectedDate={selectedDate} dayEvents={dayEvents} />
+          ) : (
             <div className="space-y-4">
               <ImageUploadSection
                 uploadedImage={uploadedImage}
@@ -358,7 +341,7 @@ const ScheduleCompare = () => {
                 <CommonFreeSlotsPanel freeSlots={commonFreeSlots} />
               )}
             </div>
-          </div>
+          )}
 
           <AvailableSlotsPanel
             availableSlots={availableSlots}

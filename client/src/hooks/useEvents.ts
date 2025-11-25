@@ -61,10 +61,8 @@ export const useCreateEvent = () => {
 
   return useMutation({
     mutationFn: (input: CreateEventInput) => createEvent(input),
-    onSuccess: (newEvent) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
-      
-      toast.success(`Event "${newEvent.title}" created successfully!`);
     },
     onError: (error: Error) => {
       toast.error(`Failed to create event: ${error.message}`);
@@ -83,8 +81,6 @@ export const useUpdateEvent = () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
       
       queryClient.setQueryData(eventKeys.detail(updatedEvent.id), updatedEvent);
-      
-      toast.success(`Event "${updatedEvent.title}" updated successfully!`);
     },
     onError: (error: Error) => {
       toast.error(`Failed to update event: ${error.message}`);
@@ -101,8 +97,6 @@ export const useDeleteEvent = () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.all });
       
       queryClient.removeQueries({ queryKey: eventKeys.detail(deletedId) });
-      
-      toast.success('Event deleted successfully!');
     },
     onError: (error: Error) => {
       toast.error(`Failed to delete event: ${error.message}`);

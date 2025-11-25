@@ -5,7 +5,7 @@ import Home from "./pages/home";
 import Calendar from "./pages/Calendar";
 import Dashboard from "./pages/Dashboard";
 import CreateEvent from "./pages/CreateEvent";
-import EventDetail from "./pages/EventDetail";
+import EventDetail from "./components/EventDetail";
 import CompareSchedules from "./pages/CompareSchedule";
 import ImageReview from "./pages/ScheduleCompare";
 import Settings from "./pages/Settings";
