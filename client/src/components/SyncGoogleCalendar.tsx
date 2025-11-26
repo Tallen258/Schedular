@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Spinner from "./Spinner";
 import { 
   startGoogleCalendarAuth,
@@ -51,9 +51,11 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
     // Auto-load if linked=1 is in the URL (came back from callback)
     const params = new URLSearchParams(window.location.search);
     if (params.get("linked") === "1") {
-      loadEvents();
+      void loadEvents();
       setIsExpanded(true);
     }
+    // loadEvents is intentionally not in deps - only run on mount when URL has linked=1
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function connectGoogle() {

@@ -54,7 +54,7 @@ const AIChat = () => {
     } else {
       void createConversationAndGo();
     }
-  }, [conversationsQuery.isLoading, conversations.length, activeId, goToConversation, createConversationAndGo]);
+  }, [conversationsQuery.isLoading, conversations, activeId, goToConversation, createConversationAndGo]);
 
   // Messages
   const messagesQuery = useMessages(activeId);

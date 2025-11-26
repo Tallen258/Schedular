@@ -25,7 +25,6 @@ export function ActionProvider({ children }: { children: ReactNode }) {
     type: ActionNotification['type'] = 'success',
     navigateTo?: string
   ) => {
-    // Add to notifications
     const notification: ActionNotification = {
       id: `${Date.now()}-${Math.random()}`,
       action,
@@ -36,7 +35,6 @@ export function ActionProvider({ children }: { children: ReactNode }) {
 
     setNotifications((prev) => [notification, ...prev].slice(0, 20)); //I want to add these two a database table with a option to delete them 
 
-    // Show toast
     const toastMessage = `${action}: ${message}`;
     switch (type) {
       case 'success':
@@ -52,13 +50,11 @@ export function ActionProvider({ children }: { children: ReactNode }) {
         toast(toastMessage);
     }
 
-    // Auto-show panel briefly
     setIsPanelOpen(true);
     setTimeout(() => {
       setIsPanelOpen(false);
     }, 4000);
 
-    // Navigate if requested
     if (navigateTo) {
       setTimeout(() => {
         navigate(navigateTo);
@@ -93,7 +89,7 @@ export function ActionProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Exported separately to satisfy react-refresh/only-export-components
+// eslint-disable-next-line react-refresh/only-export-components
 export const useActionContext = () => {
   const context = useContext(ActionContext);
   if (!context) {

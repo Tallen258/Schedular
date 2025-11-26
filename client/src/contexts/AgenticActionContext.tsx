@@ -237,6 +237,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
 }
 
 // Exported separately to satisfy react-refresh/only-export-components
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAgenticAction = () => {
   const context = useContext(AgenticActionContext);
   if (!context) {
