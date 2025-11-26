@@ -53,8 +53,8 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Create client and server
 
 #### Delivered
-**Rubric Items:** ✅ CI/CD pipeline, ✅ TypeScript, ✅ 10+ views
-**Features:** ✅ All features completed
+**Rubric Items:** [X] CI/CD pipeline, [X] TypeScript, [X] 10+ views
+**Features:** [X] All features completed
 
 ---
 
@@ -73,8 +73,8 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Toasts on simple navigation/actions  
 
 #### Delivered
-**Rubric Items:** ✅ TanStack Query, ✅ Authentication (OIDC), ✅ Auth/Public pages, ✅ Toasts
-**Features:** ✅ Home/Dashboard/Calendar views, ✅ Toast notifications, ✅ datetime-local inputs (reusable date/time picker)
+**Rubric Items:** [X] TanStack Query, [X] Authentication (OIDC), [X] Auth/Public pages, [X] Toasts
+**Features:** [X] Home/Dashboard/Calendar views, [X] Toast notifications, [X] datetime-local inputs (reusable date/time picker)
 
 ---
 
@@ -93,8 +93,8 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Create Event Form (simple validation)  
 
 #### Delivered
-**Rubric Items:** ✅ Local storage (user settings + sync timestamps), ✅ Error handling (error boundary + mutation error handling), ✅ Network calls (full CRUD API + Google Calendar integration)
-**Features:** ✅ PostgreSQL with Docker Compose + health checks, ✅ Google OAuth token storage table + events table with indexes, ✅ Frontend-backend integration, ✅ Create Event form with validation and React Hook Form patterns, ✅ Settings View with localStorage persistence, ✅ Zod schemas (Event, FreeSlot, ActionLogEntry)
+**Rubric Items:** [X] Local storage (user settings + sync timestamps), [X] Error handling (error boundary + mutation error handling), [X] Network calls (full CRUD API + Google Calendar integration)
+**Features:** [X] PostgreSQL with Docker Compose + health checks, [X] Google OAuth token storage table + events table with indexes, [X] Frontend-backend integration, [X] Create Event form with validation and React Hook Form patterns, [X] Settings View with localStorage persistence, [X] Zod schemas (Event, FreeSlot, ActionLogEntry)
 
 ---
 
@@ -112,8 +112,8 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Reusable input #3 (TimeRangePicker or AttendeeSelect)  
 
 #### Delivered
-**Rubric Items:** ✅ Google OAuth integration with token storage, ✅ Full CRUD API for events
-**Features:** ✅ Google Calendar OAuth flow with refresh token storage, ✅ Create/Update/Delete events with form validation, ✅ Event sync from Google Calendar to local database, ✅ datetime-local inputs for time selection
+**Rubric Items:** [X] Google OAuth integration with token storage, [X] Full CRUD API for events
+**Features:** [X] Google Calendar OAuth flow with refresh token storage, [X] Create/Update/Delete events with form validation, [X] Event sync from Google Calendar to local database, [X] datetime-local inputs for time selection
 
 ---
 
@@ -132,8 +132,8 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Confirmation action `createEvent` integrated  
 
 #### Delivered
-**Rubric Items:** ✅ Form inputs (datetime-local, text, textarea, checkbox, select), ✅ Layout components (card, navbar, sidebar, form layouts)
-**Features:** ✅ Server code refactored into modular route files (auth, googleOAuth, googleCalendar, events), ✅ Schedule comparison page with form, ✅ Event Detail page with edit/delete functionality, ✅ Help page with getting started guide, ✅ Google Calendar sync component with import functionality, ✅ Full CRUD operations for events
+**Rubric Items:** [X] Form inputs (datetime-local, text, textarea, checkbox, select), [X] Layout components (card, navbar, sidebar, form layouts)
+**Features:** [X] Server code refactored into modular route files (auth, googleOAuth, googleCalendar, events), [X] Schedule comparison page with form, [X] Event Detail page with edit/delete functionality, [X] Help page with getting started guide, [X] Google Calendar sync component with import functionality, [X] Full CRUD operations for events
 
 ---
 
@@ -152,8 +152,8 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Spinners and disabled states  
 
 #### Delivered
-**Rubric Items:** ✅ TanStack Query state management, ✅ Full CRUD network calls with mutations, ✅ Toast notifications throughout app
-**Features:** ✅ AI Chat view with conversational interface, ✅ AI tool calling for event creation from chat, ✅ Image upload support in chat, ✅ Loading states and disabled buttons during mutations
+**Rubric Items:** [X] TanStack Query state management, [X] Full CRUD network calls with mutations, [X] Toast notifications throughout app
+**Features:** [X] AI Chat view with conversational interface, [X] AI tool calling for event creation from chat, [X] Image upload support in chat, [X] Loading states and disabled buttons during mutations
 
 ---
 
@@ -172,8 +172,8 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Event Detail page (conflict display)  
 
 #### Delivered
-**Rubric Items:** ✅ 3 generic form input components (TextInput, TextArea, DateTimeInput), ✅ 4 generic layout components (Card, PageContainer, PageHeader, Grid), ✅ Network calls (17 total: 6 read + 11 write operations including CRUD events, AI chat, Google Calendar sync, schedule image upload)
-**Features:** ✅ Schedule comparison with AI vision image parsing, ✅ Event conflict detection utilities, ✅ Reusable form and layout components implemented
+**Rubric Items:** [X] 3 generic form input components (TextInput, TextArea, DateTimeInput), [X] 4 generic layout components (Card, PageContainer, PageHeader, Grid), [X] Network calls (17 total: 6 read + 11 write operations including CRUD events, AI chat, Google Calendar sync, schedule image upload)
+**Features:** [X] Schedule comparison with AI vision image parsing, [X] Event conflict detection utilities, [X] Reusable form and layout components implemented
 
 ---
 
@@ -191,8 +191,28 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Polish empty states and layout transitions  
 
 #### Delivered
-**Rubric Items:**  
-**Features:**  Agentic UI - actions automatically adjust UI 
+**Rubric Items:** [X] Agentic UI implementation
+**Features:** [X] Agentic UI - actions automatically adjust UI 
+
+---
+
+### Nov 25
+
+#### Estimates
+**Rubric Items**
+- [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
+- [X] Technology: authentication and user account support  
+- [X] Technology: Loading states and user feedback  
+
+**Features**
+- [X] Test suite setup with Vitest  
+- [X] Auth buttons and authentication flow improvements  
+- [X] Loading spinners throughout app  
+- [X] Schedule comparison conflict detection  
+
+#### Delivered
+**Rubric Items:**  Authentication improvements (auth buttons),  Loading states (spinners),  Tests (setup complete, need CI integration)
+**Features:**  Vitest , Auth button component with Google sign-in, Loading spinners for async operations, Conflict checking for manual event entry (button-triggered), Conflict checking for AI-extracted events,
 
 ---
 

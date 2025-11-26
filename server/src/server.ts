@@ -1,5 +1,5 @@
 // src/server.ts
-import express, { type Request, type Response, type NextFunction } from "express";
+import express from "express";
 import cors from "cors";
 import session from "express-session";
 import dotenv from "dotenv";
