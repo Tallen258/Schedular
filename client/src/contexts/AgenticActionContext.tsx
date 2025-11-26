@@ -13,7 +13,7 @@ export interface ActionNotification {
 
 interface AgenticAction {
   trigger: string;
-  context: Record<string, any>;
+  context: Record<string, unknown>;
   timestamp: Date;
 }
 
@@ -22,7 +22,7 @@ interface AgenticRule {
   condition: (action: AgenticAction, appState: AppState) => boolean;
   effects: Array<{
     type: 'navigate' | 'openPanel' | 'suggest' | 'autoExecute';
-    payload: any;
+    payload: unknown;
     delay?: number;
   }>;
 }
@@ -37,7 +37,7 @@ interface AppState {
 }
 
 interface AgenticActionContextType {
-  recordAction: (trigger: string, context?: Record<string, any>) => void;
+  recordAction: (trigger: string, context?: Record<string, unknown>) => void;
   notifications: ActionNotification[];
 }
 
@@ -65,9 +65,9 @@ const agenticRules: AgenticRule[] = [
   },
   {
     name: 'auto-open-chat-on-error',
-    condition: (action, _state) => 
+    condition: (action) => 
       action.trigger === 'error' && 
-      action.context?.retryCount >= 2,
+      (action.context?.retryCount as number) >= 2,
     effects: [
       { type: 'suggest', payload: { 
         message: 'Having trouble? Ask AI assistant for help?',
@@ -94,7 +94,7 @@ const agenticRules: AgenticRule[] = [
   },
   {
     name: 'auto-collapse-sidebar-on-schedule-view',
-    condition: (action, _state) => 
+    condition: (action) => 
       action.trigger === 'schedule_analyzed',
     effects: []
   }
@@ -127,7 +127,9 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     setTimeout(() => {
       switch (effect.type) {
         case 'navigate':
-          navigate(effect.payload);
+          if (typeof effect.payload === 'string') {
+            navigate(effect.payload);
+          }
           break;
           
         case 'openPanel':
@@ -137,13 +139,14 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
           }
           break;
           
-        case 'suggest':
+        case 'suggest': {
+          const payload = effect.payload as { message: string; action: string };
           toast((t) => (
             <div className="flex items-center gap-3">
-              <span>{effect.payload.message}</span>
+              <span>{payload.message}</span>
               <button
                 onClick={() => {
-                  navigate(effect.payload.action);
+                  navigate(payload.action);
                   toast.dismiss(t.id);
                 }}
                 className="px-3 py-1 bg-itin-sand-600 text-white rounded-lg text-sm hover:bg-itin-sand-700"
@@ -153,6 +156,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
             </div>
           ), { duration: 6000 });
           break;
+        }
           
         case 'autoExecute':
           // Execute custom logic
@@ -164,7 +168,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     }, delay);
   }, [navigate]);
 
-  const recordAction = useCallback((trigger: string, context: Record<string, any> = {}) => {
+  const recordAction = useCallback((trigger: string, context: Record<string, unknown> = {}) => {
     const action: AgenticAction = {
       trigger,
       context,
@@ -197,9 +201,9 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     // Add notification
     const notification: ActionNotification = {
       id: `${Date.now()}-${Math.random()}`,
-      action: context.actionName || formatTrigger(trigger),
-      message: context.message || 'Action completed',
-      type: context.type || 'success',
+      action: (context.actionName as string) || formatTrigger(trigger),
+      message: (context.message as string) || 'Action completed',
+      type: (context.type as ActionNotification['type']) || 'success',
       timestamp: new Date(),
     };
     setNotifications(prev => [notification, ...prev].slice(0, 20));
@@ -214,9 +218,9 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
 
     // Show simple toast for important actions
     if (context.type === 'success') {
-      toast.success(context.message || 'Action completed');
+      toast.success((context.message as string) || 'Action completed');
     } else if (context.type === 'error') {
-      toast.error(context.message || 'Action failed');
+      toast.error((context.message as string) || 'Action failed');
     }
   }, [location.pathname, recentActions, userBehavior, executeEffect]);
 
@@ -232,13 +236,14 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAgenticAction() {
+// Exported separately to satisfy react-refresh/only-export-components
+export const useAgenticAction = () => {
   const context = useContext(AgenticActionContext);
   if (!context) {
     throw new Error('useAgenticAction must be used within AgenticActionProvider');
   }
   return context;
-}
+};
 
 function formatTrigger(trigger: string): string {
   return trigger

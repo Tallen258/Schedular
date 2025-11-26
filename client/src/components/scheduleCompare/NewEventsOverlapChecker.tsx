@@ -53,7 +53,6 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
 
     // Check each event against existing events
     let hasAnyConflicts = false;
-    let totalConflicts = 0;
 
     newEvents.forEach(newEvent => {
       const startDateTime = `${selectedDate}T${newEvent.startTime}`;
@@ -62,7 +61,6 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
       
       if (result.hasOverlap) {
         hasAnyConflicts = true;
-        totalConflicts += result.conflicts.length;
       }
     });
 

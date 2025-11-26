@@ -34,7 +34,7 @@ export function ActionProvider({ children }: { children: ReactNode }) {
       timestamp: new Date(),
     };
 
-    setNotifications((prev) => [notification, ...prev].slice(0, 20)); // Keep last 20
+    setNotifications((prev) => [notification, ...prev].slice(0, 20)); //I want to add these two a database table with a option to delete them 
 
     // Show toast
     const toastMessage = `${action}: ${message}`;
@@ -93,10 +93,11 @@ export function ActionProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useActionContext() {
+// Exported separately to satisfy react-refresh/only-export-components
+export const useActionContext = () => {
   const context = useContext(ActionContext);
   if (!context) {
     throw new Error('useActionContext must be used within ActionProvider');
   }
   return context;
-}
+};

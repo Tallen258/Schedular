@@ -34,9 +34,9 @@ export default function Home() {
   }
 
   const profile = auth.user?.profile ?? ({} as Record<string, unknown>);
-  const email = (profile as any).email ?? (profile as any).preferred_username ?? "(no email claim)";
-  const displayName = (profile as any).name ?? email;
-  const sub = (profile as any).sub ?? "—";
+  const email = (profile as Record<string, unknown>).email as string ?? (profile as Record<string, unknown>).preferred_username as string ?? "(no email claim)";
+  const displayName = (profile as Record<string, unknown>).name as string ?? email;
+  const sub = (profile as Record<string, unknown>).sub as string ?? "—";
 
   return (
     <main className="min-h-screen p-6 bg-itin-sand-50">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Spinner from "./Spinner";
 import { 
   startGoogleCalendarAuth,
@@ -38,8 +38,9 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
       if (onEventsLoaded) {
         onEventsLoaded(googleEvents);
       }
-    } catch (e: any) {
-      setError(e.message ?? "Failed to load events");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error.message ?? "Failed to load events");
       console.error('Error loading events:', e);
     } finally {
       setLoading(false);
@@ -59,8 +60,9 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
     try {
       const { url } = await startGoogleCalendarAuth();
       window.location.href = url;
-    } catch (e: any) {
-      setError(e.message ?? "Failed to start Google link");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error.message ?? "Failed to start Google link");
       console.error('Error connecting to Google:', e);
     }
   }
@@ -92,8 +94,9 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
       queryClient.invalidateQueries({ queryKey: ['events'] });
       // Show success message
       setTimeout(() => setSyncResult(null), 5000);
-    } catch (e: any) {
-      setError(e.message ?? "Failed to sync events");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error.message ?? "Failed to sync events");
       console.error('Error syncing events:', e);
     } finally {
       setSyncing(false);
@@ -115,8 +118,9 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
           return newSet;
         });
       }, 1000);
-    } catch (e: any) {
-      setError(e.message ?? "Failed to import event");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error.message ?? "Failed to import event");
       console.error('Error importing event:', e);
       setImportingEvents(prev => {
         const newSet = new Set(prev);

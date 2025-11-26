@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Markdown from "../components/Markdown";
 import ChatSidebar from "../components/ChatSidebar";
@@ -31,18 +31,19 @@ const AIChat = () => {
   const createConversationMutation = useCreateConversation();
   const postMessageMutation = usePostMessage();
 
-  function goToConversation(id: number) {
+  const goToConversation = useCallback((id: number) => {
     nav(`/chat/${id}`);
-  }
+  }, [nav]);
 
-  async function createConversationAndGo() {
+  const createConversationAndGo = useCallback(async () => {
     try {
       const convo = await createConversationMutation.mutateAsync();
       nav(`/chat/${convo.id}`);
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to create conversation");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error?.message ?? "Failed to create conversation");
     }
-  }
+  }, [createConversationMutation, nav]);
 
   useEffect(() => {
     if (conversationsQuery.isLoading) return;
@@ -51,9 +52,9 @@ const AIChat = () => {
     if (conversations.length > 0) {
       goToConversation(conversations[0].id);
     } else {
-      createConversationAndGo();
+      void createConversationAndGo();
     }
-  }, [conversationsQuery.isLoading, conversations.length, activeId]);
+  }, [conversationsQuery.isLoading, conversations.length, activeId, goToConversation, createConversationAndGo]);
 
   // Messages
   const messagesQuery = useMessages(activeId);
@@ -61,14 +62,14 @@ const AIChat = () => {
   useEffect(() => {
     if (messagesQuery.data) setMessages(messagesQuery.data);
     if (messagesQuery.error) {
-      const e: any = messagesQuery.error;
+      const e = messagesQuery.error as Error;
       if (String(e?.message) === "not-found") {
-        createConversationAndGo();
+        void createConversationAndGo();
         return;
       }
       setError(e?.message ?? "Failed to load messages");
     }
-  }, [messagesQuery.data, messagesQuery.error]);
+  }, [messagesQuery.data, messagesQuery.error, createConversationAndGo]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -127,8 +128,9 @@ const AIChat = () => {
         data.userMessage,
         data.assistantMessage,
       ]);
-    } catch (e: any) {
-      setError(e?.message ?? "Send failed");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error?.message ?? "Send failed");
       setMessages((m) => m.filter((x) => x.id !== optimistic.id));
       setInput(content);
       if (imageToSend) {
