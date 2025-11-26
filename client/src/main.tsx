@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './index.css'
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import './styles/rbc-tailwind.css'
+import './styles/spinner.css'
 import App from './App.tsx'
 
 const queryClient = new QueryClient()

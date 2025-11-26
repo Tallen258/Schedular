@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useUpcomingEvents } from '../hooks/useEvents';
+import Spinner from '../components/Spinner';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -37,7 +38,9 @@ const Dashboard = () => {
             </div>
 
             {isLoading && (
-              <div className="text-itin-sand-700">Loading events...</div>
+              <div className="flex justify-center py-4">
+                <Spinner />
+              </div>
             )}
 
             {error && (

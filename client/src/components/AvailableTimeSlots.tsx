@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { getAvailableTimeSlots, getTotalAvailableHours } from '../utils/eventOverlap';
+import Spinner from './Spinner';
 
 interface AvailableTimeSlotsProps {
   targetDate?: string;
@@ -20,8 +21,8 @@ const AvailableTimeSlots = ({
 
   if (isLoading) {
     return (
-      <div className="text-itin-sand-600">
-        Loading available time slots...
+      <div className="flex justify-center py-4">
+        <Spinner />
       </div>
     );
   }

@@ -9,6 +9,7 @@ import EventDetail from "./components/EventDetail";
 import CompareSchedules from "./pages/CompareSchedule";
 import ImageReview from "./pages/ScheduleCompare";
 import Settings from "./pages/Settings";
+import Spinner from "./components/Spinner";
 import Help from "./pages/Help";
 import AIChat from "./pages/AIChat";
 import Notifications from "./pages/Notifications";
@@ -37,7 +38,7 @@ export default function App() {
       <Toaster position="top-center" />
       <ErrorBoundary>
         <AgenticActionProvider>
-          <Suspense fallback={<div className="p-4">Loading…</div>}>
+          <Suspense fallback={<div className="p-4 flex justify-center"><Spinner /></div>}>
             <NavBar />
             <div className="main-content">
               <Routes>

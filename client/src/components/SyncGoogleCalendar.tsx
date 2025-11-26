@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Spinner from "./Spinner";
 import { 
   startGoogleCalendarAuth,
   getGoogleCalendarEvents,
@@ -178,8 +179,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
 
           {loading && (
             <div className="flex items-center gap-2 text-itin-sand-700">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-itin-sand-700"></div>
-              <p>Loading events from Google Calendar...</p>
+              <Spinner />
             </div>
           )}
 

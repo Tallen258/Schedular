@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEvent, useUpdateEvent, useDeleteEvent } from '../hooks/useEvents';
 import { useAgenticAction } from '../contexts/AgenticActionContext';
 import EventForm from './EventForm';
+import Spinner from './Spinner';
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -137,8 +138,8 @@ const EventDetail = () => {
   if (isLoading) {
     return (
       <main className="min-h-screen p-6 bg-itin-sand-50">
-        <section className="mx-auto max-w-2xl card p-6">
-          <div className="text-itin-sand-700">Loading event...</div>
+        <section className="mx-auto max-w-2xl card p-6 flex justify-center">
+          <Spinner />
         </section>
       </main>
     );

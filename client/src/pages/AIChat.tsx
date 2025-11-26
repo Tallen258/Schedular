@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Markdown from "../components/Markdown";
 import ChatSidebar from "../components/ChatSidebar";
+import Spinner from "../components/Spinner";
 import {
   useConversations,
   useMessages,
@@ -157,15 +158,12 @@ const AIChat = () => {
           <span className="text-lg font-semibold text-itin-sand-800">
             {conversations.find((c) => c.id === activeId)?.title ?? "AI Assistant"}
           </span>
-          {loading && (
-            <span className="text-sm text-itin-sand-500">Thinking...</span>
-          )}
         </div>
 
         <div className="p-4 flex-1 overflow-auto space-y-4">
           {messages.length === 0 && !loading && (
             <div className="text-center text-itin-sand-600 mt-8">
-              <p className="text-lg mb-2">👋 Hi! I'm your scheduling assistant.</p>
+              <p className="text-lg mb-2"> Hi! I'm your scheduling assistant.</p>
               <p className="text-sm">Ask me about your schedule, events, or request to create new events.</p>
             </div>
           )}
@@ -199,6 +197,15 @@ const AIChat = () => {
               </div>
             </div>
           ))}
+          
+          {loading && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-xl px-4 py-3 shadow bg-custom-white text-itin-sand-800 border border-itin-sand-200 flex items-center gap-3">
+                <Spinner />
+                <span className="text-sm text-itin-sand-600">Thinking...</span>
+              </div>
+            </div>
+          )}
           
           {error && (
             <div className="text-center text-custom-red-700 text-sm bg-custom-red-50 p-3 rounded-md">

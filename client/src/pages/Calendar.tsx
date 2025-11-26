@@ -5,6 +5,7 @@ import { useEvents } from "../hooks/useEvents";
 import { getUserSettings } from "../utils/localStorage";
 import MyCalendar, { type RbcEvent } from "../components/myCalendar";
 import SyncGoogleCalendar from "../components/SyncGoogleCalendar";
+import Spinner from "../components/Spinner";
 
 const Calendar = () => {
   const navigate = useNavigate();
@@ -67,8 +68,8 @@ const Calendar = () => {
         <SyncGoogleCalendar />
 
         {isLoading && (
-          <div className="card p-6">
-            <p className="text-itin-sand-600">Loading events...</p>
+          <div className="card p-6 flex justify-center">
+            <Spinner />
           </div>
         )}
 
