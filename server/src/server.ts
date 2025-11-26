@@ -78,11 +78,11 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
+app.use(requireAuth);
+
 if (db) {
   app.use("/api/conversations", conversationsRouter(db));
 }
-
-app.use(requireAuth);
 
 
 app.use("/api", authRoutes);

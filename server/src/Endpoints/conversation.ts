@@ -10,8 +10,8 @@ export function conversationsRouter(db: IDatabase<unknown>) {
   // Get all conversations for the authenticated user
   r.get("/", async (req: Request, res: Response) => {
     try {
-      // For development: use a default email if not authenticated
-      const userEmail = req.user?.email || "dev@example.com";
+      const userEmail = req.user?.email;
+      if (!userEmail) return res.status(401).json({ error: "unauthorized" });
       console.log("GET /conversations - userEmail:", userEmail);
 
       const rows = await db.manyOrNone(
@@ -34,8 +34,8 @@ export function conversationsRouter(db: IDatabase<unknown>) {
   // Create a new conversation
   r.post("/", async (req: Request, res: Response) => {
     try {
-      // For development: use a default email if not authenticated
-      const userEmail = req.user?.email || "dev@example.com";
+      const userEmail = req.user?.email;
+      if (!userEmail) return res.status(401).json({ error: "unauthorized" });
       console.log("POST /conversations - userEmail:", userEmail);
 
       const title = req.body?.title || "New chat";
@@ -60,8 +60,8 @@ export function conversationsRouter(db: IDatabase<unknown>) {
   // Update conversation title
   r.patch("/:id", async (req: Request, res: Response) => {
     try {
-      // For development: use a default email if not authenticated
-      const userEmail = req.user?.email || "dev@example.com";
+      const userEmail = req.user?.email;
+      if (!userEmail) return res.status(401).json({ error: "unauthorized" });
 
       const id = Number(req.params.id);
       if (!Number.isFinite(id)) return res.status(400).json({ error: "invalid_id" });
@@ -90,8 +90,8 @@ export function conversationsRouter(db: IDatabase<unknown>) {
   // Delete a conversation
   r.delete("/:id", async (req: Request, res: Response) => {
     try {
-      // For development: use a default email if not authenticated
-      const userEmail = req.user?.email || "dev@example.com";
+      const userEmail = req.user?.email;
+      if (!userEmail) return res.status(401).json({ error: "unauthorized" });
 
       const id = Number(req.params.id);
       if (!Number.isFinite(id)) return res.status(400).json({ error: "invalid_id" });
@@ -141,7 +141,8 @@ export function conversationsRouter(db: IDatabase<unknown>) {
     const model = (req.body?.model ?? "gemma3-27b").toString();
     if (!content) return res.status(400).json({ error: "content_required" });
 
-    const userEmail = req.user?.email || "dev@example.com";
+    const userEmail = req.user?.email;
+    if (!userEmail) return res.status(401).json({ error: "unauthorized" });
 
     // Handle uploaded image
     let imageData: string | null = null;
