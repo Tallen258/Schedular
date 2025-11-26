@@ -10,10 +10,21 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Get the OIDC user from localStorage (stored by react-oidc-context)
+  const oidcStorageKey = `oidc.user:https://auth-dev.snowse.io/realms/DevRealm:taft-chat`;
+  const oidcStorage = localStorage.getItem(oidcStorageKey);
+  
+  if (oidcStorage) {
+    try {
+      const user = JSON.parse(oidcStorage);
+      if (user?.access_token) {
+        config.headers.Authorization = `Bearer ${user.access_token}`;
+      }
+    } catch (e) {
+      console.error('Failed to parse OIDC token', e);
+    }
   }
+  
   return config;
 });
 

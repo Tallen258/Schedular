@@ -8,7 +8,6 @@ import EventForm from '../components/EventForm';
 import { useAgenticAction } from '../contexts/AgenticActionContext';
 
 const CreateEvent = () => {
-  console.log('CreateEvent component rendering');
   const navigate = useNavigate();
   const createEventMutation = useCreateEvent();
   const { recordAction } = useAgenticAction();

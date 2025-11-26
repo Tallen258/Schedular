@@ -6,6 +6,8 @@ const Settings = () => {
   const [settings, setSettings] = useState<UserSettings>(getUserSettings());
   const [isSaving, setIsSaving] = useState(false);
 
+  
+
   useEffect(() => {
     const loaded = getUserSettings();
     setSettings(loaded);

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Views, type View } from "react-big-calendar";
 import { useEvents } from "../hooks/useEvents";
+import { getUserSettings } from "../utils/localStorage";
 import MyCalendar, { type RbcEvent } from "../components/myCalendar";
 import SyncGoogleCalendar from "../components/SyncGoogleCalendar";
 
@@ -10,6 +11,15 @@ const Calendar = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [view, setView] = useState<View>(Views.MONTH);
   const { data: events, isLoading, error } = useEvents();
+  const settings = getUserSettings();
+
+  const formatTime12Hour = (time24: string) => {
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return `${hour12}:${minutes} ${period}`;
+  };
 
   const calendarEvents: RbcEvent[] = (events || []).map(event => ({
     id: event.id.toString(),
@@ -46,6 +56,11 @@ const Calendar = () => {
               + Create Event
             </button>
           </div>
+          <div className="mt-4 p-3 bg-accent-green-50 border border-accent-green-200 rounded-lg">
+            <p className="text-sm text-accent-green-800">
+              <span className="font-semibold">Available Hours:</span> {formatTime12Hour(settings.workStartTime)} - {formatTime12Hour(settings.workEndTime)}
+            </p>
+          </div>
         </header>
 
         {/* Google Calendar Sync Section */}
@@ -74,6 +89,8 @@ const Calendar = () => {
             onView={setView}
             onSelectEvent={handleSelectEvent}
             onSelectSlot={handleSelectSlot}
+            workStartTime={settings.workStartTime}
+            workEndTime={settings.workEndTime}
           />
         )}
       </section>

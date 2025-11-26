@@ -13,6 +13,7 @@ import eventsRoutes from "./Endpoints/events";
 import chatRoutes from "./Endpoints/chat";
 import scheduleCompareRoutes from "./Endpoints/scheduleCompare";
 import { conversationsRouter } from "./Endpoints/conversation";
+import { requireAuth } from "./auth";
 
 dotenv.config();
 
@@ -55,31 +56,10 @@ function buildCorsOptions() {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   TEMP requireAuth (replace with your real Keycloak middleware)
-   - If DEV_ALLOW_FAKE_USER=true, it fakes a logged-in user.
-   - Otherwise it requires an Authorization header but doesn't verify it.
+   Auth middleware (imported from ./auth.ts)
+   - Verifies JWT tokens from Keycloak
+   - Validates issuer and audience
    ────────────────────────────────────────────────────────────── */
-const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (process.env.DEV_ALLOW_FAKE_USER === "true") {
-    req.user = { 
-      sub: "dev-user-123",
-      email: "dev@example.com", 
-      name: "Dev User",
-      roles: [],
-      raw: { sub: "dev-user-123" }
-    };
-    return next();
-  }
-  const auth = req.header("authorization");
-  if (!auth) return res.status(401).send("Login required");
-  // Minimal placeholder: attach a stub so Google linking can store an email
-  req.user = { 
-    sub: "temp-user",
-    email: req.header("x-user-email") ?? "unknown@example.com",
-    raw: { sub: "temp-user" }
-  };
-  next();
-};
 
 
 const app = express();

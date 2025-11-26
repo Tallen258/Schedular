@@ -18,6 +18,8 @@ export default function MyCalendar({
   onRangeChange,
   onSelectEvent,
   onSelectSlot,
+  workStartTime = '09:00',
+  workEndTime = '17:00',
 }: {
   events: RbcEvent[];
   date: Date;
@@ -27,7 +29,15 @@ export default function MyCalendar({
   onRangeChange?: (range: { start: Date; end: Date } | Date[]) => void;
   onSelectEvent?: (e: RbcEvent) => void;
   onSelectSlot?: (slot: { start: Date; end: Date }) => void;
+  workStartTime?: string;
+  workEndTime?: string;
 }) {
+  const minTime = new Date();
+  minTime.setHours(parseInt(workStartTime.split(':')[0]), parseInt(workStartTime.split(':')[1] || '0'), 0);
+  
+  const maxTime = new Date();
+  maxTime.setHours(parseInt(workEndTime.split(':')[0]), parseInt(workEndTime.split(':')[1] || '0'), 0);
+
   return (
     <div className="bg-white rounded-2xl shadow p-4">
       <div className="h-[700px]">
@@ -42,6 +52,8 @@ export default function MyCalendar({
           views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
           popup
           selectable
+          min={minTime}
+          max={maxTime}
           onRangeChange={onRangeChange}
           onSelectEvent={(e: RbcEvent) => onSelectEvent?.(e)}
           onSelectSlot={(slot: { start: Date; end: Date; }) =>
