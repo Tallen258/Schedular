@@ -64,23 +64,6 @@ const agenticRules: AgenticRule[] = [
     ]
   },
   {
-    name: 'suggest-schedule-comparison',
-    condition: (action, state) => {
-      // If user creates multiple events in short succession, suggest comparison
-      const recentCreates = state.recentActions.filter(
-        a => a.trigger === 'event_created' && 
-        (Date.now() - a.timestamp.getTime()) < 300000 // last 5 min
-      );
-      return action.trigger === 'event_created' && recentCreates.length >= 2;
-    },
-    effects: [
-      { type: 'suggest', payload: { 
-        message: 'You\'ve added multiple events. Want to check for conflicts?',
-        action: '/compare'
-      }, delay: 2000 }
-    ]
-  },
-  {
     name: 'auto-open-chat-on-error',
     condition: (action, _state) => 
       action.trigger === 'error' && 

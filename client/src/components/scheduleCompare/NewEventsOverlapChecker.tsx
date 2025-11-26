@@ -19,6 +19,7 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
   const [newEvents, setNewEvents] = useState<NewEvent[]>([
     { id: crypto.randomUUID(), title: '', startTime: '', endTime: '' }
   ]);
+  const [showOverlapResults, setShowOverlapResults] = useState(false);
 
   const addNewEvent = () => {
     setNewEvents([...newEvents, { id: crypto.randomUUID(), title: '', startTime: '', endTime: '' }]);
@@ -47,6 +48,8 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
       toast.error('End time must be after start time for all events');
       return;
     }
+
+    setShowOverlapResults(true);
 
     // Check each event against existing events
     let hasAnyConflicts = false;
@@ -146,7 +149,7 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
                   </div>
                 </div>
 
-                {overlapResult && event.endTime > event.startTime && (
+                {showOverlapResults && overlapResult && event.endTime > event.startTime && (
                   <div className={`p-3 rounded ${overlapResult.hasOverlap ? 'bg-custom-red-50 border border-custom-red-500' : 'bg-accent-green-50 border border-accent-green-400'}`}>
                     {overlapResult.hasOverlap ? (
                       <>

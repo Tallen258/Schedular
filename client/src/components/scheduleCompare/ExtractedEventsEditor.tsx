@@ -1,14 +1,44 @@
+import { useState } from 'react';
 import type { ExtractedEvent } from '../../api/scheduleCompare';
+import type { Event } from '../../api/event';
 import { formatForDatetimeLocal } from '../../utils/dateUtils';
+import { checkEventOverlap } from '../../utils/eventOverlap';
+import toast from 'react-hot-toast';
 
 interface ExtractedEventsEditorProps {
   events: ExtractedEvent[];
+  dayEvents: Event[];
   onUpdate: (index: number, field: 'title' | 'start_time' | 'end_time', value: string) => void;
   onRemove: (index: number) => void;
   onAdd: () => void;
+  onConfirm?: () => void;
 }
 
-const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedEventsEditorProps) => {
+const ExtractedEventsEditor = ({ events, dayEvents, onUpdate, onRemove, onAdd, onConfirm }: ExtractedEventsEditorProps) => {
+  const [showConflicts, setShowConflicts] = useState(false);
+
+  const handleCheckConflicts = () => {
+    setShowConflicts(true);
+    
+    let hasAnyConflicts = false;
+    events.forEach(event => {
+      const result = checkEventOverlap(event.start_time, event.end_time, dayEvents);
+      if (result.hasOverlap) {
+        hasAnyConflicts = true;
+      }
+    });
+
+    if (hasAnyConflicts) {
+      toast.error('Some extracted events conflict with your schedule!', { duration: 4000 });
+    } else {
+      toast.success('No conflicts found!', { duration: 3000 });
+    }
+  };
+
+  const getConflictsForEvent = (event: ExtractedEvent) => {
+    if (!showConflicts) return null;
+    return checkEventOverlap(event.start_time, event.end_time, dayEvents);
+  };
   return (
     <div className="border border-itin-sand-200 rounded p-3 bg-brand-teal-50">
       <div className="flex justify-between items-center mb-2">
@@ -26,7 +56,25 @@ const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedE
         <p className="text-sm text-brand-teal-700">No events extracted from the image.</p>
       ) : (
         <div className="space-y-3">
-          {events.map((event, index) => (
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleCheckConflicts}
+              className="btn-primary text-sm"
+            >
+              Check for Conflicts
+            </button>
+            {onConfirm && (
+              <button
+                onClick={onConfirm}
+                className="btn-primary text-sm"
+              >
+                Find Common Free Time
+              </button>
+            )}
+          </div>
+          {events.map((event, index) => {
+            const conflictResult = getConflictsForEvent(event);
+            return (
             <div key={index} className="border border-brand-teal-200 rounded p-3 bg-white">
               <div className="space-y-2">
                 <div className="flex justify-between items-start">
@@ -71,9 +119,32 @@ const ExtractedEventsEditor = ({ events, onUpdate, onRemove, onAdd }: ExtractedE
                     />
                   </div>
                 </div>
+
+                {conflictResult && (
+                  <div className={`mt-3 p-3 rounded ${conflictResult.hasOverlap ? 'bg-custom-red-50 border border-custom-red-500' : 'bg-accent-green-50 border border-accent-green-400'}`}>
+                    {conflictResult.hasOverlap ? (
+                      <>
+                        <p className="font-semibold text-custom-red-700 mb-2 text-sm">⚠️ Conflicts ({conflictResult.conflicts.length}):</p>
+                        <ul className="text-xs text-custom-red-700 space-y-1">
+                          {conflictResult.conflicts.map((evt) => (
+                            <li key={evt.id} className="flex justify-between">
+                              <span>• {evt.title}</span>
+                              <span className="text-custom-red-700 ml-2">
+                                {new Date(evt.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - 
+                                {new Date(evt.end_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <p className="text-accent-green-700 font-medium text-sm">✓ No conflicts!</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-          ))}
+          );})}
         </div>
       )}
     </div>

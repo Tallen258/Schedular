@@ -10,8 +10,7 @@ import NewEventsOverlapChecker from '../components/scheduleCompare/NewEventsOver
 import ImageUploadSection from '../components/scheduleCompare/ImageUploadSection';
 import YourEventsSummary from '../components/scheduleCompare/YourEventsSummary';
 import ExtractedEventsEditor from '../components/scheduleCompare/ExtractedEventsEditor';
-import CommonFreeSlotsPanel from '../components/scheduleCompare/CommonFreeSlotsPanel';
-import AvailableSlotsPanel from '../components/scheduleCompare/AvailableSlotsPanel';
+import FreeSlotsDisplay from '../components/scheduleCompare/CommonFreeSlotsPanel';
 
 const ScheduleCompare = () => {
   const { recordAction } = useAgenticAction();
@@ -27,7 +26,6 @@ const ScheduleCompare = () => {
     workEnd,
     dayEvents,
     availableSlots,
-    totalAvailableHours,
   } = useWorkdayAvailability(events, selectedDate);
 
   const {
@@ -136,31 +134,33 @@ const ScheduleCompare = () => {
 
                   <ExtractedEventsEditor
                     events={editableExtractedEvents}
+                    dayEvents={dayEvents.filter(
+                      (e) => !excludeAllDayEvents || !e.all_day
+                    )}
                     onUpdate={updateExtractedEvent}
                     onRemove={removeExtractedEvent}
                     onAdd={addExtractedEvent}
+                    onConfirm={handleConfirmAndCompare}
                   />
-
-                  {!isConfirmed && (
-                    <button
-                      onClick={handleConfirmAndCompare}
-                      className="btn-primary w-full"
-                    >
-                      Confirm &amp; Find Common Free Time
-                    </button>
-                  )}
                 </div>
               )}
 
               {isConfirmed && commonFreeSlots.length > 0 && (
-                <CommonFreeSlotsPanel freeSlots={commonFreeSlots} />
+                <FreeSlotsDisplay 
+                  slots={commonFreeSlots} 
+                  title="Common Free Time Slots"
+                  variant="common"
+                />
               )}
             </div>
           )}
 
-          <AvailableSlotsPanel
-            availableSlots={availableSlots}
-            totalAvailableHours={totalAvailableHours}
+          <FreeSlotsDisplay
+            slots={availableSlots}
+            title="Available Time Slots"
+            variant="available"
+            collapsible={true}
+            showTotal={true}
           />
         </div>
       </section>
