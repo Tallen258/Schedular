@@ -126,8 +126,8 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
                     placeholder="Meeting title"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1">
                     <label className="block text-sm mb-1">Start Time</label>
                     <input
                       type="time"
@@ -136,7 +136,7 @@ const NewEventsOverlapChecker = ({ selectedDate, dayEvents }: NewEventsOverlapCh
                       className="form-input w-full"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <label className="block text-sm mb-1">End Time</label>
                     <input
                       type="time"

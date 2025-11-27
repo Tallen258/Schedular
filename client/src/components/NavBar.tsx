@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import { useAgenticAction } from '../contexts/AgenticActionContext';
+import { useState } from 'react';
 import './NavBar.css';
 
 const NavBar: React.FC = () => {
@@ -8,28 +9,50 @@ const NavBar: React.FC = () => {
   const navigate = useNavigate();
   const { notifications } = useAgenticAction();
   const unreadCount = notifications.length;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="navbar">
       <div className="nav-brand">
         <Link to="/home">Schedular</Link>
       </div>
-      <div className="nav-links">
+      
+      {/* Hamburger Menu Button */}
+      <button 
+        className="hamburger-menu" 
+        onClick={toggleMenu}
+        aria-label="Toggle menu"
+        aria-expanded={isMenuOpen}
+      >
+        <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+        <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+        <span className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></span>
+      </button>
+
+      <div className={`nav-links ${isMenuOpen ? 'mobile-open' : ''}`}>
         {auth.isAuthenticated ? (
           <>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/calendar">Calendar</Link>
-            <Link to="/create-event">Create Event</Link>
-            <Link to="/compare">Compare</Link>
-            <Link to="/settings">Settings</Link>
-            <Link to="/help">Help</Link>
-            <Link to="/chat">AI Chat</Link>
+            <Link to="/dashboard" onClick={closeMenu}>Dashboard</Link>
+            <Link to="/calendar" onClick={closeMenu}>Calendar</Link>
+            <Link to="/create-event" onClick={closeMenu}>Create Event</Link>
+            <Link to="/compare" onClick={closeMenu}>Compare</Link>
+            <Link to="/settings" onClick={closeMenu}>Settings</Link>
+            <Link to="/help" onClick={closeMenu}>Help</Link>
+            <Link to="/chat" onClick={closeMenu}>AI Chat</Link>
           </>
         ) : (
           <>
-            <Link to="/calendar">Calendar</Link>
-            <Link to="/create-event">Create Event</Link>
-            <Link to="/help">Help</Link>
+            <Link to="/calendar" onClick={closeMenu}>Calendar</Link>
+            <Link to="/create-event" onClick={closeMenu}>Create Event</Link>
+            <Link to="/help" onClick={closeMenu}>Help</Link>
           </>
         )}
       </div>

@@ -219,10 +219,11 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Project scope is 2–3 times larger than Inventory Management (per group member)  
+- [X] mobile Responsive
+- [ ] Project scope is 2–3 times larger than Inventory Management 
 - [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
-- [ ] Technology: linting in pipeline  
-- [ ] Technology: CI/CD pipeline  
+- [X] Technology: linting in pipeline  
+- [X] Technology: CI/CD pipeline  
 - [ ] Production deployment (Kubernetes public URL)
 
 **Features**

@@ -11,6 +11,7 @@ import {
   useDeleteConversation,
 } from "../hooks/useAIChat";
 import type { ChatMessage } from "../api/chat";
+import "../styles/aiChatResponsive.css";
 
 const AIChat = () => {
   const nav = useNavigate();
@@ -26,6 +27,7 @@ const AIChat = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -170,20 +172,51 @@ const AIChat = () => {
   const loading = postMessageMutation.isPending;
 
   return (
-    <div className="min-h-screen flex bg-itin-sand-50">
-      <ChatSidebar
-        conversations={conversations}
-        activeId={activeId ?? null}
-        onNew={createConversationAndGo}
-        onSelect={goToConversation}
-        onDelete={handleDeleteConversation}
-      />
+    <div className="min-h-screen flex bg-itin-sand-50 ai-chat-container">
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar with mobile support */}
+      <div className={`sidebar-wrapper ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        <ChatSidebar
+          conversations={conversations}
+          activeId={activeId ?? null}
+          onNew={() => {
+            createConversationAndGo();
+            setIsSidebarOpen(false);
+          }}
+          onSelect={(id) => {
+            goToConversation(id);
+            setIsSidebarOpen(false);
+          }}
+          onDelete={handleDeleteConversation}
+        />
+      </div>
 
       <div className="flex-1 flex flex-col">
         <div className="p-4 border-b border-itin-sand-200 bg-custom-white flex items-center justify-between">
+          {/* Mobile menu button */}
+          <button
+            className="mobile-menu-btn p-2 hover:bg-itin-sand-100 rounded transition-colors"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            aria-label="Toggle sidebar"
+          >
+            <svg className="w-6 h-6 text-itin-sand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          
           <span className="text-lg font-semibold text-itin-sand-800">
             {conversations.find((c) => c.id === activeId)?.title ?? "AI Assistant"}
           </span>
+          
+          {/* Spacer for centering title on mobile */}
+          <div className="mobile-menu-btn w-10"></div>
         </div>
 
         <div className="p-4 flex-1 overflow-auto space-y-4">

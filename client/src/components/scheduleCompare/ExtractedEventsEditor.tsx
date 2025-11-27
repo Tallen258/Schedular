@@ -56,17 +56,17 @@ const ExtractedEventsEditor = ({ events, dayEvents, onUpdate, onRemove, onAdd, o
         <p className="text-sm text-brand-teal-700">No events extracted from the image.</p>
       ) : (
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={handleCheckConflicts}
-              className="btn-primary text-sm"
+              className="btn-primary text-sm flex-1"
             >
               Check for Conflicts
             </button>
             {onConfirm && (
               <button
                 onClick={onConfirm}
-                className="btn-primary text-sm"
+                className="btn-primary text-sm flex-1"
               >
                 Find Common Free Time
               </button>
@@ -93,8 +93,8 @@ const ExtractedEventsEditor = ({ events, dayEvents, onUpdate, onRemove, onAdd, o
                   className="form-input w-full text-sm"
                 />
                 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1">
                     <label className="text-xs font-medium text-brand-teal-800">Start Time</label>
                     <input
                       type="datetime-local"
@@ -106,7 +106,7 @@ const ExtractedEventsEditor = ({ events, dayEvents, onUpdate, onRemove, onAdd, o
                       className="form-input w-full text-sm"
                     />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <label className="text-xs font-medium text-brand-teal-800">End Time</label>
                     <input
                       type="datetime-local"

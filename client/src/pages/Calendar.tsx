@@ -51,14 +51,14 @@ const Calendar = () => {
     <main className="min-h-screen p-6 bg-itin-sand-50">
       <section className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
               <div className="itin-header">Calendar</div>
               <div className="accent-bar mt-2" />
             </div>
             <button
               onClick={() => navigate('/create-event')}
-              className="btn-primary"
+              className="btn-primary w-full sm:w-auto"
             >
               + Create Event
             </button>

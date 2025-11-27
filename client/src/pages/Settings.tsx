@@ -50,8 +50,8 @@ const Settings = () => {
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div>
             <h2 className="text-lg font-semibold text-itin-sand-900 mb-3">Work / School Hours</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
                 <label className="block text-sm text-itin-sand-700 mb-1">Start Time</label>
                 <input
                   type="time"
@@ -61,7 +61,7 @@ const Settings = () => {
                   required
                 />
               </div>
-              <div>
+              <div className="flex-1">
                 <label className="block text-sm text-itin-sand-700 mb-1">End Time</label>
                 <input
                   type="time"
