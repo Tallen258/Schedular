@@ -6,7 +6,7 @@ const router = Router();
 
 
 router.get("/calendar/events", (req: Request, res: Response) => {
-  // Public endpoint - return empty array if not logged in
+  // Works for both authenticated and unauthenticated users
   if (!req.user?.email) {
     return res.json({ events: [] });
   }
@@ -50,6 +50,7 @@ router.get("/", async (req: Request, res: Response) => {
     
     // For authenticated users, get their events
     if (req.user?.email) {
+      console.log(`[GET /events] Fetching events for authenticated user: ${req.user.email}`);
       events = await db.any(`
         select id, user_email, title, description, location, 
                start_time, end_time, all_day, created_at, updated_at
@@ -59,6 +60,7 @@ router.get("/", async (req: Request, res: Response) => {
       `, [req.user.email]);
     } else {
       // For anonymous users, get anonymous events
+      console.log('[GET /events] Fetching events for anonymous user');
       events = await db.any(`
         select id, user_email, title, description, location, 
                start_time, end_time, all_day, created_at, updated_at
@@ -68,6 +70,7 @@ router.get("/", async (req: Request, res: Response) => {
       `);
     }
 
+    console.log(`[GET /events] Returning ${events.length} events`);
     res.json({ events });
   } catch (e: any) {
     console.error("Error fetching events:", e);
@@ -77,21 +80,29 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.get("/:id", async (req: Request, res: Response) => {
   try {
-    // Public endpoint - return 404 if not logged in
-    if (!req.user?.email) {
-      return res.status(404).json({ error: "Event not found" });
-    }
-    
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
     }
 
-    const event = await db.oneOrNone(`
-      select id, user_email, title, description, location, 
-             start_time, end_time, all_day, created_at, updated_at
-      from events
-      where id = $1 and user_email = $2
-    `, [req.params.id, req.user.email]);
+    let event;
+    
+    if (req.user?.email) {
+      // Authenticated user - get their event
+      event = await db.oneOrNone(`
+        select id, user_email, title, description, location, 
+               start_time, end_time, all_day, created_at, updated_at
+        from events
+        where id = $1 and user_email = $2
+      `, [req.params.id, req.user.email]);
+    } else {
+      // Anonymous user - get anonymous event
+      event = await db.oneOrNone(`
+        select id, user_email, title, description, location, 
+               start_time, end_time, all_day, created_at, updated_at
+        from events
+        where id = $1 and (user_email = 'anonymous' OR user_email IS NULL)
+      `, [req.params.id]);
+    }
 
     if (!event) {
       return res.status(404).json({ error: "Event not found" });
@@ -106,9 +117,6 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
   try {
-    // Public endpoint - use 'anonymous' if not logged in
-    const userEmail = req.user?.email || 'anonymous';
-    
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
     }
@@ -121,6 +129,10 @@ router.post("/", async (req: Request, res: Response) => {
         error: "Missing required fields: title, start_time, end_time" 
       });
     }
+
+    // Use authenticated user's email or 'anonymous'
+    const userEmail = req.user?.email || 'anonymous';
+    console.log(`[POST /events] Creating event for user: ${userEmail}`);
 
     const event = await db.one(`
       insert into events (user_email, title, description, location, start_time, end_time, all_day)
@@ -145,8 +157,6 @@ router.post("/", async (req: Request, res: Response) => {
 
 router.put("/:id", async (req: Request, res: Response) => {
   try {
-    if (!req.user?.email) return res.status(401).send("Login required");
-    
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
     }
@@ -160,22 +170,44 @@ router.put("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    const event = await db.oneOrNone(`
-      update events
-      set title = $3, description = $4, location = $5, 
-          start_time = $6, end_time = $7, all_day = $8
-      where id = $1 and user_email = $2
-      returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
-    `, [
-      req.params.id,
-      req.user.email,
-      title,
-      description || null,
-      location || null,
-      start_time,
-      end_time,
-      all_day || false
-    ]);
+    let event;
+    
+    if (req.user?.email) {
+      // Authenticated user - update their event
+      event = await db.oneOrNone(`
+        update events
+        set title = $3, description = $4, location = $5, 
+            start_time = $6, end_time = $7, all_day = $8
+        where id = $1 and user_email = $2
+        returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
+      `, [
+        req.params.id,
+        req.user.email,
+        title,
+        description || null,
+        location || null,
+        start_time,
+        end_time,
+        all_day || false
+      ]);
+    } else {
+      // Anonymous user - update anonymous event
+      event = await db.oneOrNone(`
+        update events
+        set title = $2, description = $3, location = $4, 
+            start_time = $5, end_time = $6, all_day = $7
+        where id = $1 and (user_email = 'anonymous' OR user_email IS NULL)
+        returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
+      `, [
+        req.params.id,
+        title,
+        description || null,
+        location || null,
+        start_time,
+        end_time,
+        all_day || false
+      ]);
+    }
 
     if (!event) {
       return res.status(404).json({ error: "Event not found" });
@@ -190,16 +222,25 @@ router.put("/:id", async (req: Request, res: Response) => {
 
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
-    if (!req.user?.email) return res.status(401).send("Login required");
-    
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
     }
 
-    const result = await db.result(`
-      delete from events
-      where id = $1 and user_email = $2
-    `, [req.params.id, req.user.email]);
+    let result;
+    
+    if (req.user?.email) {
+      // Authenticated user - delete their event
+      result = await db.result(`
+        delete from events
+        where id = $1 and user_email = $2
+      `, [req.params.id, req.user.email]);
+    } else {
+      // Anonymous user - delete anonymous event
+      result = await db.result(`
+        delete from events
+        where id = $1 and (user_email = 'anonymous' OR user_email IS NULL)
+      `, [req.params.id]);
+    }
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "Event not found" });

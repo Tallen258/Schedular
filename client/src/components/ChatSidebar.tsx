@@ -7,10 +7,12 @@ interface ChatSidebarProps {
   activeId: number | null;
   onNew: () => void;
   onSelect: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
-export default function ChatSidebar({ conversations, activeId, onNew, onSelect }: ChatSidebarProps) {
+export default function ChatSidebar({ conversations, activeId, onNew, onSelect, onDelete }: ChatSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   return (
     <aside className={`bg-custom-white border-r border-itin-sand-200 flex flex-col transition-all duration-300 ease-in-out ${
@@ -71,7 +73,7 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect }
         ) : (
           <ul className="p-2">
             {conversations.map((convo) => (
-              <li key={convo.id}>
+              <li key={convo.id} className="relative group">
                 <button
                   onClick={() => onSelect(convo.id)}
                   className={`w-full text-left px-3 py-2 rounded-lg mb-1 transition-colors ${
@@ -89,13 +91,55 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect }
                     </div>
                   ) : (
                     <>
-                      <div className="font-medium text-sm truncate">{convo.title}</div>
+                      <div className="font-medium text-sm truncate pr-8">{convo.title}</div>
                       <div className="text-xs text-itin-sand-500 mt-1">
                         {new Date(convo.updatedAt).toLocaleDateString()}
                       </div>
                     </>
                   )}
                 </button>
+                {!isCollapsed && (
+                  <>
+                    {deletingId === convo.id ? (
+                      <div className="absolute right-2 top-2 flex gap-1">
+                        <button
+                          onClick={() => {
+                            onDelete(convo.id);
+                            setDeletingId(null);
+                          }}
+                          className="p-1 bg-custom-red-600 text-white rounded hover:bg-custom-red-700 transition-colors"
+                          title="Confirm delete"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setDeletingId(null)}
+                          className="p-1 bg-itin-sand-400 text-white rounded hover:bg-itin-sand-500 transition-colors"
+                          title="Cancel"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingId(convo.id);
+                        }}
+                        className="absolute right-2 top-2 p-1 opacity-0 group-hover:opacity-100 hover:bg-custom-red-100 rounded transition-all"
+                        title="Delete chat"
+                      >
+                        <svg className="w-4 h-4 text-custom-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </>
+                )}
               </li>
             ))}
           </ul>

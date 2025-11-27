@@ -8,6 +8,7 @@ import {
   useMessages,
   useCreateConversation,
   usePostMessage,
+  useDeleteConversation,
 } from "../hooks/useAIChat";
 import type { ChatMessage } from "../api/chat";
 
@@ -30,6 +31,7 @@ const AIChat = () => {
 
   const createConversationMutation = useCreateConversation();
   const postMessageMutation = usePostMessage();
+  const deleteConversationMutation = useDeleteConversation();
 
   const goToConversation = useCallback((id: number) => {
     nav(`/chat/${id}`);
@@ -44,6 +46,27 @@ const AIChat = () => {
       setError(error?.message ?? "Failed to create conversation");
     }
   }, [createConversationMutation, nav]);
+
+  const handleDeleteConversation = useCallback(async (id: number) => {
+    try {
+      await deleteConversationMutation.mutateAsync(id);
+      
+      // If we're deleting the active conversation, navigate to first available or create new
+      if (activeId === id) {
+        const remainingConvos = conversations.filter(c => c.id !== id);
+        if (remainingConvos.length > 0) {
+          nav(`/chat/${remainingConvos[0].id}`);
+        } else {
+          // Create a new conversation if none left
+          const newConvo = await createConversationMutation.mutateAsync();
+          nav(`/chat/${newConvo.id}`);
+        }
+      }
+    } catch (e: unknown) {
+      const error = e as Error;
+      setError(error?.message ?? "Failed to delete conversation");
+    }
+  }, [activeId, conversations, deleteConversationMutation, createConversationMutation, nav]);
 
   useEffect(() => {
     if (conversationsQuery.isLoading) return;
@@ -153,6 +176,7 @@ const AIChat = () => {
         activeId={activeId ?? null}
         onNew={createConversationAndGo}
         onSelect={goToConversation}
+        onDelete={handleDeleteConversation}
       />
 
       <div className="flex-1 flex flex-col">

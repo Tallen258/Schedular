@@ -14,6 +14,7 @@ import chatRoutes from "./Endpoints/chat";
 import scheduleCompareRoutes from "./Endpoints/scheduleCompare";
 import { conversationsRouter } from "./Endpoints/conversation";
 import { requireAuth } from "./auth";
+import { optionalAuth } from "./auth";
 
 dotenv.config();
 
@@ -78,22 +79,22 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
-// Public routes (no auth required)
-app.use("/api/events", eventsRoutes);
-app.use("/api", eventsRoutes);  // For /api/calendar/events endpoint
+// Public routes with optional authentication (works for both logged in and anonymous users)
+app.use("/api/events", optionalAuth, eventsRoutes);
+app.use("/api/calendar", optionalAuth, eventsRoutes);  // For /api/calendar/events endpoint
 
-// Protected routes (auth required)
-app.use(requireAuth);
-
+// Protected routes (authentication required)
 if (db) {
-  app.use("/api/conversations", conversationsRouter(db));
+  app.use("/api/conversations", requireAuth, conversationsRouter(db));
 }
 
-app.use("/api", authRoutes);
-app.use("/api/auth/google", googleOAuthRoutes);
-app.use("/api/google/calendar", googleCalendarRoutes);
-app.use("/api/chat", chatRoutes);
-app.use("/api/schedule", scheduleCompareRoutes);
+app.use("/api/chat", requireAuth, chatRoutes);
+app.use("/api/schedule", requireAuth, scheduleCompareRoutes);
+
+// Google OAuth and Calendar routes (require auth)
+app.use("/api", requireAuth, authRoutes);
+app.use("/api/auth/google", requireAuth, googleOAuthRoutes);
+app.use("/api/google/calendar", requireAuth, googleCalendarRoutes);
 
 
 const port = Number(process.env.PORT ?? 3000);
