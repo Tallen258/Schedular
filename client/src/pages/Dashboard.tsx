@@ -51,7 +51,7 @@ const Dashboard = () => {
 
             {!isLoading && !error && upcomingEvents && upcomingEvents.length === 0 && (
               <div className="text-itin-sand-700">
-                No upcoming events — create one to get started!
+                No upcoming events
               </div>
             )}
 

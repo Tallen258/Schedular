@@ -219,7 +219,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     if (auth.isAuthenticated) {
       agenticRules.forEach(rule => {
         if (rule.condition(action, appState)) {
-          console.log(`🤖 Agentic rule triggered: ${rule.name}`);
+          console.log(`Agentic rule triggered: ${rule.name}`);
           rule.effects.forEach(effect => executeEffect(effect));
         }
       });

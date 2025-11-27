@@ -175,10 +175,11 @@ export const getEventsByDateRange = async (startDate: Date, endDate: Date): Prom
 
 export const getUpcomingEvents = async (limit?: number): Promise<Event[]> => {
   const allEvents = await getEvents();
-  const now = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
   const upcomingEvents = allEvents
-    .filter(event => new Date(event.start_time) >= now)
+    .filter(event => new Date(event.start_time) >= today)
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
   
   return limit ? upcomingEvents.slice(0, limit) : upcomingEvents;
