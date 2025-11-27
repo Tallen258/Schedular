@@ -30,9 +30,6 @@ const EventCreationChat = ({ onBack }: EventCreationChatProps) => {
         messages={messages}
         loading={loading}
         error={error}
-        emptyStateTitle="👋 Hi! I'm your event creation assistant."
-        emptyStateDescription="Tell me about the event you'd like to create, and I'll help you set it up."
-        emptyStateExample='Example: "Create a team meeting tomorrow at 2pm for 1 hour"'
       />
 
       <ChatInput
