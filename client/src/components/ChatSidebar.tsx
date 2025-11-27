@@ -101,13 +101,13 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
                 {!isCollapsed && (
                   <>
                     {deletingId === convo.id ? (
-                      <div className="absolute right-2 top-2 flex gap-1">
+                      <div className="absolute right-2 top-2 flex gap-1 z-10">
                         <button
                           onClick={() => {
                             onDelete(convo.id);
                             setDeletingId(null);
                           }}
-                          className="p-1 bg-custom-red-600 text-white rounded hover:bg-custom-red-700 transition-colors"
+                          className="p-1 bg-custom-red-600 text-white rounded hover:bg-custom-red-700 transition-colors shadow-md"
                           title="Confirm delete"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +116,7 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
                         </button>
                         <button
                           onClick={() => setDeletingId(null)}
-                          className="p-1 bg-itin-sand-400 text-white rounded hover:bg-itin-sand-500 transition-colors"
+                          className="p-1 bg-itin-sand-400 text-white rounded hover:bg-itin-sand-500 transition-colors shadow-md"
                           title="Cancel"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
                           e.stopPropagation();
                           setDeletingId(convo.id);
                         }}
-                        className="absolute right-2 top-2 p-1 opacity-0 group-hover:opacity-100 hover:bg-custom-red-100 rounded transition-all"
+                        className="absolute right-2 top-2 p-1 opacity-0 group-hover:opacity-100 hover:bg-custom-red-100 rounded transition-all z-10"
                         title="Delete chat"
                       >
                         <svg className="w-4 h-4 text-custom-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

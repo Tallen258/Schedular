@@ -5,12 +5,16 @@ import PageContainer from '../components/layout/PageContainer';
 import Card from '../components/layout/Card';
 import PageHeader from '../components/layout/PageHeader';
 import EventForm from '../components/EventForm';
+import EventCreationChat from '../components/EventCreationChat';
+import ModeToggle from '../components/ModeToggle';
 import { useAgenticAction } from '../contexts/AgenticActionContext';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
   const createEventMutation = useCreateEvent();
   const { recordAction } = useAgenticAction();
+  
+  const [mode, setMode] = useState<'manual' | 'ai'>('manual');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -66,17 +70,35 @@ const CreateEvent = () => {
   };
 
   return (
-    <PageContainer maxWidth="sm">
+    <PageContainer maxWidth={mode === 'ai' ? 'lg' : 'sm'}>
       <Card>
-        <PageHeader title="Create Event" />
-        <EventForm
-          formData={formData}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate('/calendar')}
-          submitLabel="Create Event"
-          isSubmitting={createEventMutation.isPending}
+        <div className="flex items-center justify-between mb-6">
+          <PageHeader title="Create Event" />
+        </div>
+        
+        <ModeToggle 
+          mode={mode} 
+          onModeChange={setMode}
+          manualLabel="Manual Entry"
+          aiLabel="AI Help"
         />
+
+        {mode === 'manual' ? (
+          <div className="mt-6">
+            <EventForm
+              formData={formData}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onCancel={() => navigate('/calendar')}
+              submitLabel="Create Event"
+              isSubmitting={createEventMutation.isPending}
+            />
+          </div>
+        ) : (
+          <div className="mt-6">
+            <EventCreationChat onBack={() => navigate('/calendar')} />
+          </div>
+        )}
       </Card>
     </PageContainer>
   );
