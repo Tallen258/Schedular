@@ -114,9 +114,19 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
     }
     if (messagesQuery.error) {
       const e = messagesQuery.error as Error;
-      setError(e?.message ?? "Failed to load messages");
+      const errorMessage = e?.message ?? "Failed to load messages";
+      
+      // If conversation not found (404), clear the invalid ID and let autoCreate handle it
+      if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+        setConversationId(null);
+        if (persistKey) {
+          localStorage.removeItem(getStorageKey('conversationId')!);
+        }
+      } else {
+        setError(errorMessage);
+      }
     }
-  }, [messagesQuery.data, messagesQuery.error]);
+  }, [messagesQuery.data, messagesQuery.error, persistKey]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -187,7 +197,21 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
       ]);
     } catch (e: unknown) {
       const error = e as Error;
-      setError(error?.message ?? "Send failed");
+      const errorMessage = error?.message ?? "Send failed";
+      
+      // If conversation not found (404), clear the invalid ID
+      if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+        setConversationId(null);
+        setMessages([]);
+        if (persistKey) {
+          localStorage.removeItem(getStorageKey('conversationId')!);
+          localStorage.removeItem(getStorageKey('messages')!);
+        }
+        setError("Conversation was deleted. Please try sending your message again.");
+      } else {
+        setError(errorMessage);
+      }
+      
       setMessages((m) => m.filter((x) => x.id !== optimistic.id));
       setInput(content);
       if (imageToSend) {
