@@ -1,25 +1,15 @@
 import { useEffect, useRef } from 'react';
-import ChatMessage from './ChatMessage';
+import Markdown from '../Markdown';
 import Spinner from '../Spinner';
-import type { ChatMessage as ChatMessageType } from '../../api/chat';
+import type { ChatMessage } from '../../api/chat';
 
 interface ChatMessagesProps {
-  messages: ChatMessageType[];
+  messages: ChatMessage[];
   loading: boolean;
   error: string | null;
-  emptyStateTitle?: string;
-  emptyStateDescription?: string;
-  emptyStateExample?: string;
 }
 
-const ChatMessages = ({
-  messages,
-  loading,
-  error,
-  emptyStateTitle = "👋 Hi! I'm your assistant.",
-  emptyStateDescription = "How can I help you today?",
-  emptyStateExample
-}: ChatMessagesProps) => {
+const ChatMessages = ({ messages, loading, error }: ChatMessagesProps) => {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,24 +17,42 @@ const ChatMessages = ({
   }, [messages.length]);
 
   return (
-    <div className="flex-1 overflow-auto p-4 space-y-4 bg-itin-sand-50 rounded-lg">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
       {messages.length === 0 && !loading && (
         <div className="text-center text-itin-sand-600 mt-8">
-          <p className="text-lg mb-2">{emptyStateTitle}</p>
-          <p className="text-sm">{emptyStateDescription}</p>
-          {emptyStateExample && (
-            <p className="text-xs text-itin-sand-500 mt-2">{emptyStateExample}</p>
-          )}
+          <p className="text-lg mb-2"> Hi! I'm your scheduling assistant.</p>
+          <p className="text-sm">Ask me about your schedule, events, or request to create new events.</p>
         </div>
       )}
       
       {messages.map((m) => (
-        <ChatMessage
+        <div
           key={m.id}
-          role={m.role}
-          content={m.content}
-          imageUrl={m.imageUrl}
-        />
+          className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+        >
+          <div
+            className={`max-w-[80%] rounded-xl px-4 py-3 shadow ${
+              m.role === "user"
+                ? "bg-itin-sand-600 text-itin-sand-10"
+                : "bg-custom-white text-itin-sand-800 border border-itin-sand-200"
+            }`}
+          >
+            {m.imageUrl && (
+              <div className="mb-2">
+                <img 
+                  src={m.imageUrl} 
+                  alt="Uploaded" 
+                  className="max-w-full h-auto rounded-lg max-h-64 object-contain"
+                />
+              </div>
+            )}
+            {m.role === "assistant" ? (
+              <Markdown content={m.content} />
+            ) : (
+              <div className="whitespace-pre-wrap">{m.content}</div>
+            )}
+          </div>
+        </div>
       ))}
       
       {loading && (

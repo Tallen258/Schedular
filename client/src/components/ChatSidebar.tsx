@@ -15,11 +15,11 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   return (
-    <aside className={`bg-custom-white border-r border-itin-sand-200 flex flex-col transition-all duration-300 ease-in-out ${
+    <aside className={`bg-custom-white border-r border-itin-sand-200 flex flex-col h-full transition-all duration-300 ease-in-out ${
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
       {/* Toggle button */}
-      <div className={`p-4 border-b border-itin-sand-200 flex items-center ${
+      <div className={`p-4 border-b border-itin-sand-200 flex items-center flex-shrink-0 ${
         isCollapsed ? 'justify-center' : 'justify-between'
       }`}>
         {!isCollapsed && (
@@ -50,7 +50,7 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
 
       {/* New chat button when collapsed */}
       {isCollapsed && (
-        <div className="p-2 border-b border-itin-sand-200">
+        <div className="p-2 border-b border-itin-sand-200 flex-shrink-0">
           <button
             onClick={onNew}
             className="w-full p-2 hover:bg-itin-sand-100 rounded transition-colors flex items-center justify-center"
@@ -63,7 +63,7 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {conversations.length === 0 ? (
           !isCollapsed && (
             <div className="p-4 text-sm text-itin-sand-500 text-center">

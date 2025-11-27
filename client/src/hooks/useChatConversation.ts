@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   useConversations,
   useMessages,
@@ -15,6 +15,7 @@ interface UseChatConversationOptions {
 
 export const useChatConversation = (options: UseChatConversationOptions = {}) => {
   const { conversationTitle, autoCreate = true, persistKey } = options;
+  const hasTriedCreateRef = useRef(false);
   
   // Helper to get localStorage key
   const getStorageKey = (suffix: string) => 
@@ -86,23 +87,29 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
 
   // Initialize or reuse conversation
   useEffect(() => {
-    if (autoCreate && !conversationId) {
+    if (autoCreate && !conversationId && !conversationsQuery.isLoading && !hasTriedCreateRef.current) {
       if (conversationTitle) {
         const existingConvo = conversations.find(c => c.title === conversationTitle);
         if (existingConvo) {
           setConversationId(existingConvo.id);
+          hasTriedCreateRef.current = true;
           return;
         }
       }
       
-      createConversationMutation.mutateAsync().then(convo => {
-        setConversationId(convo.id);
-      }).catch(e => {
-        const error = e as Error;
-        setError(error?.message ?? "Failed to create conversation");
-      });
+      // Only create if not already creating
+      if (!createConversationMutation.isPending) {
+        hasTriedCreateRef.current = true;
+        createConversationMutation.mutateAsync().then(convo => {
+          setConversationId(convo.id);
+        }).catch(e => {
+          const error = e as Error;
+          setError(error?.message ?? "Failed to create conversation");
+          hasTriedCreateRef.current = false; // Allow retry on error
+        });
+      }
     }
-  }, [autoCreate, conversationId, conversations, conversationTitle, createConversationMutation]);
+  }, [autoCreate, conversationId, conversationTitle, conversations, conversationsQuery.isLoading]);
 
   // Load messages from server (only if we don't have cached messages)
   useEffect(() => {
@@ -154,6 +161,7 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
     setSelectedImage(null);
     setImagePreview(null);
     setError(null);
+    hasTriedCreateRef.current = false; // Reset so new conversation can be created
     if (persistKey) {
       localStorage.removeItem(getStorageKey('conversationId')!);
       localStorage.removeItem(getStorageKey('messages')!);
