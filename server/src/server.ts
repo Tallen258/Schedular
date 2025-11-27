@@ -78,18 +78,20 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
+// Public routes (no auth required)
+app.use("/api/events", eventsRoutes);
+app.use("/api", eventsRoutes);  // For /api/calendar/events endpoint
+
+// Protected routes (auth required)
 app.use(requireAuth);
 
 if (db) {
   app.use("/api/conversations", conversationsRouter(db));
 }
 
-
 app.use("/api", authRoutes);
 app.use("/api/auth/google", googleOAuthRoutes);
 app.use("/api/google/calendar", googleCalendarRoutes);
-app.use("/api/events", eventsRoutes);
-app.use("/api", eventsRoutes);  // For /api/calendar/events endpoint
 app.use("/api/chat", chatRoutes);
 app.use("/api/schedule", scheduleCompareRoutes);
 

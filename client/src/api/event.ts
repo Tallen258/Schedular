@@ -1,4 +1,24 @@
 import api from '../services/api';
+import { 
+  getAnonymousEvents, 
+  saveAnonymousEvent, 
+  updateAnonymousEvent, 
+  deleteAnonymousEvent,
+  type LocalEvent 
+} from '../utils/localStorage';
+
+// Helper to check if user is authenticated
+const isAuthenticated = (): boolean => {
+  const oidcStorageKey = `oidc.user:https://auth-dev.snowse.io/realms/DevRealm:taft-chat`;
+  const oidcStorage = localStorage.getItem(oidcStorageKey);
+  if (!oidcStorage) return false;
+  try {
+    const user = JSON.parse(oidcStorage);
+    return !!user?.access_token;
+  } catch {
+    return false;
+  }
+};
 
 export interface Event {
   id: number;
@@ -46,30 +66,99 @@ export interface DeleteEventResponse {
 
 
 export const getEvents = async (): Promise<Event[]> => {
+  console.log('[getEvents] Checking authentication...');
+  const authenticated = isAuthenticated();
+  console.log('[getEvents] Is authenticated:', authenticated);
+  
+  // For anonymous users, return localStorage events
+  if (!authenticated) {
+    const localEvents = getAnonymousEvents();
+    console.log('[getEvents] Returning localStorage events:', localEvents);
+    return localEvents;
+  }
+  
+  // For authenticated users, fetch from API
+  console.log('[getEvents] Fetching from API...');
   const response = await api.get<EventsResponse>('/api/events');
+  console.log('[getEvents] API response:', response.data);
   return response.data.events;
 };
 
 
 export const getEventById = async (id: number): Promise<Event> => {
+  // For anonymous users, get from localStorage
+  if (!isAuthenticated()) {
+    const events = getAnonymousEvents();
+    const event = events.find(e => e.id === id);
+    if (!event) throw new Error('Event not found');
+    return event;
+  }
+  
+  // For authenticated users, fetch from API
   const response = await api.get<EventResponse>(`/api/events/${id}`);
   return response.data.event;
 };
 
 
 export const createEvent = async (input: CreateEventInput): Promise<Event> => {
+  console.log('[createEvent] Input:', input);
+  console.log('[createEvent] Checking authentication...');
+  const authenticated = isAuthenticated();
+  console.log('[createEvent] Is authenticated:', authenticated);
+  
+  // For anonymous users, save to localStorage
+  if (!authenticated) {
+    const newEvent = saveAnonymousEvent({
+      user_email: 'anonymous',
+      title: input.title,
+      description: input.description || null,
+      location: input.location || null,
+      start_time: input.start_time,
+      end_time: input.end_time,
+      all_day: input.all_day || false,
+    });
+    console.log('[createEvent] Saved to localStorage:', newEvent);
+    return newEvent;
+  }
+  
+  // For authenticated users, post to API
+  console.log('[createEvent] Posting to API...');
   const response = await api.post<EventResponse>('/api/events', input);
+  console.log('[createEvent] API response:', response.data);
   return response.data.event;
 };
 
 
 export const updateEvent = async (id: number, input: UpdateEventInput): Promise<Event> => {
+  // For anonymous users, update in localStorage
+  if (!isAuthenticated()) {
+    const updated = updateAnonymousEvent(id, {
+      title: input.title,
+      description: input.description || null,
+      location: input.location || null,
+      start_time: input.start_time,
+      end_time: input.end_time,
+      all_day: input.all_day || false,
+    });
+    if (!updated) throw new Error('Event not found');
+    return updated;
+  }
+  
+  // For authenticated users, put to API
   const response = await api.put<EventResponse>(`/api/events/${id}`, input);
   return response.data.event;
 };
 
 
 export const deleteEvent = async (id: number): Promise<void> => {
+  // For anonymous users, delete from localStorage
+  if (!isAuthenticated()) {
+    const success = deleteAnonymousEvent(id);
+    if (!success) throw new Error('Event not found');
+    return;
+  }
+  
+  // For authenticated users, delete via API
   await api.delete<DeleteEventResponse>(`/api/events/${id}`);
 };
 

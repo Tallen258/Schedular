@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from 'react-oidc-context';
 import toast from 'react-hot-toast';
 
 export interface ActionNotification {
@@ -103,6 +104,7 @@ const agenticRules: AgenticRule[] = [
 export function AgenticActionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = useAuth();
   
   const [notifications, setNotifications] = useState<ActionNotification[]>([]);
   const [recentActions, setRecentActions] = useState<AgenticAction[]>([]);
@@ -122,6 +124,11 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
   }, [location.pathname]);
 
   const executeEffect = useCallback((effect: AgenticRule['effects'][0]) => {
+    // Only execute AI effects for authenticated users
+    if (!auth.isAuthenticated) {
+      return;
+    }
+    
     const delay = effect.delay || 0;
     
     setTimeout(() => {
@@ -166,7 +173,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
           break;
       }
     }, delay);
-  }, [navigate]);
+  }, [navigate, auth.isAuthenticated]);
 
   const recordAction = useCallback((trigger: string, context: Record<string, unknown> = {}) => {
     const action: AgenticAction = {
@@ -208,13 +215,15 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     };
     setNotifications(prev => [notification, ...prev].slice(0, 20));
 
-    // Evaluate agentic rules
-    agenticRules.forEach(rule => {
-      if (rule.condition(action, appState)) {
-        console.log(`🤖 Agentic rule triggered: ${rule.name}`);
-        rule.effects.forEach(effect => executeEffect(effect));
-      }
-    });
+    // Evaluate agentic rules (only for authenticated users)
+    if (auth.isAuthenticated) {
+      agenticRules.forEach(rule => {
+        if (rule.condition(action, appState)) {
+          console.log(`🤖 Agentic rule triggered: ${rule.name}`);
+          rule.effects.forEach(effect => executeEffect(effect));
+        }
+      });
+    }
 
     // Show simple toast for important actions
     if (context.type === 'success') {
@@ -222,7 +231,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     } else if (context.type === 'error') {
       toast.error((context.message as string) || 'Action failed');
     }
-  }, [location.pathname, recentActions, userBehavior, executeEffect]);
+  }, [location.pathname, recentActions, userBehavior, executeEffect, auth.isAuthenticated]);
 
   return (
     <AgenticActionContext.Provider

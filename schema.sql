@@ -11,7 +11,7 @@ create table if not exists google_tokens (
 
 create table if not exists events (
   id serial primary key,
-  user_email text not null,
+  user_email text,
   title text not null,
   description text,
   location text,

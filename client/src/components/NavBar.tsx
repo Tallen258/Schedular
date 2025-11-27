@@ -14,17 +14,25 @@ const NavBar: React.FC = () => {
       <div className="nav-brand">
         <Link to="/home">Schedular</Link>
       </div>
-      {auth.isAuthenticated && (
-        <div className="nav-links">
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/calendar">Calendar</Link>
-          <Link to="/create-event">Create Event</Link>
-          <Link to="/compare">Compare</Link>
-          <Link to="/settings">Settings</Link>
-          <Link to="/help">Help</Link>
-          <Link to="/chat">AI Chat</Link>
-        </div>
-      )}
+      <div className="nav-links">
+        {auth.isAuthenticated ? (
+          <>
+            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/calendar">Calendar</Link>
+            <Link to="/create-event">Create Event</Link>
+            <Link to="/compare">Compare</Link>
+            <Link to="/settings">Settings</Link>
+            <Link to="/help">Help</Link>
+            <Link to="/chat">AI Chat</Link>
+          </>
+        ) : (
+          <>
+            <Link to="/calendar">Calendar</Link>
+            <Link to="/create-event">Create Event</Link>
+            <Link to="/help">Help</Link>
+          </>
+        )}
+      </div>
       <div className="nav-auth">
         {auth.isAuthenticated && (
           <button 

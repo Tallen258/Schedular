@@ -33,6 +33,7 @@ const STORAGE_KEYS = {
   THEME_PREFERENCE: 'schedular_theme',
   LAST_SYNC: 'schedular_last_sync',
   SCHEDULE_COMPARE: 'schedular_schedule_compare',
+  ANONYMOUS_EVENTS: 'schedular_anonymous_events',
 } as const;
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -156,5 +157,92 @@ export function clearScheduleCompareState(): void {
     localStorage.removeItem(STORAGE_KEYS.SCHEDULE_COMPARE);
   } catch (error) {
     console.error('Error clearing schedule compare state:', error);
+  }
+}
+
+// Anonymous Events Management
+export interface LocalEvent {
+  id: number;
+  user_email: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  start_time: string;
+  end_time: string;
+  all_day: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export function getAnonymousEvents(): LocalEvent[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.ANONYMOUS_EVENTS);
+    if (!stored) return [];
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error('Error reading anonymous events:', error);
+    return [];
+  }
+}
+
+export function saveAnonymousEvent(event: Omit<LocalEvent, 'id' | 'created_at' | 'updated_at'>): LocalEvent {
+  try {
+    const events = getAnonymousEvents();
+    const newId = events.length > 0 ? Math.max(...events.map(e => e.id)) + 1 : 1;
+    const now = new Date().toISOString();
+    const newEvent: LocalEvent = {
+      ...event,
+      id: newId,
+      created_at: now,
+      updated_at: now,
+    };
+    events.push(newEvent);
+    localStorage.setItem(STORAGE_KEYS.ANONYMOUS_EVENTS, JSON.stringify(events));
+    return newEvent;
+  } catch (error) {
+    console.error('Error saving anonymous event:', error);
+    throw error;
+  }
+}
+
+export function updateAnonymousEvent(id: number, updates: Partial<LocalEvent>): LocalEvent | null {
+  try {
+    const events = getAnonymousEvents();
+    const index = events.findIndex(e => e.id === id);
+    if (index === -1) return null;
+    
+    const updatedEvent = {
+      ...events[index],
+      ...updates,
+      id: events[index].id,
+      updated_at: new Date().toISOString(),
+    };
+    events[index] = updatedEvent;
+    localStorage.setItem(STORAGE_KEYS.ANONYMOUS_EVENTS, JSON.stringify(events));
+    return updatedEvent;
+  } catch (error) {
+    console.error('Error updating anonymous event:', error);
+    throw error;
+  }
+}
+
+export function deleteAnonymousEvent(id: number): boolean {
+  try {
+    const events = getAnonymousEvents();
+    const filtered = events.filter(e => e.id !== id);
+    if (filtered.length === events.length) return false;
+    localStorage.setItem(STORAGE_KEYS.ANONYMOUS_EVENTS, JSON.stringify(filtered));
+    return true;
+  } catch (error) {
+    console.error('Error deleting anonymous event:', error);
+    return false;
+  }
+}
+
+export function clearAnonymousEvents(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.ANONYMOUS_EVENTS);
+  } catch (error) {
+    console.error('Error clearing anonymous events:', error);
   }
 }

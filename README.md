@@ -42,7 +42,7 @@ To analyze calendar pictures for the schedule comparison.
 #### Estimates
 **Rubric Items**
 - [X] Technology: CI/CD pipeline  
-- [ ] Technology: linting in pipeline  
+- [X] Technology: linting in pipeline  
 - [X] Technology: Developer type helping (typescript)  
 - [X] Technology: 10+ pages or views  
 
@@ -102,7 +102,7 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
+- [X] Technology: tests run in pipeline, pipeline aborts if they fail  
 - [X] Technology: authentication and user account support (OAuth integration)  
 - [X] Technology: Network Calls that read and write data  
 
@@ -127,9 +127,8 @@ To analyze calendar pictures for the schedule comparison.
 
 **Features**
 - [X] Image Review page (verify/edit parsed times)  
-- [ ] Compare Schedule page (upload photo or add participant)  
-- [ ] Autonomous action `suggestFreeTimeSlots`  
-- [ ] Confirmation action `createEvent` integrated  
+- [X] Compare Schedule page (upload photo or add participant)  
+- [X] Autonomous action `suggestFreeTimeSlots`  
 
 #### Delivered
 **Rubric Items:** [X] Form inputs (datetime-local, text, textarea, checkbox, select), [X] Layout components (card, navbar, sidebar, form layouts)
@@ -149,7 +148,7 @@ To analyze calendar pictures for the schedule comparison.
 - [ ] Agent loop MVP (`AI Chat` view stream + confirm/deny)  
 - [ ] Persist decisions in `agent_actions` + show Action Log  
 - [ ] `rescheduleEvent` wired with confirm  
-- [ ] Spinners and disabled states  
+- [X] Spinners and disabled states  
 
 #### Delivered
 **Rubric Items:** [X] TanStack Query state management, [X] Full CRUD network calls with mutations, [X] Toast notifications throughout app
@@ -166,7 +165,7 @@ To analyze calendar pictures for the schedule comparison.
 - [X] Technology: Network Calls that read and write data  
 
 **Features**
-- [ ] `compareSchedulesAndPropose` 
+- [X] `compareSchedulesAndPropose` 
 - [ ] Confirmation → `createEvent`  
 - [ ] Compare Schedule view shows top slots + reasons  
 - [ ] Event Detail page (conflict display)  
@@ -200,7 +199,7 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
+- [X] Technology: tests run in pipeline, pipeline aborts if they fail  
 - [X] Technology: authentication and user account support  
 - [X] Technology: Loading states and user feedback  
 

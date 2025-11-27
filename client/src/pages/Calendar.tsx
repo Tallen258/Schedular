@@ -14,6 +14,10 @@ const Calendar = () => {
   const { data: events, isLoading, error } = useEvents();
   const settings = getUserSettings();
 
+  console.log('[Calendar] Events data:', events);
+  console.log('[Calendar] Is loading:', isLoading);
+  console.log('[Calendar] Error:', error);
+
   const formatTime12Hour = (time24: string) => {
     const [hours, minutes] = time24.split(':');
     const hour = parseInt(hours);
@@ -30,6 +34,8 @@ const Calendar = () => {
     allDay: event.all_day,
     resource: event, 
   }));
+
+  console.log('[Calendar] Calendar events:', calendarEvents);
 
   const handleSelectEvent = (event: RbcEvent) => {
     navigate(`/event/${event.id}`);

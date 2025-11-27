@@ -6,7 +6,10 @@ const router = Router();
 
 
 router.get("/calendar/events", (req: Request, res: Response) => {
-  if (!req.user?.email) return res.status(401).send("Login required");
+  // Public endpoint - return empty array if not logged in
+  if (!req.user?.email) {
+    return res.json({ events: [] });
+  }
 
   const mockEvents = [
     {
@@ -39,19 +42,31 @@ router.get("/calendar/events", (req: Request, res: Response) => {
 
 router.get("/", async (req: Request, res: Response) => {
   try {
-    if (!req.user?.email) return res.status(401).send("Login required");
-    
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
     }
 
-    const events = await db.any(`
-      select id, user_email, title, description, location, 
-             start_time, end_time, all_day, created_at, updated_at
-      from events
-      where user_email = $1
-      order by start_time asc
-    `, [req.user.email]);
+    let events;
+    
+    // For authenticated users, get their events
+    if (req.user?.email) {
+      events = await db.any(`
+        select id, user_email, title, description, location, 
+               start_time, end_time, all_day, created_at, updated_at
+        from events
+        where user_email = $1
+        order by start_time asc
+      `, [req.user.email]);
+    } else {
+      // For anonymous users, get anonymous events
+      events = await db.any(`
+        select id, user_email, title, description, location, 
+               start_time, end_time, all_day, created_at, updated_at
+        from events
+        where user_email = 'anonymous' OR user_email IS NULL
+        order by start_time asc
+      `);
+    }
 
     res.json({ events });
   } catch (e: any) {
@@ -62,7 +77,10 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.get("/:id", async (req: Request, res: Response) => {
   try {
-    if (!req.user?.email) return res.status(401).send("Login required");
+    // Public endpoint - return 404 if not logged in
+    if (!req.user?.email) {
+      return res.status(404).json({ error: "Event not found" });
+    }
     
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
@@ -88,7 +106,8 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
   try {
-    if (!req.user?.email) return res.status(401).send("Login required");
+    // Public endpoint - use 'anonymous' if not logged in
+    const userEmail = req.user?.email || 'anonymous';
     
     if (!db) {
       return res.status(503).json({ error: "Database not configured" });
@@ -108,7 +127,7 @@ router.post("/", async (req: Request, res: Response) => {
       values ($1, $2, $3, $4, $5, $6, $7)
       returning id, user_email, title, description, location, start_time, end_time, all_day, created_at, updated_at
     `, [
-      req.user.email,
+      userEmail,
       title,
       description || null,
       location || null,
