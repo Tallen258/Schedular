@@ -6,7 +6,7 @@ import {
   syncGoogleCalendarEvents, 
   importGoogleCalendarEvent,
   type GoogleCalendarEvent
-} from "../api/event";
+} from "../api/googleCalendar";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface SyncGoogleCalendarProps {

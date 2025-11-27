@@ -89,7 +89,7 @@ const Notifications = () => {
   return (
     <PageContainer>
       <Card>
-        <PageHeader title="Notifications" />
+        <PageHeader title="Session Notifications" />
         
         <div className="mt-6">
           {notifications.length === 0 ? (
