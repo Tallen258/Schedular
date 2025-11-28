@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatForDatetimeLocal, formatTime, formatDuration } from '../../utils/dateUtils';
+import { formatForDatetimeLocal, formatTime, formatDuration } from '../../src/utils/dateUtils';
 
 describe('dateUtils', () => {
   describe('formatForDatetimeLocal', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EventSchema, CreateEventSchema, UpdateEventSchema } from '../../types/event';
+import { EventSchema, CreateEventSchema, UpdateEventSchema } from '../../src/types/event';
 
 describe('Event Schemas', () => {
   describe('EventSchema', () => {

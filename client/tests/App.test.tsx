@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
-import App from '../App';
+import App from '../src/App';
 
 // Mock OIDC configuration
 const mockOidcConfig = {
