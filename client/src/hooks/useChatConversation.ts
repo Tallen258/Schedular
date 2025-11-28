@@ -1,50 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  useConversations,
-  useMessages,
-  useCreateConversation,
-  usePostMessage,
-} from './useAIChat';
+import { useConversations, useMessages, useCreateConversation, usePostMessage } from './useAIChat';
 import type { ChatMessage } from '../api/chat';
 
 interface UseChatConversationOptions {
   conversationTitle?: string;
   autoCreate?: boolean;
-  persistKey?: string; // Key for localStorage persistence
+  persistKey?: string;
 }
 
 export const useChatConversation = (options: UseChatConversationOptions = {}) => {
   const { conversationTitle, autoCreate = true, persistKey } = options;
   const hasTriedCreateRef = useRef(false);
   
-  // Helper to get localStorage key
-  const getStorageKey = (suffix: string) => 
-    persistKey ? `chat_${persistKey}_${suffix}` : null;
+  const getKey = (suffix: string) => persistKey ? `chat_${persistKey}_${suffix}` : null;
+  const getStored = (key: string | null, fallback: any = null) => 
+    key ? (localStorage.getItem(key) ?? fallback) : fallback;
 
-  // Initialize state from localStorage if available
   const [conversationId, setConversationId] = useState<number | null>(() => {
-    if (!persistKey) return null;
-    const stored = localStorage.getItem(getStorageKey('conversationId')!);
+    const stored = getStored(getKey('conversationId'));
     return stored ? Number(stored) : null;
   });
-
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    if (!persistKey) return [];
-    const stored = localStorage.getItem(getStorageKey('messages')!);
+    const stored = getStored(getKey('messages'));
     return stored ? JSON.parse(stored) : [];
   });
-
-  const [input, setInput] = useState(() => {
-    if (!persistKey) return "";
-    return localStorage.getItem(getStorageKey('input')!) || "";
-  });
-
+  const [input, setInput] = useState(() => getStored(getKey('input'), ""));
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(() => {
-    if (!persistKey) return null;
-    return localStorage.getItem(getStorageKey('imagePreview')!) || null;
-  });
-
+  const [imagePreview, setImagePreview] = useState<string | null>(() => getStored(getKey('imagePreview')));
   const [error, setError] = useState<string | null>(null);
 
   const conversationsQuery = useConversations();
@@ -53,82 +35,52 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
   const postMessageMutation = usePostMessage();
   const messagesQuery = useMessages(conversationId);
 
-  // Persist conversationId to localStorage
+  // Persist to localStorage
   useEffect(() => {
-    if (persistKey && conversationId !== null) {
-      localStorage.setItem(getStorageKey('conversationId')!, String(conversationId));
-    }
-  }, [conversationId, persistKey]);
-
-  // Persist messages to localStorage
-  useEffect(() => {
-    if (persistKey && messages.length > 0) {
-      localStorage.setItem(getStorageKey('messages')!, JSON.stringify(messages));
-    }
-  }, [messages, persistKey]);
-
-  // Persist input to localStorage
-  useEffect(() => {
-    if (persistKey) {
-      localStorage.setItem(getStorageKey('input')!, input);
-    }
-  }, [input, persistKey]);
-
-  // Persist imagePreview to localStorage
-  useEffect(() => {
-    if (persistKey) {
-      if (imagePreview) {
-        localStorage.setItem(getStorageKey('imagePreview')!, imagePreview);
-      } else {
-        localStorage.removeItem(getStorageKey('imagePreview')!);
-      }
-    }
-  }, [imagePreview, persistKey]);
+    if (!persistKey) return;
+    const idKey = getKey('conversationId')!;
+    const msgKey = getKey('messages')!;
+    const inputKey = getKey('input')!;
+    const imgKey = getKey('imagePreview')!;
+    
+    if (conversationId !== null) localStorage.setItem(idKey, String(conversationId));
+    if (messages.length > 0) localStorage.setItem(msgKey, JSON.stringify(messages));
+    localStorage.setItem(inputKey, input);
+    imagePreview ? localStorage.setItem(imgKey, imagePreview) : localStorage.removeItem(imgKey);
+  }, [conversationId, messages, input, imagePreview, persistKey]);
 
   // Initialize or reuse conversation
   useEffect(() => {
-    if (autoCreate && !conversationId && !conversationsQuery.isLoading && !hasTriedCreateRef.current) {
-      if (conversationTitle) {
-        const existingConvo = conversations.find(c => c.title === conversationTitle);
-        if (existingConvo) {
-          setConversationId(existingConvo.id);
-          hasTriedCreateRef.current = true;
-          return;
-        }
-      }
-      
-      // Only create if not already creating
-      if (!createConversationMutation.isPending) {
-        hasTriedCreateRef.current = true;
-        createConversationMutation.mutateAsync().then(convo => {
-          setConversationId(convo.id);
-        }).catch(e => {
-          const error = e as Error;
-          setError(error?.message ?? "Failed to create conversation");
-          hasTriedCreateRef.current = false; // Allow retry on error
+    if (!autoCreate || conversationId || conversationsQuery.isLoading || hasTriedCreateRef.current) return;
+    
+    const existingConvo = conversationTitle && conversations.find(c => c.title === conversationTitle);
+    if (existingConvo) {
+      setConversationId(existingConvo.id);
+      hasTriedCreateRef.current = true;
+      return;
+    }
+    
+    if (!createConversationMutation.isPending) {
+      hasTriedCreateRef.current = true;
+      createConversationMutation.mutateAsync()
+        .then(convo => setConversationId(convo.id))
+        .catch(e => {
+          setError((e as Error)?.message ?? "Failed to create conversation");
+          hasTriedCreateRef.current = false;
         });
-      }
     }
   }, [autoCreate, conversationId, conversationTitle, conversations, conversationsQuery.isLoading]);
 
-  // Load messages from server (only if we don't have cached messages)
+  // Load messages from server
   useEffect(() => {
-    if (messagesQuery.data) {
-      // Only update if we don't have messages or server has more messages
-      if (messages.length === 0 || messagesQuery.data.length > messages.length) {
-        setMessages(messagesQuery.data);
-      }
+    if (messagesQuery.data && (messages.length === 0 || messagesQuery.data.length > messages.length)) {
+      setMessages(messagesQuery.data);
     }
     if (messagesQuery.error) {
-      const e = messagesQuery.error as Error;
-      const errorMessage = e?.message ?? "Failed to load messages";
-      
-      // If conversation not found (404), clear the invalid ID and let autoCreate handle it
+      const errorMessage = (messagesQuery.error as Error)?.message ?? "Failed to load messages";
       if (errorMessage.includes('404') || errorMessage.includes('not found')) {
         setConversationId(null);
-        if (persistKey) {
-          localStorage.removeItem(getStorageKey('conversationId')!);
-        }
+        if (persistKey) localStorage.removeItem(getKey('conversationId')!);
       } else {
         setError(errorMessage);
       }
@@ -150,9 +102,7 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
   const clearImage = () => {
     setSelectedImage(null);
     setImagePreview(null);
-    if (persistKey) {
-      localStorage.removeItem(getStorageKey('imagePreview')!);
-    }
+    if (persistKey) localStorage.removeItem(getKey('imagePreview')!);
   };
 
   const clearConversation = () => {
@@ -161,73 +111,65 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
     setSelectedImage(null);
     setImagePreview(null);
     setError(null);
-    hasTriedCreateRef.current = false; // Reset so new conversation can be created
+    hasTriedCreateRef.current = false;
     if (persistKey) {
-      localStorage.removeItem(getStorageKey('conversationId')!);
-      localStorage.removeItem(getStorageKey('messages')!);
-      localStorage.removeItem(getStorageKey('input')!);
-      localStorage.removeItem(getStorageKey('imagePreview')!);
+      ['conversationId', 'messages', 'input', 'imagePreview'].forEach(key => 
+        localStorage.removeItem(getKey(key)!)
+      );
     }
   };
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!conversationId) return;
-    const content = input.trim();
-    if (!content) return;
+    if (!conversationId || !input.trim()) return;
 
+    const content = input.trim();
     setInput("");
     setError(null);
 
     const optimistic: ChatMessage = {
       id: -Date.now(),
-      conversationId: conversationId,
+      conversationId,
       role: "user",
       content,
       imageUrl: imagePreview || undefined,
       createdAt: new Date().toISOString(),
     };
-    setMessages((m) => [...m, optimistic]);
+    setMessages(m => [...m, optimistic]);
 
     const imageToSend = selectedImage;
     clearImage();
 
     try {
       const data = await postMessageMutation.mutateAsync({
-        conversationId: conversationId,
+        conversationId,
         content,
         imageFile: imageToSend || undefined,
       });
-      setMessages((m) => [
-        ...m.filter((x) => x.id !== optimistic.id),
+      setMessages(m => [
+        ...m.filter(x => x.id !== optimistic.id),
         data.userMessage,
         data.assistantMessage,
       ]);
     } catch (e: unknown) {
-      const error = e as Error;
-      const errorMessage = error?.message ?? "Send failed";
-      
-      // If conversation not found (404), clear the invalid ID
+      const errorMessage = (e as Error)?.message ?? "Send failed";
       if (errorMessage.includes('404') || errorMessage.includes('not found')) {
         setConversationId(null);
         setMessages([]);
         if (persistKey) {
-          localStorage.removeItem(getStorageKey('conversationId')!);
-          localStorage.removeItem(getStorageKey('messages')!);
+          localStorage.removeItem(getKey('conversationId')!);
+          localStorage.removeItem(getKey('messages')!);
         }
         setError("Conversation was deleted. Please try sending your message again.");
       } else {
         setError(errorMessage);
       }
-      
-      setMessages((m) => m.filter((x) => x.id !== optimistic.id));
+      setMessages(m => m.filter(x => x.id !== optimistic.id));
       setInput(content);
       if (imageToSend) {
         setSelectedImage(imageToSend);
         const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview(reader.result as string);
-        };
+        reader.onloadend = () => setImagePreview(reader.result as string);
         reader.readAsDataURL(imageToSend);
       }
     }

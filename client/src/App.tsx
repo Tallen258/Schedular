@@ -42,32 +42,28 @@ export default function App() {
             <NavBar />
             <div className="main-content">
               <Routes>
-                {/* Redirect root to /home */}
                 <Route index element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
 
-              {/* OIDC callback route (must match your redirect_uri path) */}
-              <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/account" element={<Navigate to="/home" replace />} />
 
-              {/* If your post_logout_redirect_uri is /account, funnel it to /home */}
-              <Route path="/account" element={<Navigate to="/home" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/create-event" element={<CreateEvent />} />
+                <Route path="/event/:id" element={<EventDetail />} />
+                <Route path="/compare" element={<CompareSchedules />} />
+                <Route path="/image-review" element={<ImageReview />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/chat" element={<AIChat />} />
+                <Route path="/chat/:conversationId" element={<AIChat />} />
+                <Route path="/notifications" element={<Notifications />} />
 
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/create-event" element={<CreateEvent />} />
-              <Route path="/event/:id" element={<EventDetail />} />
-              <Route path="/compare" element={<CompareSchedules />} />
-              <Route path="/image-review" element={<ImageReview />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/chat" element={<AIChat />} />
-              <Route path="/chat/:conversationId" element={<AIChat />} />
-              <Route path="/notifications" element={<Notifications />} />
-
-              <Route path="*" element={<div className="p-4">Not Found</div>} />
-            </Routes>
-          </div>
-        </Suspense>
+                <Route path="*" element={<div className="p-4">Not Found</div>} />
+              </Routes>
+            </div>
+          </Suspense>
         </AgenticActionProvider>
       </ErrorBoundary>
     </>

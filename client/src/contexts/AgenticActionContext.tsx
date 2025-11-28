@@ -3,103 +3,19 @@ import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import toast from 'react-hot-toast';
+import { agenticRules } from './agenticRules';
+import { formatTrigger } from '../utils/stringUtils';
+import type { 
+  ActionNotification, 
+  AgenticAction, 
+  AgenticRule, 
+  AppState, 
+  AgenticActionContextType 
+} from './types';
 
-export interface ActionNotification {
-  id: string;
-  message: string;
-  type: 'success' | 'info' | 'warning' | 'error';
-  action?: string;
-  timestamp: Date;
-}
-
-interface AgenticAction {
-  trigger: string;
-  context: Record<string, unknown>;
-  timestamp: Date;
-}
-
-interface AgenticRule {
-  name: string;
-  condition: (action: AgenticAction, appState: AppState) => boolean;
-  effects: Array<{
-    type: 'navigate' | 'openPanel' | 'suggest' | 'autoExecute';
-    payload: unknown;
-    delay?: number;
-  }>;
-}
-
-interface AppState {
-  currentPath: string;
-  recentActions: AgenticAction[];
-  userBehavior: {
-    frequentPaths: Map<string, number>;
-    actionPatterns: Map<string, string[]>; // action -> likely next actions
-  };
-}
-
-interface AgenticActionContextType {
-  recordAction: (trigger: string, context?: Record<string, unknown>) => void;
-  notifications: ActionNotification[];
-}
+export type { ActionNotification };
 
 const AgenticActionContext = createContext<AgenticActionContextType | undefined>(undefined);
-
-// Agentic Rules - The "brain" of the system
-const agenticRules: AgenticRule[] = [
-  {
-    name: 'auto-navigate-after-create',
-    condition: (action, state) => 
-      action.trigger === 'event_created' && 
-      state.currentPath === '/create-event',
-    effects: [
-      { type: 'navigate', payload: '/calendar', delay: 800 }
-    ]
-  },
-  {
-    name: 'auto-navigate-after-delete',
-    condition: (action, state) => 
-      action.trigger === 'event_deleted' && 
-      state.currentPath.includes('/event/'),
-    effects: [
-      { type: 'navigate', payload: '/calendar', delay: 800 }
-    ]
-  },
-  {
-    name: 'auto-open-chat-on-error',
-    condition: (action) => 
-      action.trigger === 'error' && 
-      (action.context?.retryCount as number) >= 2,
-    effects: [
-      { type: 'suggest', payload: { 
-        message: 'Having trouble? Ask AI assistant for help?',
-        action: '/chat'
-      }, delay: 1500 }
-    ]
-  },
-  {
-    name: 'smart-dashboard-redirect',
-    condition: (action, state) => {
-      // If user frequently goes to dashboard after calendar, predict and suggest
-      const pattern = state.userBehavior.actionPatterns.get('view_calendar');
-      return (
-        action.trigger === 'view_calendar' && 
-        pattern ? pattern.includes('view_dashboard') : false
-      );
-    },
-    effects: [
-      { type: 'suggest', payload: { 
-        message: 'View dashboard overview?',
-        action: '/dashboard'
-      }, delay: 3000 }
-    ]
-  },
-  {
-    name: 'auto-collapse-sidebar-on-schedule-view',
-    condition: (action) => 
-      action.trigger === 'schedule_analyzed',
-    effects: []
-  }
-];
 
 export function AgenticActionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -220,7 +136,7 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
       agenticRules.forEach(rule => {
         if (rule.condition(action, appState)) {
           console.log(`Agentic rule triggered: ${rule.name}`);
-          rule.effects.forEach(effect => executeEffect(effect));
+          rule.effects.forEach((effect: AgenticRule['effects'][0]) => executeEffect(effect));
         }
       });
     }
@@ -254,10 +170,3 @@ export const useAgenticAction = () => {
   }
   return context;
 };
-
-function formatTrigger(trigger: string): string {
-  return trigger
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
