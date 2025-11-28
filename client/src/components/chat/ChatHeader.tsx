@@ -4,7 +4,7 @@ interface ChatHeaderProps {
   onToggleSidebar: () => void;
 }
 
-const ChatHeader = ({ title, isSidebarOpen, onToggleSidebar }: ChatHeaderProps) => {
+const ChatHeader = ({ title, onToggleSidebar }: ChatHeaderProps) => {
   return (
     <div className="p-4 border-b border-itin-sand-200 bg-custom-white flex items-center justify-between flex-shrink-0">
       <button

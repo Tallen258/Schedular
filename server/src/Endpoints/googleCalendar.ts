@@ -3,9 +3,9 @@ import { Router, type Request, type Response } from "express";
 import { google } from "googleapis";
 import { db } from "../server";
 import { oauth2 } from "./googleOAuth";
+import { upsertGoogleEvent, mapGoogleEvent } from "../services/googleCalendarHelpers";
 
 const router = Router();
-
 
 async function getCalendarClientFor(userEmail: string) {
   if (!db) throw new Error("DB not configured");
@@ -23,7 +23,6 @@ async function getCalendarClientFor(userEmail: string) {
     expiry_date: Number(row.expiry_ms),
   });
 
-  // keep DB updated when googleapis refreshes tokens
   oauth2.on("tokens", async (t) => {
     try {
       if (!db) return;
@@ -47,61 +46,36 @@ async function getCalendarClientFor(userEmail: string) {
   return google.calendar({ version: "v3", auth: oauth2 });
 }
 
-/**
- * Get upcoming Google Calendar events for the authenticated user
- */
 router.get("/upcoming", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
-    
-    if (!db) {
-      return res.status(503).json({ 
-        error: "Database not configured. Please set DATABASE_URL environment variable and ensure PostgreSQL is running." 
-      });
-    }
+    if (!db) return res.status(503).json({ error: "Database not configured" });
     
     const cal = await getCalendarClientFor(req.user.email);
-
-    const nowIso = new Date().toISOString();
     const { data } = await cal.events.list({
       calendarId: "primary",
-      timeMin: nowIso,
+      timeMin: new Date().toISOString(),
       singleEvents: true,
       orderBy: "startTime",
       maxResults: 25,
     });
 
-    const items = (data.items ?? []).map(e => ({
-      id: e.id!,
-      summary: e.summary ?? "(no title)",
-      start: e.start?.dateTime ?? e.start?.date ?? null,
-      end: e.end?.dateTime ?? e.end?.date ?? null,
-      location: e.location ?? null,
-      attendees: (e.attendees ?? []).map(a => ({ email: a.email ?? "", responseStatus: a.responseStatus })),
-      hangoutLink: e.hangoutLink ?? null,
-    }));
-
-    res.json({ items });
+    res.json({ items: (data.items ?? []).map(mapGoogleEvent) });
   } catch (e: any) {
     console.error("Error fetching Google Calendar events:", e);
     res.status(500).json({ error: e.message ?? "Failed to fetch events" });
   }
 });
 
-
 router.post("/sync", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
-    
-    if (!db) {
-      return res.status(503).json({ error: "Database not configured" });
-    }
+    if (!db) return res.status(503).json({ error: "Database not configured" });
     
     const cal = await getCalendarClientFor(req.user.email);
-    const nowIso = new Date().toISOString();
     const { data } = await cal.events.list({
       calendarId: "primary",
-      timeMin: nowIso,
+      timeMin: new Date().toISOString(),
       singleEvents: true,
       orderBy: "startTime",
       maxResults: 50,
@@ -120,66 +94,11 @@ router.post("/sync", async (req: Request, res: Response) => {
         continue;
       }
 
-      const title = gEvent.summary ?? "(No title)";
-      const description = gEvent.description ?? null;
-      const location = gEvent.location ?? null;
-      const googleEventId = gEvent.id!;
-      
-      const isAllDay = !gEvent.start?.dateTime;
-
       try {
-        const existing = await db.oneOrNone(`
-          select id from events 
-          where user_email = $1 and google_event_id = $2
-        `, [req.user.email, googleEventId]);
-
-        if (existing) {
-          // Update existing event
-          const event = await db.one(`
-            update events
-            set title = $3, description = $4, location = $5, 
-                start_time = $6, end_time = $7, all_day = $8, 
-                updated_at = now()
-            where id = $1 and user_email = $2
-            returning id, user_email, title, description, location, 
-                      start_time, end_time, all_day, google_event_id, 
-                      created_at, updated_at
-          `, [
-            existing.id,
-            req.user.email,
-            title,
-            description,
-            location,
-            startTime,
-            endTime,
-            isAllDay
-          ]);
-          importedEvents.push(event);
-        } else {
-          // Insert new event
-          const event = await db.one(`
-            insert into events (
-              user_email, title, description, location, 
-              start_time, end_time, all_day, google_event_id
-            )
-            values ($1, $2, $3, $4, $5, $6, $7, $8)
-            returning id, user_email, title, description, location, 
-                      start_time, end_time, all_day, google_event_id, 
-                      created_at, updated_at
-          `, [
-            req.user.email,
-            title,
-            description,
-            location,
-            startTime,
-            endTime,
-            isAllDay,
-            googleEventId
-          ]);
-          importedEvents.push(event);
-        }
+        const event = await upsertGoogleEvent(req.user.email, gEvent, gEvent.id!);
+        importedEvents.push(event);
       } catch (err: any) {
-        console.error(`Failed to import event ${googleEventId}:`, err);
+        console.error(`Failed to import event ${gEvent.id}:`, err);
         skippedCount++;
       }
     }
@@ -197,88 +116,25 @@ router.post("/sync", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST /import/:eventId - Import a single Google Calendar event
- */
 router.post("/import/:eventId", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
-    
-    if (!db) {
-      return res.status(503).json({ error: "Database not configured" });
-    }
+    if (!db) return res.status(503).json({ error: "Database not configured" });
     
     const cal = await getCalendarClientFor(req.user.email);
     const eventId = req.params.eventId;
 
-    // Fetch the specific event from Google Calendar
     const { data: gEvent } = await cal.events.get({
       calendarId: "primary",
       eventId: eventId,
     });
 
-    const startTime = gEvent.start?.dateTime ?? gEvent.start?.date;
-    const endTime = gEvent.end?.dateTime ?? gEvent.end?.date;
-    
-    if (!startTime || !endTime) {
-      return res.status(400).json({ error: "Event missing time information" });
-    }
+    const existing = await db.oneOrNone(
+      `select id from events where user_email = $1 and google_event_id = $2`,
+      [req.user.email, eventId]
+    );
 
-    const title = gEvent.summary ?? "(No title)";
-    const description = gEvent.description ?? null;
-    const location = gEvent.location ?? null;
-    const isAllDay = !gEvent.start?.dateTime;
-
-    // Check if event already exists
-    const existing = await db.oneOrNone(`
-      select id from events 
-      where user_email = $1 and google_event_id = $2
-    `, [req.user.email, eventId]);
-
-    let event;
-    if (existing) {
-      // Update existing event
-      event = await db.one(`
-        update events
-        set title = $3, description = $4, location = $5, 
-            start_time = $6, end_time = $7, all_day = $8, 
-            updated_at = now()
-        where id = $1 and user_email = $2
-        returning id, user_email, title, description, location, 
-                  start_time, end_time, all_day, google_event_id, 
-                  created_at, updated_at
-      `, [
-        existing.id,
-        req.user.email,
-        title,
-        description,
-        location,
-        startTime,
-        endTime,
-        isAllDay
-      ]);
-    } else {
-      // Insert new event
-      event = await db.one(`
-        insert into events (
-          user_email, title, description, location, 
-          start_time, end_time, all_day, google_event_id
-        )
-        values ($1, $2, $3, $4, $5, $6, $7, $8)
-        returning id, user_email, title, description, location, 
-                  start_time, end_time, all_day, google_event_id, 
-                  created_at, updated_at
-      `, [
-        req.user.email,
-        title,
-        description,
-        location,
-        startTime,
-        endTime,
-        isAllDay,
-        eventId
-      ]);
-    }
+    const event = await upsertGoogleEvent(req.user.email, gEvent, eventId);
 
     res.json({ 
       success: true,
