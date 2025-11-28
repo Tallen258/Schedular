@@ -5,6 +5,17 @@ import { useAgenticAction } from '../contexts/AgenticActionContext';
 import EventForm from './EventForm';
 import Spinner from './Spinner';
 
+const formatForInput = (date: Date) => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
+const formatDateTime = (dateString: string) => {
+  return new Date(dateString).toLocaleString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit',
+  });
+};
+
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -16,35 +27,15 @@ const EventDetail = () => {
   const deleteEventMutation = useDeleteEvent();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    start_time: '',
-    end_time: '',
-  });
+  const [formData, setFormData] = useState({ title: '', description: '', start_time: '', end_time: '' });
 
-  // Initialize form data when event loads
   useEffect(() => {
     if (event) {
-      // Convert UTC times to local datetime-local format
-      const startDate = new Date(event.start_time);
-      const endDate = new Date(event.end_time);
-      
-      // Format as YYYY-MM-DDTHH:mm for datetime-local input
-      const formatForInput = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-      };
-      
       setFormData({
         title: event.title,
         description: event.description || '',
-        start_time: formatForInput(startDate),
-        end_time: formatForInput(endDate),
+        start_time: formatForInput(new Date(event.start_time)),
+        end_time: formatForInput(new Date(event.end_time)),
       });
     }
   }, [event]);
@@ -52,33 +43,22 @@ const EventDetail = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      // Convert local datetime to ISO string for API
-      const startISO = new Date(formData.start_time).toISOString();
-      const endISO = new Date(formData.end_time).toISOString();
-      
       await updateEventMutation.mutateAsync({
         id: eventId,
         input: {
           title: formData.title,
           description: formData.description || undefined,
-          start_time: startISO,
-          end_time: endISO,
+          start_time: new Date(formData.start_time).toISOString(),
+          end_time: new Date(formData.end_time).toISOString(),
         },
       });
       setIsEditing(false);
-      
-      // Trigger automatic UI update
       recordAction('event_updated', {
         actionName: 'Event Updated',
         message: `"${formData.title}" has been successfully updated`,
@@ -97,15 +77,10 @@ const EventDetail = () => {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this event?')) {
-      return;
-    }
-
+    if (!confirm('Are you sure you want to delete this event?')) return;
     try {
       const eventTitle = event?.title || 'Event';
       await deleteEventMutation.mutateAsync(eventId);
-      
-      // Trigger automatic UI update with navigation to calendar
       recordAction('event_deleted', {
         actionName: 'Event Deleted',
         message: `"${eventTitle}" has been removed from your calendar`,
@@ -123,24 +98,10 @@ const EventDetail = () => {
     }
   };
 
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
   if (isLoading) {
     return (
       <main className="min-h-screen p-6 bg-itin-sand-50">
-        <section className="mx-auto max-w-2xl card p-6 flex justify-center">
-          <Spinner />
-        </section>
+        <section className="mx-auto max-w-2xl card p-6 flex justify-center"><Spinner /></section>
       </main>
     );
   }
@@ -150,9 +111,7 @@ const EventDetail = () => {
       <main className="min-h-screen p-6 bg-itin-sand-50">
         <section className="mx-auto max-w-2xl card p-6">
           <div className="text-custom-red-700">Failed to load event: {error?.message || 'Event not found'}</div>
-          <button onClick={() => navigate('/dashboard')} className="btn-primary mt-4">
-            Back to Dashboard
-          </button>
+          <button onClick={() => navigate('/dashboard')} className="btn-primary mt-4">Back to Dashboard</button>
         </section>
       </main>
     );
@@ -166,19 +125,12 @@ const EventDetail = () => {
             <div className="itin-header">Event Details</div>
             <div className="accent-bar mt-2" />
           </div>
-          <button
-            onClick={() => navigate('/calendar')}
-            className="btn-secondary"
-          >
-            ← Calendar
-          </button>
+          <button onClick={() => navigate('/calendar')} className="btn-secondary">← Calendar</button>
         </header>
 
         {!isEditing ? (
           <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-bold">{event.title}</h2>
-            </div>
+            <div><h2 className="text-2xl font-bold">{event.title}</h2></div>
 
             <div>
               <div className="form-label">Start</div>
@@ -211,12 +163,7 @@ const EventDetail = () => {
             )}
 
             <div className="flex gap-3 pt-4 border-t border-itin-sand-200">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="btn-primary"
-              >
-                Edit Event
-              </button>
+              <button onClick={() => setIsEditing(true)} className="btn-primary">Edit Event</button>
               <button
                 onClick={handleDelete}
                 className="btn-secondary bg-custom-red-50 text-custom-red-700 hover:bg-custom-red-500 hover:text-white"

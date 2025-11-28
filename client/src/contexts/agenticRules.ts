@@ -1,4 +1,4 @@
-import type { AgenticAction, AgenticRule, AppState } from './types';
+import type { AgenticAction, AgenticRule, AppState } from './types.ts';
 
 export const agenticRules: AgenticRule[] = [
   {
