@@ -18,7 +18,6 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
     <aside className={`bg-custom-white border-r border-itin-sand-200 flex flex-col h-full transition-all duration-300 ease-in-out ${
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
-      {/* Toggle button */}
       <div className={`p-4 border-b border-itin-sand-200 flex items-center flex-shrink-0 ${
         isCollapsed ? 'justify-center' : 'justify-between'
       }`}>
@@ -107,7 +106,7 @@ export default function ChatSidebar({ conversations, activeId, onNew, onSelect, 
                             onDelete(convo.id);
                             setDeletingId(null);
                           }}
-                          className="p-1 bg-custom-red-600 text-white rounded hover:bg-custom-red-700 transition-colors shadow-md"
+                          className="p-1 bg-custom-red-700 text-white rounded hover:bg-custom-red-900 transition-colors shadow-md"
                           title="Confirm delete"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
