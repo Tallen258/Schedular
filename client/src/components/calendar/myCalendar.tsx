@@ -1,5 +1,5 @@
 import { Calendar, Views, type View } from "react-big-calendar";
-import { localizer } from "../utils/calendarLocalizer";
+import { localizer } from "../../utils/calendarLocalizer";
 export type RbcEvent = {
   id?: string;
   title: string;

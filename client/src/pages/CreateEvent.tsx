@@ -4,10 +4,10 @@ import { useCreateEvent } from '../hooks/useEvents';
 import PageContainer from '../components/layout/PageContainer';
 import Card from '../components/layout/Card';
 import PageHeader from '../components/layout/PageHeader';
-import EventForm from '../components/EventForm';
-import EventCreationChat from '../components/EventCreationChat';
+import EventForm from '../components/event/EventForm';
+import EventCreationChat from '../components/event/EventCreationChat';
 import ModeToggle from '../components/ModeToggle';
-import { useAgenticAction } from '../contexts/AgenticActionContext';
+import { useAgenticAction } from '../context/AgenticActionContext';
 
 const CreateEvent = () => {
   const navigate = useNavigate();

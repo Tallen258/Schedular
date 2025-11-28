@@ -1,4 +1,4 @@
-import { useAgenticAction } from '../contexts/AgenticActionContext';
+import { useAgenticAction } from '../context/AgenticActionContext';
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/layout/PageHeader';
 import Card from '../components/layout/Card';

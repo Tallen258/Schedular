@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import Spinner from "./Spinner";
+import Spinner from "../Spinner";
 import GoogleCalendarEventItem from "./GoogleCalendarEventItem";
 import { startGoogleCalendarAuth, getGoogleCalendarEvents, syncGoogleCalendarEvents, 
-  importGoogleCalendarEvent, type GoogleCalendarEvent } from "../api/googleCalendar";
+  importGoogleCalendarEvent, type GoogleCalendarEvent } from "../../api/googleCalendar";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface SyncGoogleCalendarProps {

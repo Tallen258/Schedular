@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEvent, useUpdateEvent, useDeleteEvent } from '../hooks/useEvents';
-import { useAgenticAction } from '../contexts/AgenticActionContext';
+import { useEvent, useUpdateEvent, useDeleteEvent } from '../../hooks/useEvents';
+import { useAgenticAction } from '../../context/AgenticActionContext';
 import EventForm from './EventForm';
-import Spinner from './Spinner';
+import Spinner from '../Spinner';
 
 const formatForInput = (date: Date) => {
   const pad = (n: number) => String(n).padStart(2, '0');

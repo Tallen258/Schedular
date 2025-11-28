@@ -5,7 +5,7 @@ import Home from "./pages/home";
 import Calendar from "./pages/Calendar";
 import Dashboard from "./pages/Dashboard";
 import CreateEvent from "./pages/CreateEvent";
-import EventDetail from "./components/EventDetail";
+import EventDetail from "./components/event/EventDetail";
 import CompareSchedules from "./pages/CompareSchedule";
 import ImageReview from "./pages/ScheduleCompare";
 import Settings from "./pages/Settings";
@@ -14,7 +14,7 @@ import Help from "./pages/Help";
 import AIChat from "./pages/AIChat";
 import Notifications from "./pages/Notifications";
 import NavBar from "./components/NavBar";
-import { AgenticActionProvider } from "./contexts/AgenticActionContext";
+import { AgenticActionProvider } from "./context/AgenticActionContext";
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
   try {

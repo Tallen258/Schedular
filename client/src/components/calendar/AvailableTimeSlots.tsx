@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useEvents } from '../hooks/useEvents';
-import { getAvailableTimeSlots, getTotalAvailableHours } from '../utils/eventOverlap';
-import Spinner from './Spinner';
+import { useEvents } from '../../hooks/useEvents';
+import { getAvailableTimeSlots, getTotalAvailableHours } from '../../utils/eventOverlap';
+import Spinner from '../Spinner';
 
 interface AvailableTimeSlotsProps {
   targetDate?: string;

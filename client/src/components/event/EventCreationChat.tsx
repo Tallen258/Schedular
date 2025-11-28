@@ -1,6 +1,6 @@
-import ChatMessages from './chat/ChatMessages';
-import ChatInput from './chat/ChatInput';
-import { useChatConversation } from '../hooks/useChatConversation';
+import ChatMessages from '../chat/ChatMessages';
+import ChatInput from '../chat/ChatInput';
+import { useChatConversation } from '../../hooks/useChatConversation';
 
 interface EventCreationChatProps {
   onBack: () => void;

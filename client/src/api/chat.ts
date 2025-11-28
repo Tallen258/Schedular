@@ -1,5 +1,5 @@
 // src/api/chat.ts
-import api from '../services/api';
+import api from './client';
 
 export type ChatMessage = {
   id: number;

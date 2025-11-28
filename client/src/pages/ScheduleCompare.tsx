@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAgenticAction } from '../contexts/AgenticActionContext';
+import { useAgenticAction } from '../context/AgenticActionContext';
 import { useEvents } from '../hooks/useEvents';
 import { useWorkdayAvailability } from '../hooks/useWorkdayAvailability';
 import { useAiScheduleCompare } from '../hooks/useAiScheduleCompare';

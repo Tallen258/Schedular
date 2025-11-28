@@ -1,4 +1,4 @@
-import type { GoogleCalendarEvent } from "../api/googleCalendar";
+import type { GoogleCalendarEvent } from "../../api/googleCalendar";
 
 interface GoogleCalendarEventItemProps {
   event: GoogleCalendarEvent;

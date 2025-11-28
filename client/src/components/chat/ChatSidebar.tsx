@@ -1,6 +1,6 @@
 // src/components/ChatSidebar.tsx
 import { useState } from 'react';
-import type { Conversation } from '../api/chat';
+import type { Conversation } from '../../api/chat';
 
 interface ChatSidebarProps {
   conversations: Conversation[];

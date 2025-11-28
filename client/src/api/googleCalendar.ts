@@ -1,4 +1,4 @@
-import api from '../services/api';
+import api from './client';
 import type { Event } from './event';
 
 export interface GoogleCalendarEvent {

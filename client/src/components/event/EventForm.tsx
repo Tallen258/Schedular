@@ -1,6 +1,6 @@
-import TextInput from './forms/TextInput';
-import TextArea from './forms/TextArea';
-import DateTimeInput from './forms/DateTimeInput';
+import TextInput from '../forms/TextInput';
+import TextArea from '../forms/TextArea';
+import DateTimeInput from '../forms/DateTimeInput';
 
 interface EventFormData {
   title: string;

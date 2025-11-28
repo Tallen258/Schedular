@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import Markdown from '../Markdown';
+import Markdown from './Markdown';
 import Spinner from '../Spinner';
 import type { ChatMessage } from '../../api/chat';
 

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Views, type View } from "react-big-calendar";
 import { useEvents } from "../hooks/useEvents";
 import { getUserSettings } from "../utils/localStorage";
-import MyCalendar, { type RbcEvent } from "../components/myCalendar";
-import SyncGoogleCalendar from "../components/SyncGoogleCalendar";
+import MyCalendar, { type RbcEvent } from "../components/calendar/myCalendar";
+import SyncGoogleCalendar from "../components/event/SyncGoogleCalendar";
 import Spinner from "../components/Spinner";
 
 const Calendar = () => {

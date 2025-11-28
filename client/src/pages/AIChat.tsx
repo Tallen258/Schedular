@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ChatSidebar from "../components/ChatSidebar";
+import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatHeader from "../components/chat/ChatHeader";
 import ChatMessages from "../components/chat/ChatMessages";
 import ChatInputForm from "../components/chat/ChatInputForm";
@@ -8,7 +8,7 @@ import { useMessages, usePostMessage } from "../hooks/useAIChat";
 import { useConversationManagement } from "../hooks/useConversationManagement";
 import { useChatInput } from "../hooks/useChatInput";
 import type { ChatMessage } from "../api/chat";
-import "../styles/aiChatResponsive.css";
+import "../assets/styles/aiChatResponsive.css";
 
 const AIChat = () => {
   const { conversationId: paramId } = useParams<{ conversationId: string }>();

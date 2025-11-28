@@ -1,4 +1,4 @@
-import Markdown from '../Markdown';
+import Markdown from './Markdown';
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';

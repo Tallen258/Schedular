@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { apiService } from './api';
+import { apiService } from './client';
 
 export const useHealthCheck = (): UseQueryResult<{ ok: boolean; time: string }, Error> => {
   return useQuery({
