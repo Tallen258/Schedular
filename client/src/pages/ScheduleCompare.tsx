@@ -4,6 +4,7 @@ import { useEvents } from '../hooks/useEvents';
 import { useWorkdayAvailability } from '../hooks/useWorkdayAvailability';
 import { useAiScheduleCompare } from '../hooks/useAiScheduleCompare';
 
+import ModeToggle from '../components/ModeToggle';
 import DateSelector from '../components/scheduleCompare/DateSelector';
 import DayEventsList from '../components/scheduleCompare/DayEventsList';
 import NewEventsOverlapChecker from '../components/scheduleCompare/NewEventsOverlapChecker';
@@ -63,28 +64,12 @@ const ScheduleCompare = () => {
           </div>
         </header>
 
-        <div className="mt-6 flex gap-2 p-1 bg-itin-sand-100 rounded-lg w-fit">
-          <button
-            onClick={() => setComparisonMode('manual')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              comparisonMode === 'manual'
-                ? 'bg-white text-itin-sand-800 shadow-sm'
-                : 'text-itin-sand-600 hover:text-itin-sand-800'
-            }`}
-          >
-            Manual Entry
-          </button>
-          <button
-            onClick={() => setComparisonMode('ai')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              comparisonMode === 'ai'
-                ? 'bg-white text-itin-sand-800 shadow-sm'
-                : 'text-itin-sand-600 hover:text-itin-sand-800'
-            }`}
-          >
-            AI Image Analysis
-          </button>
-        </div>
+        <ModeToggle 
+          mode={comparisonMode}
+          onModeChange={setComparisonMode}
+          manualLabel="Manual Entry"
+          aiLabel="AI Image Analysis"
+        />
 
         <div className="mt-6 space-y-6">
           <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
