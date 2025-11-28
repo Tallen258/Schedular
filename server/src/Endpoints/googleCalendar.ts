@@ -6,9 +6,7 @@ import { oauth2 } from "./googleOAuth";
 
 const router = Router();
 
-/* ──────────────────────────────────────────────────────────────
-   Helper: load calendar client for a user (auto-refresh & keep DB in sync)
-   ────────────────────────────────────────────────────────────── */
+
 async function getCalendarClientFor(userEmail: string) {
   if (!db) throw new Error("DB not configured");
 
@@ -90,9 +88,7 @@ router.get("/upcoming", async (req: Request, res: Response) => {
   }
 });
 
-/**
- * POST /sync - Import Google Calendar events to local database
- */
+
 router.post("/sync", async (req: Request, res: Response) => {
   try {
     if (!req.user?.email) return res.status(401).send("Login required");
@@ -116,7 +112,6 @@ router.post("/sync", async (req: Request, res: Response) => {
     let skippedCount = 0;
 
     for (const gEvent of googleEvents) {
-      // Skip events without proper time information
       const startTime = gEvent.start?.dateTime ?? gEvent.start?.date;
       const endTime = gEvent.end?.dateTime ?? gEvent.end?.date;
       
@@ -130,11 +125,9 @@ router.post("/sync", async (req: Request, res: Response) => {
       const location = gEvent.location ?? null;
       const googleEventId = gEvent.id!;
       
-      // Determine if it's an all-day event (date only, no dateTime)
       const isAllDay = !gEvent.start?.dateTime;
 
       try {
-        // Check if event already exists (by google_event_id)
         const existing = await db.oneOrNone(`
           select id from events 
           where user_email = $1 and google_event_id = $2

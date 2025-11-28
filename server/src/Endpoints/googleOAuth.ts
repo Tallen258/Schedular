@@ -3,6 +3,7 @@ import { Router, type Request, type Response } from "express";
 import crypto from "node:crypto";
 import { google } from "googleapis";
 import { db } from "../server";
+import { requireAuth } from "../auth";
 
 const router = Router();
 
@@ -15,9 +16,6 @@ const oauth2 = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URI!
 );
 
-/* ──────────────────────────────────────────────────────────────
-   Helper: persist Google tokens
-   ────────────────────────────────────────────────────────────── */
 async function saveGoogleTokens(userEmail: string, tokens: {
   access_token?: string | null;
   refresh_token?: string | null;
@@ -47,8 +45,9 @@ async function saveGoogleTokens(userEmail: string, tokens: {
 /**
  * Start: authenticated POST that returns the Google consent URL.
  * Frontend calls with Authorization: Bearer <token> and credentials: "include"
+ * REQUIRES KEYCLOAK AUTH
  */
-router.post("/start", (req: Request, res: Response) => {
+router.post("/start", requireAuth, (req: Request, res: Response) => {
   if (!req.user?.email) return res.status(401).send("Login required");
 
   const state = crypto.randomBytes(16).toString("hex");
@@ -67,10 +66,12 @@ router.post("/start", (req: Request, res: Response) => {
 
 /**
  * Callback: exchange code, save tokens, and redirect to calendar page
+ * PUBLIC ROUTE - Google redirects here, no Keycloak auth needed
  */
 router.get("/callback", async (req: Request, res: Response) => {
   try {
     const { code, state } = req.query;
+    
     if (!code || !state) return res.status(400).send("Missing code/state");
 
     if ((req.session as any).oauth_state !== state) {
@@ -78,10 +79,16 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const who = (req.session as any).link_user_email;
-    if (!who) return res.status(401).send("User context missing—start from /api/auth/google/start");
+    if (!who) {
+      return res.status(401).send("User context missing—start from /api/auth/google/start");
+    }
 
     const { tokens } = await oauth2.getToken(String(code));
     await saveGoogleTokens(who, tokens);  // persist refresh token
+
+    // Clear session state
+    delete (req.session as any).oauth_state;
+    delete (req.session as any).link_user_email;
 
     // redirect back to your app UI (e.g., Calendar page) after linking
     res.redirect((process.env.POST_LINK_REDIRECT ?? "http://localhost:5173") + "/calendar?linked=1");

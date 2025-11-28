@@ -91,9 +91,11 @@ if (db) {
 app.use("/api/chat", requireAuth, chatRoutes);
 app.use("/api/schedule", requireAuth, scheduleCompareRoutes);
 
-// Google OAuth and Calendar routes (require auth)
+// Google OAuth routes - /start requires auth, /callback is public (Google redirects to it)
+app.use("/api/auth/google", googleOAuthRoutes);
+
+// Google Calendar routes (require auth)
 app.use("/api", requireAuth, authRoutes);
-app.use("/api/auth/google", requireAuth, googleOAuthRoutes);
 app.use("/api/google/calendar", requireAuth, googleCalendarRoutes);
 
 

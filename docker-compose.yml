@@ -60,6 +60,19 @@ services:
       - DEV_ALLOW_FAKE_USER=true
       - DATABASE_URL=postgres://schedular_user:schedular_pass@db:5432/schedular
       - POST_LINK_REDIRECT=http://localhost:5173
+      # Google OAuth Configuration - Set these in .env file
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-http://localhost:3000/api/auth/google/callback}
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-in-production}
+      # Keycloak/OIDC Configuration
+      - AUTH_ISSUER=${AUTH_ISSUER:-https://auth-dev.snowse.io/realms/DevRealm}
+      - AUTH_AUDIENCE=${AUTH_AUDIENCE:-taft-chat-api}
+      - OIDC_ISSUER=${OIDC_ISSUER:-https://auth-dev.snowse.io/realms/DevRealm}
+      - OIDC_AUDIENCE=${OIDC_AUDIENCE:-taft-chat}
+      # AI Configuration
+      - AI_BASE_URL=${AI_BASE_URL:-https://ai-snow.reindeer-pinecone.ts.net}
+      - OPENWEBUI_API_KEY=${OPENWEBUI_API_KEY}
     volumes:
       - ./server:/app
       - server_node_modules:/app/node_modules
