@@ -20,13 +20,75 @@ spec:
           image: taftallen/schedular-server:$BUILD_NUMBER
           ports:
             - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3000"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DATABASE_URL
+            - name: CORS_ALLOWED_ORIGINS
+              value: "https://schedular-app.duckdns.org"
+            - name: POST_LINK_REDIRECT
+              value: "https://schedular-app.duckdns.org"
+            # Google OAuth - You need to create a secret for these
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: google-oauth-secret
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: google-oauth-secret
+                  key: GOOGLE_CLIENT_SECRET
+            - name: GOOGLE_REDIRECT_URI
+              value: "https://schedular-app.duckdns.org/api/auth/google/callback"
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: SESSION_SECRET
+            # Keycloak/OIDC Configuration
+            - name: AUTH_ISSUER
+              value: "https://auth-dev.snowse.io/realms/DevRealm"
+            - name: AUTH_AUDIENCE
+              value: "account"
+            - name: OIDC_ISSUER
+              value: "https://auth-dev.snowse.io/realms/DevRealm"
+            - name: OIDC_AUDIENCE
+              value: "taft-chat"
+            # AI Configuration - You need to create a secret for this
+            - name: AI_BASE_URL
+              value: "https://ai-snow.reindeer-pinecone.ts.net"
+            - name: OPENWEBUI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-secret
+                  key: OPENWEBUI_API_KEY
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /api/health
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /api/health
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
