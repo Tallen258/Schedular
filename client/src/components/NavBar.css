@@ -39,6 +39,27 @@
   align-items: center;
 }
 
+.auth-button {
+  background-color: #91653c;
+  color: #fffdfa;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.auth-button:hover {
+  background-color: #744e30;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.auth-button:active {
+  transform: translateY(1px);
+}
+
 /* Hamburger Menu Button */
 .hamburger-menu {
   display: none;
