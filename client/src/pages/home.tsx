@@ -4,7 +4,15 @@ export default function Home() {
   const auth = useAuth();
 
   const handleLogin = () => {
-    void auth?.signinRedirect?.();
+    console.log("Sign In button clicked on home page");
+    console.log("Auth object:", auth);
+    if (auth && auth.signinRedirect) {
+      auth.signinRedirect().catch((err) => {
+        console.error("Sign in redirect error:", err);
+      });
+    } else {
+      console.error("Auth or signinRedirect not available");
+    }
   };
 
   const handleLogout = () => {

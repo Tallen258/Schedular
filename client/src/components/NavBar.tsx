@@ -78,7 +78,20 @@ const NavBar: React.FC = () => {
             Log out
           </button>
         ) : (
-          <button onClick={() => void auth.signinRedirect()} className="auth-button">
+          <button 
+            onClick={() => {
+              console.log("Login button clicked");
+              console.log("Auth state:", { 
+                isLoading: auth.isLoading, 
+                isAuthenticated: auth.isAuthenticated,
+                error: auth.error 
+              });
+              auth.signinRedirect().catch((err) => {
+                console.error("Sign in error:", err);
+              });
+            }} 
+            className="auth-button"
+          >
             Log in
           </button>
         )}

@@ -21,9 +21,18 @@ const oidcConfig: AuthProviderProps = {
   scope: "openid profile email",
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   onSigninCallback: () => {
-    window.location.replace("/home"); // <— send them to Home after processing
+    window.location.replace("/home");
+  },
+  onRemoveUser: () => {
+    console.log("User removed");
   },
 }
+
+console.log("OIDC Config:", {
+  authority: oidcConfig.authority,
+  client_id: oidcConfig.client_id,
+  redirect_uri: oidcConfig.redirect_uri,
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
