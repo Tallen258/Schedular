@@ -20,6 +20,9 @@ dist-ssr
 server/.env
 client/.env
 
+# Kubernetes secrets (never commit real secrets)
+kubernetes/*-secret.yml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
