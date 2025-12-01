@@ -67,7 +67,7 @@ jobs:
           docker build  \
             -f ./client/Dockerfile \
             -t ${{ env.DH_USER }}/schedular-client:${{ github.run_number }} \
-            --build-arg VITE_API_BASE=/api \
+            --build-arg VITE_API_URL=/api \
             ./client
           docker push ${{ env.DH_USER }}/schedular-client:${{ github.run_number }}
 
