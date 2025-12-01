@@ -29,9 +29,9 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 export const apiService = {
-  checkHealth: () => api.get('/api/health'),
+  checkHealth: () => api.get('/health'),
 
-  getWhoAmI: () => api.get('/api/whoami'),
+  getWhoAmI: () => api.get('/whoami'),
 
 
 };

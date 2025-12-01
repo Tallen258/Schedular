@@ -16,12 +16,12 @@ export interface GoogleCalendarResponse {
 }
 
 export const startGoogleCalendarAuth = async (): Promise<{ url: string }> => {
-  const response = await api.post<{ url: string }>('/api/auth/google/start', {});
+  const response = await api.post<{ url: string }>('/auth/google/start', {});
   return response.data;
 };
 
 export const getGoogleCalendarEvents = async (): Promise<GoogleCalendarEvent[]> => {
-  const response = await api.get<GoogleCalendarResponse>('/api/google/calendar/upcoming');
+  const response = await api.get<GoogleCalendarResponse>('/google/calendar/upcoming');
   return response.data.items ?? [];
 };
 
@@ -38,7 +38,7 @@ export const syncGoogleCalendarEvents = async (): Promise<{
     skipped: number;
     total: number;
     events: Event[];
-  }>('/api/google/calendar/sync', {});
+  }>('/google/calendar/sync', {});
   return response.data;
 };
 
@@ -51,6 +51,6 @@ export const importGoogleCalendarEvent = async (eventId: string): Promise<{
     success: boolean;
     event: Event;
     action: 'created' | 'updated';
-  }>(`/api/google/calendar/import/${eventId}`, {});
+  }>(`/google/calendar/import/${eventId}`, {});
   return response.data;
 };

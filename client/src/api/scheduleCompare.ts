@@ -35,11 +35,11 @@ export const compareScheduleWithImage = async (
   formData.append('image', imageFile);
   formData.append('data', JSON.stringify({ date, myEvents, workStartHour, workEndHour }));
 
-  console.log('API: Sending POST request to /api/schedule/compare');
+  console.log('API: Sending POST request to /schedule/compare');
 
   try {
     const response = await api.post<CompareScheduleResponse>(
-      '/api/schedule/compare',
+      '/schedule/compare',
       formData,
       {
         headers: {

@@ -11,9 +11,8 @@ export default defineConfig({
     open: false,       // disable auto-open in Docker
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // <-- change if your server uses another port
+        target: 'http://server:3000', // Use Docker service name
         changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/api/, '')
       }
     }
   },

@@ -19,12 +19,12 @@ export type Conversation = {
 
 
 export async function fetchConversations(): Promise<Conversation[]> {
-  const response = await api.get<Conversation[]>('/api/conversations');
+  const response = await api.get<Conversation[]>('/conversations');
   return response.data;
 }
 
 export async function createConversation(): Promise<Conversation> {
-  const response = await api.post<Conversation>('/api/conversations', {
+  const response = await api.post<Conversation>('/conversations', {
     title: 'New chat',
   });
   return response.data;
@@ -32,7 +32,7 @@ export async function createConversation(): Promise<Conversation> {
 
 
 export async function fetchMessages(conversationId: number): Promise<ChatMessage[]> {
-  const response = await api.get<ChatMessage[]>(`/api/conversations/${conversationId}/messages`);
+  const response = await api.get<ChatMessage[]>(`/conversations/${conversationId}/messages`);
   return response.data;
 }
 
@@ -49,7 +49,7 @@ export async function postMessage(
   if (imageFile) formData.append('image', imageFile);
 
   const response = await api.post<{ userMessage: ChatMessage; assistantMessage: ChatMessage }>(
-    `/api/conversations/${conversationId}/messages`,
+    `/conversations/${conversationId}/messages`,
     formData,
     {
       headers: {
@@ -62,11 +62,11 @@ export async function postMessage(
 
 
 export async function deleteConversation(conversationId: number): Promise<void> {
-  await api.delete(`/api/conversations/${conversationId}`);
+  await api.delete(`/conversations/${conversationId}`);
 }
 
 
 export async function updateConversationTitle(conversationId: number, title: string): Promise<Conversation> {
-  const response = await api.patch<Conversation>(`/api/conversations/${conversationId}`, { title });
+  const response = await api.patch<Conversation>(`/conversations/${conversationId}`, { title });
   return response.data;
 }

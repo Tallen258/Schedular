@@ -66,7 +66,7 @@ export const getEvents = async (): Promise<Event[]> => {
   if (!isAuthenticated()) {
     return getAnonymousEvents();
   }
-  const response = await api.get<EventsResponse>('/api/events');
+  const response = await api.get<EventsResponse>('/events');
   return response.data.events;
 };
 
@@ -77,7 +77,7 @@ export const getEventById = async (id: number): Promise<Event> => {
     if (!event) throw new Error('Event not found');
     return event;
   }
-  const response = await api.get<EventResponse>(`/api/events/${id}`);
+  const response = await api.get<EventResponse>(`/events/${id}`);
   return response.data.event;
 };
 
@@ -93,7 +93,7 @@ export const createEvent = async (input: CreateEventInput): Promise<Event> => {
       all_day: input.all_day || false,
     });
   }
-  const response = await api.post<EventResponse>('/api/events', input);
+  const response = await api.post<EventResponse>('/events', input);
   return response.data.event;
 };
 
@@ -110,7 +110,7 @@ export const updateEvent = async (id: number, input: UpdateEventInput): Promise<
     if (!updated) throw new Error('Event not found');
     return updated;
   }
-  const response = await api.put<EventResponse>(`/api/events/${id}`, input);
+  const response = await api.put<EventResponse>(`/events/${id}`, input);
   return response.data.event;
 };
 
@@ -120,7 +120,7 @@ export const deleteEvent = async (id: number): Promise<void> => {
     if (!success) throw new Error('Event not found');
     return;
   }
-  await api.delete<DeleteEventResponse>(`/api/events/${id}`);
+  await api.delete<DeleteEventResponse>(`/events/${id}`);
 };
 
 export const getEventsByDateRange = async (startDate: Date, endDate: Date): Promise<Event[]> => {
