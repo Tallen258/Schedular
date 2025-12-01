@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useConversations, useMessages, useCreateConversation, usePostMessage } from './useAIChat';
 import type { ChatMessage } from '../api/chat';
 
@@ -12,25 +12,35 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
   const { conversationTitle, autoCreate = true, persistKey } = options;
   const hasTriedCreateRef = useRef(false);
   
-  const getKey = (suffix: string) => persistKey ? `chat_${persistKey}_${suffix}` : null;
-  const getStored = (key: string | null, fallback: any = null) => 
-    key ? (localStorage.getItem(key) ?? fallback) : fallback;
+  const getKey = useCallback((suffix: string) => persistKey ? `chat_${persistKey}_${suffix}` : null, [persistKey]);
 
   const [conversationId, setConversationId] = useState<number | null>(() => {
-    const stored = getStored(getKey('conversationId'));
+    if (!persistKey) return null;
+    const key = `chat_${persistKey}_conversationId`;
+    const stored = localStorage.getItem(key);
     return stored ? Number(stored) : null;
   });
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    const stored = getStored(getKey('messages'));
+    if (!persistKey) return [];
+    const key = `chat_${persistKey}_messages`;
+    const stored = localStorage.getItem(key);
     return stored ? JSON.parse(stored) : [];
   });
-  const [input, setInput] = useState(() => getStored(getKey('input'), ""));
+  const [input, setInput] = useState(() => {
+    if (!persistKey) return "";
+    const key = `chat_${persistKey}_input`;
+    return localStorage.getItem(key) ?? "";
+  });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(() => getStored(getKey('imagePreview')));
+  const [imagePreview, setImagePreview] = useState<string | null>(() => {
+    if (!persistKey) return null;
+    const key = `chat_${persistKey}_imagePreview`;
+    return localStorage.getItem(key);
+  });
   const [error, setError] = useState<string | null>(null);
 
   const conversationsQuery = useConversations();
-  const conversations = conversationsQuery.data ?? [];
+  const conversations = useMemo(() => conversationsQuery.data ?? [], [conversationsQuery.data]);
   const createConversationMutation = useCreateConversation();
   const postMessageMutation = usePostMessage();
   const messagesQuery = useMessages(conversationId);
@@ -46,8 +56,12 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
     if (conversationId !== null) localStorage.setItem(idKey, String(conversationId));
     if (messages.length > 0) localStorage.setItem(msgKey, JSON.stringify(messages));
     localStorage.setItem(inputKey, input);
-    imagePreview ? localStorage.setItem(imgKey, imagePreview) : localStorage.removeItem(imgKey);
-  }, [conversationId, messages, input, imagePreview, persistKey]);
+    if (imagePreview) {
+      localStorage.setItem(imgKey, imagePreview);
+    } else {
+      localStorage.removeItem(imgKey);
+    }
+  }, [conversationId, messages, input, imagePreview, persistKey, getKey]);
 
   // Initialize or reuse conversation
   useEffect(() => {
@@ -69,7 +83,7 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
           hasTriedCreateRef.current = false;
         });
     }
-  }, [autoCreate, conversationId, conversationTitle, conversations, conversationsQuery.isLoading]);
+  }, [autoCreate, conversationId, conversationTitle, conversations, conversationsQuery.isLoading, createConversationMutation]);
 
   // Load messages from server
   useEffect(() => {
@@ -85,7 +99,7 @@ export const useChatConversation = (options: UseChatConversationOptions = {}) =>
         setError(errorMessage);
       }
     }
-  }, [messagesQuery.data, messagesQuery.error, persistKey]);
+  }, [messagesQuery.data, messagesQuery.error, persistKey, getKey, messages.length]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

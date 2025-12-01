@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useConversations,
@@ -9,7 +9,7 @@ import {
 export const useConversationManagement = (activeId: number | null) => {
   const nav = useNavigate();
   const conversationsQuery = useConversations();
-  const conversations = conversationsQuery.data ?? [];
+  const conversations = useMemo(() => conversationsQuery.data ?? [], [conversationsQuery.data]);
   const createConversationMutation = useCreateConversation();
   const deleteConversationMutation = useDeleteConversation();
 

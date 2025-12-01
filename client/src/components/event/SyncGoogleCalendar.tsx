@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Spinner from "../Spinner";
 import GoogleCalendarEventItem from "./GoogleCalendarEventItem";
 import { startGoogleCalendarAuth, getGoogleCalendarEvents, syncGoogleCalendarEvents, 
@@ -19,7 +19,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
   const [syncResult, setSyncResult] = useState<{ imported: number; skipped: number; total: number } | null>(null);
   const [importingEvents, setImportingEvents] = useState<Set<string>>(new Set());
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -31,7 +31,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
     } finally {
       setLoading(false);
     }
-  };
+  }, [onEventsLoaded]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -39,7 +39,7 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
       void loadEvents();
       setIsExpanded(true);
     }
-  }, []);
+  }, [loadEvents]);
 
   const connectGoogle = async () => {
     try {
