@@ -1,8 +1,8 @@
 // src/Endpoints/scheduleCompare.ts
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
-import { uploadScheduleImage } from '../middleware/uploadScheduleImage';
-import { extractEventsFromScheduleImage } from '../services/scheduleExtraction';
+import { uploadScheduleImage } from '../middleware/uploadScheduleImage.js';
+import { extractEventsFromScheduleImage } from '../services/scheduleExtraction.js';
 
 const router = Router();
 

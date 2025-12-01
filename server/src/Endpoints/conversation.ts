@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import type { IDatabase } from "pg-promise";
-import { uploadImage } from "../middleware/uploadImage";
-import { chatWithToolsAndMaybeCreateEvent } from "../services/chatWithTools";
-import { generateTitleFromFirstMessage } from "../services/titleGenerator";
+import { uploadImage } from "../middleware/uploadImage.js";
+import { chatWithToolsAndMaybeCreateEvent } from "../services/chatWithTools.js";
+import { generateTitleFromFirstMessage } from "../services/titleGenerator.js";
 import {
   insertUserMessage,
   insertAssistantMessage,
@@ -10,7 +10,7 @@ import {
   buildMessagesArray,
   updateConversationTitle,
   touchConversation
-} from "../services/conversationHelpers";
+} from "../services/conversationHelpers.js";
 
 export function conversationsRouter(db: IDatabase<unknown>) {
   const r = Router();

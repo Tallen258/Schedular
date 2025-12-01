@@ -1,5 +1,5 @@
 import type { calendar_v3 } from "googleapis";
-import { db } from "../server";
+import { db } from "../server.js";
 
 export async function upsertGoogleEvent(
   userEmail: string,

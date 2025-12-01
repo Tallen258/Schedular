@@ -2,8 +2,8 @@
 import { Router, type Request, type Response } from "express";
 import crypto from "node:crypto";
 import { google } from "googleapis";
-import { db } from "../server";
-import { requireAuth } from "../auth";
+import { db } from "../server.js";
+import { requireAuth } from "../auth.js";
 
 const router = Router();
 

@@ -1,9 +1,9 @@
 // src/routes/googleCalendar.ts
 import { Router, type Request, type Response } from "express";
 import { google } from "googleapis";
-import { db } from "../server";
-import { oauth2 } from "./googleOAuth";
-import { upsertGoogleEvent, mapGoogleEvent } from "../services/googleCalendarHelpers";
+import { db } from "../server.js";
+import { oauth2 } from "./googleOAuth.js";
+import { upsertGoogleEvent, mapGoogleEvent } from "../services/googleCalendarHelpers.js";
 
 const router = Router();
 

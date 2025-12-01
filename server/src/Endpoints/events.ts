@@ -1,7 +1,7 @@
 // src/routes/events.ts
 import { Router, type Request, type Response } from "express";
-import { db } from "../server";
-import { fetchUserEvents, fetchEventById, createEvent, updateEvent, deleteEvent } from "../services/eventHelpers";
+import { db } from "../server.js";
+import { fetchUserEvents, fetchEventById, createEvent, updateEvent, deleteEvent } from "../services/eventHelpers.js";
 
 const router = Router();
 

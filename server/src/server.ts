@@ -6,15 +6,15 @@ import dotenv from "dotenv";
 import pgPromise from "pg-promise";
 
 // Import route modules
-import authRoutes from "./Endpoints/auth";
-import googleOAuthRoutes from "./Endpoints/googleOAuth";
-import googleCalendarRoutes from "./Endpoints/googleCalendar";
-import eventsRoutes from "./Endpoints/events";
-import chatRoutes from "./Endpoints/chat";
-import scheduleCompareRoutes from "./Endpoints/scheduleCompare";
-import { conversationsRouter } from "./Endpoints/conversation";
-import { requireAuth } from "./auth";
-import { optionalAuth } from "./auth";
+import authRoutes from "./Endpoints/auth.js";
+import googleOAuthRoutes from "./Endpoints/googleOAuth.js";
+import googleCalendarRoutes from "./Endpoints/googleCalendar.js";
+import eventsRoutes from "./Endpoints/events.js";
+import chatRoutes from "./Endpoints/chat.js";
+import scheduleCompareRoutes from "./Endpoints/scheduleCompare.js";
+import { conversationsRouter } from "./Endpoints/conversation.js";
+import { requireAuth } from "./auth.js";
+import { optionalAuth } from "./auth.js";
 
 dotenv.config();
 
