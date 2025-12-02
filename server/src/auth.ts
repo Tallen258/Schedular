@@ -3,7 +3,6 @@ import type { Request, Response, NextFunction } from "express";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const ISSUER = process.env.OIDC_ISSUER || "https://auth-dev.snowse.io/realms/DevRealm";
-const AUDIENCE = process.env.OIDC_AUDIENCE || "taft-chat"; // usually your Keycloak client_id (expected aud/azp)
 const JWKS_URI = `${ISSUER}/protocol/openid-connect/certs`;
 const JWKS = createRemoteJWKSet(new URL(JWKS_URI));
 
