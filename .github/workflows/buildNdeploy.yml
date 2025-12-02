@@ -87,6 +87,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create Google OAuth Secret
+        run: |
+          kubectl create secret generic google-oauth-secret \
+            --from-literal=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --from-literal=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --namespace=taft \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Apply Kubernetes Changes
         run: |
           export BUILD_NUMBER=${{ github.run_number }}
