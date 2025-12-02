@@ -27,7 +27,7 @@ services:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:3000
+      - VITE_API_URL=http://localhost:3000/api
       - WATCHPACK_POLLING=true # Enable hot reload on Windows
     volumes:
       - ./client:/app
