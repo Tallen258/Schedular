@@ -22,9 +22,10 @@ export async function verifyJWT(authHeader: string): Promise<User> {
   console.log(token);
   if (!token) throw new Error("No token found");
   
+  // Keycloak tokens have aud="account" and azp="taft-chat", so accept "account"
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: ISSUER,
-    audience: AUDIENCE,   // cryptographic audience check
+    audience: "account",   // Accept "account" which is what Keycloak issues
     clockTolerance: 15,   // small skew tolerance
   });
   
