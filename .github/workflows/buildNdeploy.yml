@@ -95,12 +95,38 @@ jobs:
             --namespace=taft \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Create Postgres Secret
+        run: |
+          kubectl create secret generic postgres-secret \
+            --from-literal=POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}" \
+            --from-literal=DATABASE_URL="postgresql://schedular_user:${{ secrets.POSTGRES_PASSWORD }}@postgres-svc:5432/schedular" \
+            --namespace=taft \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create Session Secret
+        run: |
+          kubectl create secret generic session-secret \
+            --from-literal=SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
+            --namespace=taft \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create AI Secret
+        run: |
+          kubectl create secret generic ai-secret \
+            --from-literal=OPENWEBUI_API_KEY="${{ secrets.OPENWEBUI_API_KEY }}" \
+            --namespace=taft \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Apply Kubernetes Changes
         run: |
           export BUILD_NUMBER=${{ github.run_number }}
 
           for FILE in "kubernetes"/*
           do
+              # Skip secret files as they're handled separately
+              if [[ "$FILE" == *"-secret.yml" ]]; then
+                continue
+              fi
               cat $FILE | envsubst | kubectl apply -f -
           done
             
