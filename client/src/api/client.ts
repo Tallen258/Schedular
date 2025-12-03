@@ -10,7 +10,6 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // Get the OIDC user from localStorage (stored by react-oidc-context)
   const oidcStorageKey = `oidc.user:https://auth-dev.snowse.io/realms/DevRealm:taft-chat`;
   const oidcStorage = localStorage.getItem(oidcStorageKey);
   
