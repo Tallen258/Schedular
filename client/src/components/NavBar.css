@@ -39,25 +39,37 @@
   align-items: center;
 }
 
-.auth-button {
-  background-color: #91653c;
-  color: #fffdfa;
+.nav-link-button {
+  background: none;
   border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
+  color: #666;
+  text-decoration: none;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.95rem;
+  transition: color 0.2s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.auth-button:hover {
-  background-color: #744e30;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.nav-link-button:hover {
+  color: #333;
 }
 
-.auth-button:active {
-  transform: translateY(1px);
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 9999px;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Hamburger Menu Button */

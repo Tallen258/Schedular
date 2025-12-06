@@ -50,6 +50,17 @@ export async function chatWithToolsAndMaybeCreateEvent(options: {
           required: ["title", "start_time", "end_time"]
         }
       }
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_today_schedule",
+        description: "Get the user's schedule for today. Use this when the user asks about their schedule, what they have today, or their agenda for today.",
+        parameters: {
+          type: "object",
+          properties: {}
+        }
+      }
     }
   ];
 
@@ -88,7 +99,53 @@ export async function chatWithToolsAndMaybeCreateEvent(options: {
   if (toolCalls && toolCalls.length > 0) {
     const toolCall = toolCalls[0];
     
-    if (toolCall.function.name === "create_event") {
+    if (toolCall.function.name === "get_today_schedule") {
+      try {
+        // Get today's date
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayDate = `${year}-${month}-${day}`;
+        
+        // Fetch today's events - convert both to date for comparison to handle any timezone differences
+        const events = await db.any(`
+          select id, title, description, location, start_time, end_time, all_day
+          from events
+          where user_email = $1
+            and date(start_time at time zone 'America/Denver') = date($2)
+          order by start_time asc
+        `, [userEmail, todayDate]);
+        
+        const followUpMessages = [
+          ...messages,
+          assistantMessage,
+          {
+            role: "tool",
+            tool_call_id: toolCall.id,
+            name: "get_today_schedule",
+            content: JSON.stringify({ success: true, events, count: events.length })
+          }
+        ];
+        
+        const followUpResponse = await fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ model, messages: followUpMessages, tools, temperature: 0.2 }),
+        });
+        
+        const followUpText = await followUpResponse.text();
+        if (followUpResponse.ok) {
+          const followUpJson = JSON.parse(followUpText);
+          replyContent = followUpJson?.choices?.[0]?.message?.content ?? "Here's your schedule for today.";
+        } else {
+          replyContent = "Here's your schedule for today.";
+        }
+      } catch (toolError: any) {
+        console.error("Tool execution error:", toolError);
+        replyContent = `I tried to fetch your schedule but encountered an error: ${toolError.message}`;
+      }
+    } else if (toolCall.function.name === "create_event") {
       try {
         const args = JSON.parse(toolCall.function.arguments);
         

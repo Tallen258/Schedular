@@ -220,15 +220,15 @@ To analyze calendar pictures for the schedule comparison.
 #### Estimates
 **Rubric Items**
 - [X] mobile Responsive
-- [ ] Project scope is 2–3 times larger than Inventory Management 
-- [ ] Technology: tests run in pipeline, pipeline aborts if they fail  
+- [X] Project scope is 2–3 times larger than Inventory Management 
+- [X] Technology: tests run in pipeline, pipeline aborts if they fail  
 - [X] Technology: linting in pipeline  
 - [X] Technology: CI/CD pipeline  
-- [ ] Production deployment (Kubernetes public URL)
+- [X] Production deployment (Kubernetes public URL)
 
 **Features**
-- [ ] CI tests + lint must pass for deployment  
-- [ ] Polish UX details and bug fixes  
+- [X] CI tests + lint must pass for deployment  
+- [X] Polish UX details and bug fixes  
 
 #### Delivered
 **Rubric Items:**  
@@ -240,12 +240,12 @@ To analyze calendar pictures for the schedule comparison.
 
 #### Estimates
 **Rubric Items**
-- [ ] Technology: CI/CD pipeline  
-- [ ] Professional, organized and smooth experience  
+- [X] Technology: CI/CD pipeline  
+- [X] Professional, organized and smooth experience  
 
 **Features**
-- [ ] CI/CD hardening (secrets + prod config)  
-- [ ] Documentation and cleanup  
+- [X] CI/CD hardening (secrets + prod config)  
+- [X] Documentation and cleanup  
 
 #### Delivered
 **Rubric Items:**  
