@@ -16,7 +16,7 @@ export default function Home() {
   };
 
   const handleLogout = () => {
-    void auth?.signoutRedirect?.();
+    void auth?.removeUser();
   };
 
   if (!auth || !auth.isAuthenticated) {

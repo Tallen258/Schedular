@@ -14,6 +14,7 @@ import Help from "./pages/Help";
 import AIChat from "./pages/AIChat";
 import Notifications from "./pages/Notifications";
 import NavBar from "./components/NavBar";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AgenticActionProvider } from "./context/AgenticActionContext";
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -48,17 +49,17 @@ export default function App() {
 
                 <Route path="/account" element={<Navigate to="/home" replace />} />
 
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/create-event" element={<CreateEvent />} />
-                <Route path="/event/:id" element={<EventDetail />} />
-                <Route path="/compare" element={<CompareSchedules />} />
-                <Route path="/image-review" element={<ImageReview />} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+                <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+                <Route path="/event/:id" element={<ProtectedRoute><EventDetail /></ProtectedRoute>} />
+                <Route path="/compare" element={<ProtectedRoute><CompareSchedules /></ProtectedRoute>} />
+                <Route path="/image-review" element={<ProtectedRoute><ImageReview /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/help" element={<Help />} />
-                <Route path="/chat" element={<AIChat />} />
-                <Route path="/chat/:conversationId" element={<AIChat />} />
-                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/chat" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+                <Route path="/chat/:conversationId" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
 
                 <Route path="*" element={<div className="p-4">Not Found</div>} />
               </Routes>
