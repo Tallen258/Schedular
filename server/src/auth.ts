@@ -1,4 +1,4 @@
-// src/auth.ts
+
 import type { Request, Response, NextFunction } from "express";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
@@ -21,14 +21,12 @@ export async function verifyJWT(authHeader: string): Promise<User> {
   console.log(token);
   if (!token) throw new Error("No token found");
   
-  // Keycloak tokens have aud="account" and azp="taft-chat", so accept "account"
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: ISSUER,
-    audience: "account",   // Accept "account" which is what Keycloak issues
-    clockTolerance: 15,   // small skew tolerance
+    audience: "account",   
+    clockTolerance: 15,   
   });
   
-  // Extract roles from realm_access if present
   const realmAccess = (payload as any).realm_access;
   const roles = realmAccess?.roles ?? [];
   
@@ -57,12 +55,10 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
     next();
   } catch (err: any) {
-    // Keep it descriptive but not leaky
     return res.status(401).json({ error: "Invalid or expired token", detail: String(err?.message || "") });
   }
 }
 
-// Optional auth middleware - sets req.user if token is present and valid, but doesn't fail if missing
 export async function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   try {
     const authHeader = req.header("authorization");
@@ -76,7 +72,6 @@ export async function optionalAuth(req: Request, _res: Response, next: NextFunct
     next();
   } catch (err: any) {
     console.log("optional auth: invalid token, continuing without auth");
-    // Continue without auth even if token is invalid
     next();
   }
 }

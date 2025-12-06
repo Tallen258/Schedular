@@ -1,4 +1,3 @@
-// src/Endpoints/scheduleCompare.ts
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import { uploadScheduleImage } from '../middleware/uploadScheduleImage.js';
@@ -17,12 +16,8 @@ interface CompareScheduleRequest {
   }>;
 }
 
-/**
- * POST /api/schedule/compare
- * Upload an image of a calendar/schedule and extract events, then compare with user's calendar
- */
 router.post('/compare', uploadScheduleImage.single('image'), async (req: Request, res: Response) => {
-  console.log('📸 Schedule compare request received');
+  console.log('Schedule compare request received');
   try {
     if (!req.file) {
       console.error(' No image file in request');
@@ -43,33 +38,27 @@ router.post('/compare', uploadScheduleImage.single('image'), async (req: Request
     console.log('Work hours:', workStartHour, '-', workEndHour);
     console.log('My events count:', myEvents.length);
 
-    // Read the uploaded image file
     const imagePath = req.file.path;
     console.log('Image path:', imagePath);
 
-    // Read and convert image to base64
     const imageBuffer = fs.readFileSync(imagePath);
     const base64Image = imageBuffer.toString('base64');
     const mimeType = req.file.mimetype;
     const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
     console.log('Image converted to base64, size:', base64Image.length);
 
-    // Use AI to extract events from the image
     console.log('Starting AI vision analysis...');
     const extractedEvents = await extractEventsFromScheduleImage(imageDataUrl);
     console.log(' Parsed', extractedEvents.length, 'events from AI response');
 
-    // Convert extracted events to the same format as myEvents for comparison
     const theirEvents = extractedEvents.map(event => ({
       title: event.title,
       start_time: `${event.date || date}T${event.startTime}:00`,
       end_time: `${event.date || date}T${event.endTime}:00`,
     }));
 
-    // Find overlapping time slots and free time slots
     const allEvents = [...myEvents, ...theirEvents];
     
-    // Sort all events by start time
     const sortedEvents = allEvents
       .map(e => ({
         ...e,
@@ -78,7 +67,6 @@ router.post('/compare', uploadScheduleImage.single('image'), async (req: Request
       }))
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    // Calculate free time slots using provided work hours
     const [year, month, day] = date.split('-').map(Number);
     const dayStart = new Date(year, month - 1, day, workStartHour, 0, 0);
     const dayEnd = new Date(year, month - 1, day, workEndHour, 0, 0);
@@ -98,7 +86,6 @@ router.post('/compare', uploadScheduleImage.single('image'), async (req: Request
       }
     }
 
-    // Add remaining time after last event
     if (currentTime < dayEnd) {
       freeSlots.push({
         start: currentTime.toISOString(),
@@ -106,7 +93,6 @@ router.post('/compare', uploadScheduleImage.single('image'), async (req: Request
       });
     }
 
-    // Clean up uploaded file
     fs.unlinkSync(imagePath);
     console.log('  Cleaned up uploaded file');
 
@@ -126,7 +112,6 @@ router.post('/compare', uploadScheduleImage.single('image'), async (req: Request
   } catch (error) {
     console.error('Schedule comparison error:', error);
     
-    // Clean up file if it exists
     if (req.file?.path) {
       try {
         fs.unlinkSync(req.file.path);

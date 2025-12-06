@@ -1,4 +1,3 @@
-// src/api/chat.ts
 import api from './client';
 
 export type ChatMessage = {

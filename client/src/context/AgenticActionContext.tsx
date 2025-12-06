@@ -29,7 +29,6 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     actionPatterns: new Map()
   });
 
-  // Learn user behavior patterns
   useEffect(() => {
     setUserBehavior(prev => {
       const newFrequentPaths = new Map(prev.frequentPaths);
@@ -40,7 +39,6 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
   }, [location.pathname]);
 
   const executeEffect = useCallback((effect: AgenticRule['effects'][0]) => {
-    // Only execute AI effects for authenticated users
     if (!auth.isAuthenticated) {
       return;
     }
@@ -114,14 +112,12 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
       });
     }
 
-    // Build current app state
     const appState: AppState = {
       currentPath: location.pathname,
       recentActions: [action, ...recentActions],
       userBehavior
     };
 
-    // Add notification
     const notification: ActionNotification = {
       id: `${Date.now()}-${Math.random()}`,
       action: (context.actionName as string) || formatTrigger(trigger),
@@ -131,7 +127,6 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
     };
     setNotifications(prev => [notification, ...prev].slice(0, 20));
 
-    // Evaluate agentic rules (only for authenticated users)
     if (auth.isAuthenticated) {
       agenticRules.forEach(rule => {
         if (rule.condition(action, appState)) {
@@ -141,7 +136,6 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
       });
     }
 
-    // Show simple toast for important actions
     if (context.type === 'success') {
       toast.success((context.message as string) || 'Action completed');
     } else if (context.type === 'error') {
@@ -161,8 +155,6 @@ export function AgenticActionProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Exported separately to satisfy react-refresh/only-export-components
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAgenticAction = () => {
   const context = useContext(AgenticActionContext);
   if (!context) {

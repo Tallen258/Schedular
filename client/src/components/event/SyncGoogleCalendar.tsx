@@ -95,10 +95,11 @@ const SyncGoogleCalendar: React.FC<SyncGoogleCalendarProps> = ({ onEventsLoaded 
         </h2>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-itin-sand-600 hover:text-itin-sand-800 transition-colors focus:outline-none"
+          className="text-itin-sand-600 hover:text-itin-sand-800 transition-colors focus:outline-none p-3 text-2xl"
           style={{ color: 'var(--color-itin-sand-600)' }}
+          aria-label={isExpanded ? "Collapse Google Calendar section" : "Expand Google Calendar section"}
         >
-          {isExpanded ? '▼' : '▲'}
+          {isExpanded ?  '▲': '▼'}
         </button>
       </div>
 

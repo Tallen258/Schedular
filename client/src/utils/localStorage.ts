@@ -45,7 +45,6 @@ const DEFAULT_SETTINGS: UserSettings = {
   preferredDays: [1, 2, 3, 4, 5],
 };
 
-// Generic helpers
 const getItem = <T>(key: string, fallback: T): T => {
   try {
     const stored = localStorage.getItem(key);
