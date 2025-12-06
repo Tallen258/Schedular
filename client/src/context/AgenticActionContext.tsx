@@ -13,8 +13,6 @@ import type {
   AgenticActionContextType 
 } from './types';
 
-export type { ActionNotification };
-
 const AgenticActionContext = createContext<AgenticActionContextType | undefined>(undefined);
 
 export function AgenticActionProvider({ children }: { children: ReactNode }) {
