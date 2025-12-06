@@ -4,11 +4,11 @@ export default function Home() {
   const auth = useAuth();
 
   const handleLogin = () => {
-    console.log("Sign In button clicked on home page");
+    console.log("Log in button clicked on home page");
     console.log("Auth object:", auth);
     if (auth && auth.signinRedirect) {
       auth.signinRedirect().catch((err) => {
-        console.error("Sign in redirect error:", err);
+        console.error("Log in redirect error:", err);
       });
     } else {
       console.error("Auth or signinRedirect not available");
@@ -36,7 +36,7 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-3 justify-center mb-12">
               <button onClick={handleLogin} className="btn-primary text-lg px-8 py-3">
-                Sign In
+                Log in
               </button>
             </div>
 
@@ -83,7 +83,7 @@ export default function Home() {
               <p className="text-itin-sand-600 mt-1">{email}</p>
             </div>
             <button onClick={handleLogout} className="btn-secondary">
-              Sign Out
+              Log out
             </button>
           </div>
         </div>
